@@ -122,7 +122,7 @@ def start_chat():
             
             return jsonify({
                 'success': True,
-                'room': room_id
+                'room_id': room_id
             })
     
     # Otherwise create a new room
@@ -139,7 +139,7 @@ def start_chat():
     
     return jsonify({
         'success': True,
-        'room': room_id
+        'room_id': room_id
     })
 
 @chat_bp.route('/admin/chats')
@@ -149,12 +149,28 @@ def admin_chats():
     if not current_user.is_admin:
         return render_template('errors/403.html'), 403
     
-    # Get all chat rooms ordered by activity
-    chat_rooms = ChatRoom.query.filter_by(is_active=True).order_by(ChatRoom.last_activity.desc()).all()
+    # Get active chat rooms ordered by activity
+    active_rooms = ChatRoom.query.filter_by(is_active=True).order_by(ChatRoom.last_activity.desc()).all()
+    
+    # Get archived chat rooms
+    archived_rooms = ChatRoom.query.filter_by(is_active=False).order_by(ChatRoom.last_activity.desc()).all()
+    
+    # Add a "has_unread" flag to each active room
+    for room in active_rooms:
+        room.has_unread = ChatMessage.query.filter_by(
+            room=room.room_id, 
+            is_read=False,
+            is_from_client=True
+        ).count() > 0
+    
+    # Get total chat count
+    total_chats = ChatRoom.query.count()
     
     return render_template('admin/chats.html', 
                           title='Manage Chats',
-                          chat_rooms=chat_rooms)
+                          active_rooms=active_rooms,
+                          archived_rooms=archived_rooms,
+                          total_chats=total_chats)
 
 @chat_bp.route('/admin/chat/<room_id>')
 @login_required
@@ -201,4 +217,14 @@ def unread_message_count():
         return jsonify({'error': 'Unauthorized'}), 403
     
     count = ChatMessage.query.filter_by(is_read=False, is_from_client=True).count()
+    return jsonify({'count': count})
+
+@chat_bp.route('/admin/chat/active-count')
+@login_required
+def active_chat_count():
+    """API endpoint for getting the count of active chat rooms"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    count = ChatRoom.query.filter_by(is_active=True).count()
     return jsonify({'count': count})
