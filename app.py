@@ -8,6 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
+from flask_socketio import SocketIO
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -20,6 +21,7 @@ db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 migrate = Migrate()
 mail = Mail()
+socketio = SocketIO()
 
 # Create the app
 app = Flask(__name__)
@@ -49,10 +51,11 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
 migrate.init_app(app, db)
 mail.init_app(app)
+socketio.init_app(app, cors_allowed_origins="*")
 
 with app.app_context():
     # Import models to ensure they're registered with SQLAlchemy
-    from models import User, Service, TeamMember, CaseStudy, ContactMessage
+    from models import User, Service, TeamMember, CaseStudy, ContactMessage, ChatMessage, ChatRoom
 
     # Import and register blueprints
     from routes.auth_routes import auth_bp
