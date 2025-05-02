@@ -171,6 +171,9 @@
                 chatInterface.classList.remove('d-none');
                 connectionStatus.classList.remove('d-none');
                 
+                // Load existing messages first
+                loadExistingMessages(roomId, name, email);
+                
                 // Initialize socket connection
                 initializeSocketConnection(roomId, name, email);
                 
@@ -185,6 +188,30 @@
             console.error('Error starting chat:', error);
             alert('Failed to start chat. Please try again later.');
         });
+    }
+    
+    // Load existing messages for the chat room
+    function loadExistingMessages(room, name, email) {
+        // Get existing messages from the server (they're already in the template)
+        {% if messages %}
+            // Remove the no messages div if there are messages
+            if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
+                chatMessages.removeChild(noMessagesDiv);
+            }
+            
+            // Add existing messages to the chat
+            {% for message in messages %}
+                const messageData = {
+                    id: {{ message.id }},
+                    content: '{{ message.content|safe }}',
+                    is_from_client: {% if message.is_from_client %}true{% else %}false{% endif %},
+                    client_name: '{{ message.client_name if message.client_name else "" }}',
+                    user: '{{ message.user.username if message.user else "" }}',
+                    timestamp: '{{ message.timestamp }}'
+                };
+                addMessage(messageData);
+            {% endfor %}
+        {% endif %}
     }
     
     // Initialize socket connection
