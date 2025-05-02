@@ -1,0 +1,294 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i> Live Chat Support
+                    </h5>
+                    <span id="chat-status" class="badge bg-success">Connected</span>
+                </div>
+                
+                <!-- Chat Registration Form -->
+                <div id="chat-registration" class="card-body">
+                    <div class="text-center mb-4">
+                        <h4>Start a Conversation</h4>
+                        <p class="text-muted">Please provide your information to begin chatting with our team.</p>
+                    </div>
+                    <form id="chat-form" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="client-name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="client-name" required>
+                            <div class="invalid-feedback">
+                                Please provide your name.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="client-email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="client-email" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Start Chat</button>
+                    </form>
+                </div>
+                
+                <!-- Chat Interface -->
+                <div id="chat-interface" class="d-none">
+                    <div class="card-body chat-messages" id="chat-messages" style="height: 350px; overflow-y: auto;">
+                        <!-- Messages will be inserted here -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="message mb-3 {% if message.is_from_client %}message-client{% else %}message-staff{% endif %}">
+                                    <div class="message-content p-3 rounded {% if message.is_from_client %}bg-light text-dark ms-auto{% else %}bg-primary text-white{% endif %}">
+                                        {{ message.content }}
+                                    </div>
+                                    <div class="message-meta small text-muted mt-1 {% if message.is_from_client %}text-end{% endif %}">
+                                        {% if message.is_from_client %}
+                                            You
+                                        {% elif message.user %}
+                                            {{ message.user.username }}
+                                        {% else %}
+                                            Staff
+                                        {% endif %}
+                                        | {{ message.timestamp.strftime('%H:%M') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="card-footer p-3">
+                        <form id="message-form" class="d-flex">
+                            <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    <i class="fas fa-lock me-1"></i> This chat is secure and your information is protected.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+    // Store DOM elements
+    const chatRegistration = document.getElementById('chat-registration');
+    const chatInterface = document.getElementById('chat-interface');
+    const chatForm = document.getElementById('chat-form');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatStatus = document.getElementById('chat-status');
+    
+    // Chat room ID
+    const roomId = '{{ room }}';
+    let clientName = '';
+    let clientEmail = '';
+    
+    // Check if chat session already exists
+    const checkExistingSession = () => {
+        // If messages exist, show chat interface directly
+        {% if messages and messages|length > 0 %}
+            chatRegistration.classList.add('d-none');
+            chatInterface.classList.remove('d-none');
+            scrollToBottom();
+        {% endif %}
+    };
+    
+    // Initialize Socket.IO connection
+    const socket = io();
+    
+    // Socket event listeners
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        chatStatus.textContent = 'Connected';
+        chatStatus.classList.remove('bg-danger');
+        chatStatus.classList.add('bg-success');
+        
+        // Join room if we have a room ID
+        if (roomId) {
+            socket.emit('join', { room: roomId });
+        }
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        chatStatus.textContent = 'Disconnected';
+        chatStatus.classList.remove('bg-success');
+        chatStatus.classList.add('bg-danger');
+    });
+    
+    socket.on('message', (data) => {
+        appendMessage(data);
+    });
+    
+    socket.on('status', (data) => {
+        console.log(data.msg);
+    });
+    
+    // Form submission for registration
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const nameInput = document.getElementById('client-name');
+        const emailInput = document.getElementById('client-email');
+        
+        // Validate form
+        if (!chatForm.checkValidity()) {
+            e.stopPropagation();
+            chatForm.classList.add('was-validated');
+            return;
+        }
+        
+        clientName = nameInput.value.trim();
+        clientEmail = emailInput.value.trim();
+        
+        // Send registration data to server
+        fetch('/chat/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: clientName,
+                email: clientEmail
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show chat interface
+                chatRegistration.classList.add('d-none');
+                chatInterface.classList.remove('d-none');
+                
+                // Join the room
+                socket.emit('join', { room: data.room });
+                
+                // Add welcome message
+                appendMessage({
+                    content: `Welcome ${clientName}! How can we assist you today?`,
+                    is_from_client: false,
+                    user: 'System',
+                    timestamp: new Date().toISOString()
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    
+    // Form submission for sending messages
+    messageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        
+        if (message) {
+            // Send message to server
+            socket.emit('message', {
+                room: roomId,
+                message: message,
+                is_from_client: true,
+                client_name: clientName,
+                client_email: clientEmail
+            });
+            
+            // Clear input field
+            messageInput.value = '';
+        }
+    });
+    
+    // Function to append a message to the chat
+    function appendMessage(data) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message mb-3 ${data.is_from_client ? 'message-client' : 'message-staff'}`;
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = `message-content p-3 rounded ${data.is_from_client ? 'bg-light text-dark ms-auto' : 'bg-primary text-white'}`;
+        messageContent.textContent = data.content;
+        
+        const messageMeta = document.createElement('div');
+        messageMeta.className = `message-meta small text-muted mt-1 ${data.is_from_client ? 'text-end' : ''}`;
+        
+        // Format the timestamp
+        let timeString;
+        if (data.timestamp) {
+            const timestamp = new Date(data.timestamp);
+            timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        let sender;
+        if (data.is_from_client) {
+            sender = 'You';
+        } else if (data.user) {
+            sender = data.user;
+        } else {
+            sender = 'Staff';
+        }
+        
+        messageMeta.textContent = `${sender} | ${timeString}`;
+        
+        messageDiv.appendChild(messageContent);
+        messageDiv.appendChild(messageMeta);
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    // Function to scroll chat to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        checkExistingSession();
+    });
+</script>
+
+<style>
+    .message {
+        max-width: 85%;
+    }
+    
+    .message-client {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    
+    .message-client .message-content {
+        border-radius: 18px 18px 0 18px !important;
+        max-width: 100%;
+    }
+    
+    .message-staff .message-content {
+        border-radius: 18px 18px 18px 0 !important;
+        max-width: 100%;
+    }
+    
+    .chat-messages {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+</style>
+{% endblock %}

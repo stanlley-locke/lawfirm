@@ -1,0 +1,282 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            <i class="fas fa-comment-dots me-2"></i> 
+                            Chat with 
+                            {% if room.client_name %}
+                                {{ room.client_name }}
+                            {% else %}
+                                Anonymous
+                            {% endif %}
+                        </h5>
+                        {% if room.client_email %}
+                            <div class="small">
+                                <i class="fas fa-envelope me-1"></i> {{ room.client_email }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <a href="{{ url_for('chat.admin_chats') }}" class="btn btn-sm btn-light me-2">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Chats
+                        </a>
+                        <span id="chat-status" class="badge bg-success">Connected</span>
+                    </div>
+                </div>
+                
+                <div class="card-body chat-messages p-0" id="chat-messages" style="height: 400px; overflow-y: auto;">
+                    <div class="p-3">
+                        <!-- Messages will appear here -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="message mb-3 {% if message.is_from_client %}message-client{% else %}message-staff{% endif %}">
+                                    <div class="message-content p-3 rounded {% if message.is_from_client %}bg-light text-dark ms-auto{% else %}bg-primary text-white{% endif %}">
+                                        {{ message.content }}
+                                    </div>
+                                    <div class="message-meta small text-muted mt-1 {% if message.is_from_client %}text-end{% endif %}">
+                                        {% if message.is_from_client %}
+                                            {% if message.client_name %}
+                                                {{ message.client_name }}
+                                            {% else %}
+                                                Client
+                                            {% endif %}
+                                        {% elif message.user %}
+                                            {{ message.user.username }}
+                                        {% else %}
+                                            Staff
+                                        {% endif %}
+                                        | {{ message.timestamp.strftime('%H:%M') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-comments fa-3x mb-3"></i>
+                                <p>No messages yet. Start the conversation!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-footer p-3">
+                    <form id="message-form" class="d-flex">
+                        <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message...">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Client Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> 
+                                {% if room.client_name %}
+                                    {{ room.client_name }}
+                                {% else %}
+                                    <span class="text-muted">Not provided</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Email:</strong> 
+                                {% if room.client_email %}
+                                    <a href="mailto:{{ room.client_email }}">{{ room.client_email }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not provided</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Session Started:</strong> {{ room.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>Session ID:</strong> <span class="text-muted">{{ room.room_id }}</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button id="close-chat-btn" class="btn btn-danger" data-room-id="{{ room.room_id }}">
+                            <i class="fas fa-times me-1"></i> Close Chat Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+    // Store DOM elements
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatStatus = document.getElementById('chat-status');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+    
+    // Chat room ID
+    const roomId = '{{ room.room_id }}';
+    
+    // Initialize Socket.IO connection
+    const socket = io();
+    
+    // Socket event listeners
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        chatStatus.textContent = 'Connected';
+        chatStatus.classList.remove('bg-danger');
+        chatStatus.classList.add('bg-success');
+        
+        // Join room
+        socket.emit('join', { room: roomId });
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        chatStatus.textContent = 'Disconnected';
+        chatStatus.classList.remove('bg-success');
+        chatStatus.classList.add('bg-danger');
+    });
+    
+    socket.on('message', (data) => {
+        appendMessage(data);
+    });
+    
+    socket.on('status', (data) => {
+        console.log(data.msg);
+    });
+    
+    // Form submission for sending messages
+    messageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        
+        if (message) {
+            // Send message to server
+            socket.emit('message', {
+                room: roomId,
+                message: message,
+                is_from_client: false
+            });
+            
+            // Clear input field
+            messageInput.value = '';
+        }
+    });
+    
+    // Close chat button
+    closeChatBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to close this chat session?')) {
+            fetch(`/admin/chat/${roomId}/close`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the chats list
+                    window.location.href = '{{ url_for("chat.admin_chats") }}';
+                }
+            })
+            .catch(error => console.error('Error closing chat:', error));
+        }
+    });
+    
+    // Function to append a message to the chat
+    function appendMessage(data) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message mb-3 ${data.is_from_client ? 'message-client' : 'message-staff'}`;
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = `message-content p-3 rounded ${data.is_from_client ? 'bg-light text-dark ms-auto' : 'bg-primary text-white'}`;
+        messageContent.textContent = data.content;
+        
+        const messageMeta = document.createElement('div');
+        messageMeta.className = `message-meta small text-muted mt-1 ${data.is_from_client ? 'text-end' : ''}`;
+        
+        // Format the timestamp
+        let timeString;
+        if (data.timestamp) {
+            const timestamp = new Date(data.timestamp);
+            timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        let sender;
+        if (data.is_from_client) {
+            sender = data.client_name || 'Client';
+        } else if (data.user) {
+            sender = data.user;
+        } else {
+            sender = 'Staff';
+        }
+        
+        messageMeta.textContent = `${sender} | ${timeString}`;
+        
+        messageDiv.appendChild(messageContent);
+        messageDiv.appendChild(messageMeta);
+        
+        // Find the first child of chatMessages (which is the p-3 div)
+        const messagesContainer = chatMessages.querySelector('.p-3');
+        
+        // If there's a "no messages yet" notice, remove it
+        const noMessagesDiv = messagesContainer.querySelector('.text-center.text-muted.py-5');
+        if (noMessagesDiv) {
+            messagesContainer.removeChild(noMessagesDiv);
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    // Function to scroll chat to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        scrollToBottom();
+    });
+</script>
+
+<style>
+    .message {
+        max-width: 85%;
+    }
+    
+    .message-client {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    
+    .message-client .message-content {
+        border-radius: 18px 18px 0 18px !important;
+        max-width: 100%;
+    }
+    
+    .message-staff .message-content {
+        border-radius: 18px 18px 18px 0 !important;
+        max-width: 100%;
+    }
+    
+    .chat-messages .p-3 {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+</style>
+{% endblock %}

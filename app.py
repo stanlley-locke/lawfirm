@@ -62,11 +62,13 @@ with app.app_context():
     from routes.admin_routes import admin_bp
     from routes.main_routes import main_bp
     from routes.contact_routes import contact_bp
+    from routes.chat_routes import chat_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(contact_bp)
+    app.register_blueprint(chat_bp)
 
     # Create all database tables
     db.create_all()
