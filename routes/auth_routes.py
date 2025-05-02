@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, session
 from flask_login import login_user, logout_user, login_required, current_user
 from urllib.parse import urlparse
+import random
+import string
+import os
 from app import db
 from models import User
-from forms import LoginForm
+from forms import LoginForm, SecretLoginForm
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -65,3 +68,51 @@ def create_admin():
     
     flash('Admin user has been created! You can now log in.', 'success')
     return redirect(url_for('auth.login'))
+
+# Secret admin login page - not linked from anywhere in the UI
+@auth_bp.route('/secret', methods=['GET', 'POST'])
+def secret_login():
+    # If already logged in, redirect to dashboard
+    if current_user.is_authenticated:
+        return redirect(url_for('admin.dashboard'))
+        
+    # Generate a random access code if one doesn't exist in the session
+    if 'secret_access_code' not in session:
+        session['secret_access_code'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    
+    form = SecretLoginForm()
+    if form.validate_on_submit():
+        # Verify the access code
+        if form.access_code.data != session['secret_access_code']:
+            flash('Invalid access code', 'danger')
+            return redirect(url_for('auth.secret_login'))
+            
+        # Check password matches the super admin password
+        correct_password = 'lawyer@2025' # A hardcoded password for the example
+        if form.password.data != correct_password:
+            flash('Invalid password', 'danger')
+            return redirect(url_for('auth.secret_login'))
+            
+        # Look up the admin user
+        admin = User.query.filter_by(username='admin', is_admin=True).first()
+        if not admin:
+            flash('Admin account not configured', 'danger')
+            return redirect(url_for('auth.secret_login'))
+            
+        # Log in as the admin
+        login_user(admin)
+        
+        # Regenerate access code for security
+        session.pop('secret_access_code', None)
+        session['secret_access_code'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        flash('You have been logged in through the secret entrance', 'success')
+        return redirect(url_for('admin.dashboard'))
+        
+    # Show the access code (in a real app, would be sent via email/SMS)
+    access_code = session['secret_access_code']
+    
+    return render_template('admin/auth/secret_login.html', 
+                           title='Secret Admin Access',
+                           form=form,
+                           access_code=access_code)

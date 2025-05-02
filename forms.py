@@ -6,6 +6,10 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
+    
+class SecretLoginForm(FlaskForm):
+    access_code = StringField('Access Code', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
