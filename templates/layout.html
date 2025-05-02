@@ -12,6 +12,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     
+    {% block head_scripts %}{% endblock %}
+    
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
 </head>
@@ -56,6 +58,9 @@
                             <li><a class="dropdown-item" href="{{ url_for('admin.team') }}">Team</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin.cases') }}">Case Studies</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin.messages') }}">Messages</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('chat.admin_chats') }}">
+                                Live Chats <span id="chat-nav-badge" class="badge bg-danger ms-2 d-none">0</span>
+                            </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                         </ul>

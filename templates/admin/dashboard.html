@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 
+{% block head_scripts %}
+<script src="{{ url_for('static', filename='js/admin-chat.js') }}" defer></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row mb-4">
@@ -51,6 +55,57 @@
                     <h2 class="h4">Unread Messages</h2>
                     <p class="display-4">{{ unread_messages_count }}</p>
                     <a href="{{ url_for('admin.messages') }}" class="btn btn-outline-dark btn-sm">View Messages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Live Chat Stats -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center bg-purple text-white" style="background-color: #6f42c1;">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-comments me-2"></i> Live Chat System
+                    </h2>
+                    <a href="{{ url_for('chat.admin_chats') }}" class="btn btn-sm btn-light">Manage Live Chats</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <div class="display-4 text-success">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </div>
+                                    <h3 class="h5">Active Chats</h3>
+                                    <p class="h3 mb-0" id="active-chats-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <div class="display-4 text-danger">
+                                        <i class="fas fa-comment-alt"></i>
+                                    </div>
+                                    <h3 class="h5">Unread Messages</h3>
+                                    <p class="h3 mb-0" id="unread-chat-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <div class="display-4 text-info">
+                                        <i class="fas fa-headset"></i>
+                                    </div>
+                                    <h3 class="h5">Response Time</h3>
+                                    <p class="h3 mb-0">< 5 min</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
