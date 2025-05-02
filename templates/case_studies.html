@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">Case Studies</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Case Studies</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Case Studies Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2>Our Success Stories</h2>
+                <p class="lead">Explore how we've helped our clients achieve successful legal outcomes through strategic representation and expert counsel.</p>
+            </div>
+        </div>
+        
+        <!-- Filter by Service -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <label for="serviceFilter" class="form-label">Filter by Practice Area:</label>
+                        <select id="serviceFilter" class="form-select">
+                            <option value="all">All Practice Areas</option>
+                            <option value="none">No Specific Practice Area</option>
+                            {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if case_studies %}
+        <div class="row">
+            {% for case in case_studies %}
+            <div class="col-md-6 col-lg-4 mb-4 case-study-item" data-service-id="{{ case.service_id|default('none') }}">
+                <div class="card h-100 case-study-card">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h4 mb-3">{{ case.title }}</h3>
+                        {% if case.client %}
+                        <p class="text-muted mb-3">Client: {{ case.client }}</p>
+                        {% endif %}
+                        {% if case.service %}
+                        <div class="mb-3">
+                            <span class="badge bg-secondary">{{ case.service.title }}</span>
+                            {% if case.featured %}
+                            <span class="badge badge-featured">Featured</span>
+                            {% endif %}
+                        </div>
+                        {% elif case.featured %}
+                        <div class="mb-3">
+                            <span class="badge badge-featured">Featured</span>
+                        </div>
+                        {% endif %}
+                        <p class="card-text">{{ case.summary }}</p>
+                        <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="btn btn-outline-primary mt-3">Read Full Case Study</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center">
+            <p>No case studies available at the moment. Please check back soon.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Need Legal Assistance?</h2>
+                <p class="lead mb-5">Our team is ready to help you achieve similar successful outcomes with your legal challenges. Contact us today to discuss your case.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Schedule a Consultation</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">Our Legal Services</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Services</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Services Introduction -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2>Comprehensive Legal Solutions</h2>
+                <p class="lead">We offer a wide range of legal services to meet the needs of individuals, businesses, and organizations. Our attorneys bring expertise and experience to every case, ensuring that you receive the highest quality legal representation.</p>
+            </div>
+        </div>
+        
+        {% if services %}
+        <div class="row">
+            {% for service in services %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 service-card">
+                    <div class="card-body p-4">
+                        {% if service.icon %}
+                        <div class="service-icon text-primary text-center">
+                            <i class="{{ service.icon }}"></i>
+                        </div>
+                        {% else %}
+                        <div class="service-icon text-primary text-center">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="card-title h4 text-center mb-3">{{ service.title }}</h3>
+                        <p class="card-text">{{ service.description|truncate(150) }}</p>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('main.service_detail', slug=service.slug) }}" class="btn btn-outline-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center">
+            <p>Our services are currently being updated. Please check back soon or contact us for more information.</p>
+            <a href="{{ url_for('contact.contact') }}" class="btn btn-primary mt-3">Contact Us</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Approach Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2>Our Legal Approach</h2>
+                <p class="lead">How we work with you to achieve successful outcomes</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="card-title h5">Initial Consultation</h3>
+                        <p class="card-text">We begin by understanding your specific situation and objectives through comprehensive consultation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="card-title h5">Case Assessment</h3>
+                        <p class="card-text">We thoroughly evaluate your case, identifying strengths, challenges, and optimal legal strategies.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <h3 class="card-title h5">Strategy Development</h3>
+                        <p class="card-text">We create a customized legal plan that addresses your unique circumstances and goals.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <h3 class="card-title h5">Execution</h3>
+                        <p class="card-text">We implement your legal strategy with skill and determination while keeping you informed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Client Commitment -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Our Commitment to Clients</h2>
+                <p class="lead mb-5">When you work with LawFirm Name, you can expect:</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-star text-primary me-2"></i>Excellence</h3>
+                        <p class="card-text">We strive for excellence in all aspects of our legal work, bringing our best to every case and client.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-comments text-primary me-2"></i>Communication</h3>
+                        <p class="card-text">We maintain clear, timely communication throughout your case, ensuring you're always informed.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-user-shield text-primary me-2"></i>Advocacy</h3>
+                        <p class="card-text">We advocate zealously for your interests, working tirelessly to achieve your desired outcome.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-handshake text-primary me-2"></i>Integrity</h3>
+                        <p class="card-text">We uphold the highest ethical standards in all our actions and advice to clients.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-lightbulb text-primary me-2"></i>Innovation</h3>
+                        <p class="card-text">We employ creative problem-solving and innovative approaches to address complex legal challenges.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5"><i class="fas fa-globe text-primary me-2"></i>Accessibility</h3>
+                        <p class="card-text">We make ourselves accessible to our clients, responding promptly to questions and concerns.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Need Legal Assistance?</h2>
+                <p class="lead mb-5">Contact our team today to discuss your legal needs and how we can help you achieve the best possible outcome.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Schedule a Consultation</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-0">
+                        {% if service %}Edit Service: {{ service.title }}{% else %}Create New Service{% endif %}
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Service Information</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" 
+                          {% if service %}
+                          action="{{ url_for('admin.edit_service', id=service.id) }}"
+                          {% else %}
+                          action="{{ url_for('admin.new_service') }}"
+                          {% endif %}>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.title.label(class="form-label") }}
+                                    {{ form.title(class="form-control slug-source", placeholder="Service title") }}
+                                    {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.title.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Enter a descriptive title for this service.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.slug.label(class="form-label") }}
+                                    {{ form.slug(class="form-control slug-target", placeholder="service-url-slug") }}
+                                    {% if form.slug.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.slug.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Used in URLs. Will be auto-generated from title if left blank.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="6", placeholder="Detailed description of the service") }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Provide a detailed description of this service.</small>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.icon.label(class="form-label") }}
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-icons"></i></span>
+                                        {{ form.icon(class="form-control", placeholder="fas fa-balance-scale") }}
+                                    </div>
+                                    {% if form.icon.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.icon.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Font Awesome icon class (e.g., fas fa-briefcase). <a href="https://fontawesome.com/icons" target="_blank">Browse icons</a></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.display_order.label(class="form-label") }}
+                                    {{ form.display_order(class="form-control", type="number") }}
+                                    {% if form.display_order.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.display_order.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Lower numbers appear first in listings.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                            <small class="form-text text-muted d-block">Inactive services won't be displayed on the website.</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.services') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if service %}Update Service{% else %}Create Service{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Section (if editing) -->
+    {% if service %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Service Preview</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="card service-card">
+                                <div class="card-body text-center p-4">
+                                    {% if service.icon %}
+                                    <div class="service-icon text-primary">
+                                        <i class="{{ service.icon }}"></i>
+                                    </div>
+                                    {% else %}
+                                    <div class="service-icon text-primary">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </div>
+                                    {% endif %}
+                                    <h3 class="card-title h4">{{ service.title }}</h3>
+                                    <p class="card-text">{{ service.description|truncate(150) }}</p>
+                                    <a href="{{ url_for('main.service_detail', slug=service.slug) }}" class="btn btn-outline-primary" target="_blank">View on Website</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

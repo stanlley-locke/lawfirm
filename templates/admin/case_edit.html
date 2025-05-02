@@ -1,0 +1,215 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-0">
+                        {% if case_study %}Edit Case Study: {{ case_study.title }}{% else %}Create New Case Study{% endif %}
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Case Study Information</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" 
+                          {% if case_study %}
+                          action="{{ url_for('admin.edit_case', id=case_study.id) }}"
+                          {% else %}
+                          action="{{ url_for('admin.new_case') }}"
+                          {% endif %}>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form.title.label(class="form-label") }}
+                                    {{ form.title(class="form-control slug-source", placeholder="Case study title") }}
+                                    {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.title.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.client.label(class="form-label") }}
+                                    {{ form.client(class="form-control", placeholder="Client name or type") }}
+                                    {% if form.client.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.client.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Optional. Can be anonymized if confidential.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    {{ form.slug.label(class="form-label") }}
+                                    {{ form.slug(class="form-control slug-target", placeholder="case-study-url-slug") }}
+                                    {% if form.slug.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.slug.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Used in URLs. Will be auto-generated from title if left blank.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form.service_id.label(class="form-label") }}
+                                    {{ form.service_id(class="form-control") }}
+                                    {% if form.service_id.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.service_id.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.summary.label(class="form-label") }}
+                            {{ form.summary(class="form-control", rows="4", placeholder="Brief overview of the case") }}
+                            {% if form.summary.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.summary.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">A concise summary that will appear in listings.</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.challenge.label(class="form-label") }}
+                            {{ form.challenge(class="form-control", rows="4", placeholder="Describe the legal challenge or problem") }}
+                            {% if form.challenge.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.challenge.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.solution.label(class="form-label") }}
+                            {{ form.solution(class="form-control", rows="4", placeholder="Describe how your firm approached the challenge") }}
+                            {% if form.solution.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.solution.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.outcome.label(class="form-label") }}
+                            {{ form.outcome(class="form-control", rows="4", placeholder="Describe the results and benefits achieved") }}
+                            {% if form.outcome.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.outcome.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.featured(class="form-check-input") }}
+                                    {{ form.featured.label(class="form-check-label") }}
+                                    <small class="form-text text-muted d-block">Featured case studies appear on the homepage and are highlighted in listings.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.is_active(class="form-check-input") }}
+                                    {{ form.is_active.label(class="form-check-label") }}
+                                    <small class="form-text text-muted d-block">Inactive case studies won't be displayed on the website.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.cases') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if case_study %}Update Case Study{% else %}Create Case Study{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Section (if editing) -->
+    {% if case_study %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Case Study Preview</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-10 offset-md-1">
+                            <div class="card case-study-card">
+                                <div class="card-body p-4">
+                                    <h3 class="card-title h4 mb-3">{{ case_study.title }}</h3>
+                                    
+                                    {% if case_study.featured %}
+                                    <div class="mb-3">
+                                        <span class="badge badge-featured">Featured Case Study</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if case_study.client %}
+                                    <p class="text-muted mb-3">Client: {{ case_study.client }}</p>
+                                    {% endif %}
+                                    
+                                    {% if case_study.service %}
+                                    <p class="mb-3">Practice Area: {{ case_study.service.title }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="mb-3">
+                                        <h4 class="h6">Summary</h4>
+                                        <p>{{ case_study.summary }}</p>
+                                    </div>
+                                    
+                                    <a href="{{ url_for('main.case_study_detail', slug=case_study.slug) }}" class="btn btn-outline-primary" target="_blank">View on Website</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

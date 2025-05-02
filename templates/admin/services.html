@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">Manage Services</h1>
+                    <a href="{{ url_for('admin.new_service') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Service
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">All Services</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="5%">ID</th>
+                                    <th width="20%">Title</th>
+                                    <th width="35%">Description</th>
+                                    <th width="10%">Display Order</th>
+                                    <th width="10%">Status</th>
+                                    <th width="20%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if services %}
+                                    {% for service in services %}
+                                    <tr>
+                                        <td>{{ service.id }}</td>
+                                        <td>
+                                            {% if service.icon %}
+                                            <i class="{{ service.icon }} me-2 text-primary"></i>
+                                            {% endif %}
+                                            {{ service.title }}
+                                        </td>
+                                        <td>{{ service.description|truncate(100) }}</td>
+                                        <td>{{ service.display_order }}</td>
+                                        <td>
+                                            {% if service.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('main.service_detail', slug=service.slug) }}" class="btn btn-sm btn-outline-info" target="_blank" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_service', id=service.id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" onclick="confirmDelete('delete-service-{{ service.id }}', 'service')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            <form id="delete-service-{{ service.id }}" action="{{ url_for('admin.delete_service', id=service.id) }}" method="POST" class="d-none">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No services found. <a href="{{ url_for('admin.new_service') }}">Add a new service</a>.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Navigation -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <div>
+                            <a href="{{ url_for('admin.team') }}" class="btn btn-outline-primary me-2">Manage Team</a>
+                            <a href="{{ url_for('admin.cases') }}" class="btn btn-outline-primary me-2">Manage Case Studies</a>
+                            <a href="{{ url_for('admin.messages') }}" class="btn btn-outline-primary">Manage Messages</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

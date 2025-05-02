@@ -1,0 +1,140 @@
+/* Custom styles for Law Firm website */
+
+/* General styles */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* Hero section */
+.hero-section {
+    padding: 6rem 0;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Service cards */
+.service-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Team member cards */
+.team-card {
+    transition: transform 0.3s ease-in-out;
+    height: 100%;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+}
+
+.team-social a {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Case study cards */
+.case-study-card {
+    transition: transform 0.3s ease-in-out;
+    height: 100%;
+}
+
+.case-study-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+    padding: 3rem 0;
+}
+
+.footer a {
+    color: var(--bs-light);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--bs-info);
+}
+
+/* Admin dashboard */
+.dashboard-stat {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.dashboard-stat i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Custom form styling */
+.form-control:focus {
+    border-color: var(--bs-info);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), 0.25);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    padding: 0.75rem 0;
+}
+
+/* Page headers */
+.page-header {
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+}
+
+/* Custom table styling for admin tables */
+.admin-table th {
+    border-top: none;
+}
+
+/* Custom badge styling */
+.badge-featured {
+    background-color: var(--bs-warning);
+    color: var(--bs-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 4rem 0;
+    }
+    
+    .service-icon {
+        font-size: 2rem;
+    }
+}

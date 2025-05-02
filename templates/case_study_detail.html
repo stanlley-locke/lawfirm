@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">{{ case_study.title }}</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.case_studies') }}">Case Studies</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ case_study.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Case Study Detail Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Case Study Overview -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        {% if case_study.featured %}
+                        <div class="mb-3">
+                            <span class="badge badge-featured">Featured Case Study</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.client %}
+                        <div class="mb-4">
+                            <h3 class="h5">Client</h3>
+                            <p>{{ case_study.client }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.service %}
+                        <div class="mb-4">
+                            <h3 class="h5">Practice Area</h3>
+                            <p><a href="{{ url_for('main.service_detail', slug=case_study.service.slug) }}">{{ case_study.service.title }}</a></p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <h3 class="h5">Summary</h3>
+                            <p>{{ case_study.summary }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Case Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="h4 mb-0">Case Details</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if case_study.challenge %}
+                        <div class="mb-4">
+                            <h3 class="h5">The Challenge</h3>
+                            <p>{{ case_study.challenge }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.solution %}
+                        <div class="mb-4">
+                            <h3 class="h5">Our Approach & Solution</h3>
+                            <p>{{ case_study.solution }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.outcome %}
+                        <div>
+                            <h3 class="h5">The Outcome</h3>
+                            <p>{{ case_study.outcome }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Related Case Studies -->
+                {% if related_cases %}
+                <div class="mt-5">
+                    <h3 class="mb-4">Related Case Studies</h3>
+                    <div class="row">
+                        {% for case in related_cases %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 case-study-card">
+                                <div class="card-body p-4">
+                                    <h4 class="card-title h5">{{ case.title }}</h4>
+                                    {% if case.client %}
+                                    <p class="text-muted mb-3">Client: {{ case.client }}</p>
+                                    {% endif %}
+                                    <p class="card-text">{{ case.summary|truncate(100) }}</p>
+                                    <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="btn btn-outline-primary mt-3">Read Case Study</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Key Takeaways -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 mb-0">Key Takeaways</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Strategic legal approach tailored to client needs</li>
+                            <li class="list-group-item">Expert navigation of complex legal challenges</li>
+                            <li class="list-group-item">Dedication to achieving optimal client outcomes</li>
+                            <li class="list-group-item">Thorough understanding of legal and industry contexts</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Contact Sidebar -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Need Similar Results?</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Contact our team to discuss how we can help you achieve similar successful outcomes with your legal challenges.</p>
+                        <a href="{{ url_for('contact.contact') }}" class="btn btn-primary w-100">Schedule a Consultation</a>
+                    </div>
+                </div>
+                
+                <!-- Related Services -->
+                {% if case_study.service %}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Explore Related Service</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="h6">{{ case_study.service.title }}</h4>
+                        <p>{{ case_study.service.description|truncate(150) }}</p>
+                        <a href="{{ url_for('main.service_detail', slug=case_study.service.slug) }}" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Let Us Help You Succeed</h2>
+                <p class="lead mb-5">Our experienced legal team can help you navigate your complex legal challenges and achieve the best possible outcome.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Contact Us Today</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

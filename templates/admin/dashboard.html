@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-0">Admin Dashboard</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card dashboard-stat h-100 bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-briefcase"></i>
+                    <h2 class="h4">Services</h2>
+                    <p class="display-4">{{ services_count }}</p>
+                    <a href="{{ url_for('admin.services') }}" class="btn btn-outline-light btn-sm">Manage Services</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card dashboard-stat h-100 bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-users"></i>
+                    <h2 class="h4">Team Members</h2>
+                    <p class="display-4">{{ team_members_count }}</p>
+                    <a href="{{ url_for('admin.team') }}" class="btn btn-outline-light btn-sm">Manage Team</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 mb-md-0">
+            <div class="card dashboard-stat h-100 bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-file-alt"></i>
+                    <h2 class="h4">Case Studies</h2>
+                    <p class="display-4">{{ case_studies_count }}</p>
+                    <a href="{{ url_for('admin.cases') }}" class="btn btn-outline-light btn-sm">Manage Cases</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-stat h-100 bg-warning text-dark">
+                <div class="card-body">
+                    <i class="fas fa-envelope"></i>
+                    <h2 class="h4">Unread Messages</h2>
+                    <p class="display-4">{{ unread_messages_count }}</p>
+                    <a href="{{ url_for('admin.messages') }}" class="btn btn-outline-dark btn-sm">View Messages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Messages -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Recent Messages</h2>
+                    <a href="{{ url_for('admin.messages') }}" class="btn btn-sm btn-outline-primary">View All Messages</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_messages %}
+                                    {% for message in recent_messages %}
+                                    <tr {% if not message.is_read %}class="table-warning"{% endif %}>
+                                        <td>{{ message.name }}</td>
+                                        <td><a href="mailto:{{ message.email }}">{{ message.email }}</a></td>
+                                        <td>{{ message.subject|truncate(30) }}</td>
+                                        <td>{{ message.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% if message.is_read %}
+                                            <span class="badge bg-success">Read</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark">Unread</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No recent messages</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Quick Actions</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="d-grid">
+                                <a href="{{ url_for('admin.new_service') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-plus-circle me-2"></i>Add New Service
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="d-grid">
+                                <a href="{{ url_for('admin.new_team_member') }}" class="btn btn-outline-success">
+                                    <i class="fas fa-plus-circle me-2"></i>Add Team Member
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="d-grid">
+                                <a href="{{ url_for('admin.new_case') }}" class="btn btn-outline-info">
+                                    <i class="fas fa-plus-circle me-2"></i>Add Case Study
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-grid">
+                                <a href="{{ url_for('main.index') }}" target="_blank" class="btn btn-outline-secondary">
+                                    <i class="fas fa-external-link-alt me-2"></i>View Website
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">{{ service.title }}</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.services') }}">Services</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ service.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Service Detail Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="mb-4">
+                    {% if service.icon %}
+                    <div class="service-icon text-primary mb-3">
+                        <i class="{{ service.icon }}" style="font-size: 3rem;"></i>
+                    </div>
+                    {% else %}
+                    <div class="service-icon text-primary mb-3">
+                        <i class="fas fa-balance-scale" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        {{ service.description|safe }}
+                    </div>
+                </div>
+
+                <!-- How We Help Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">How We Can Help</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Our experienced team of attorneys specializes in {{ service.title }} law and can assist you with:</p>
+                        <ul>
+                            <li>Legal consultation and advice tailored to your specific situation</li>
+                            <li>Document preparation and review</li>
+                            <li>Representation in negotiations and dispute resolution</li>
+                            <li>Court representation and litigation when necessary</li>
+                            <li>Strategic planning to achieve your long-term objectives</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Our Approach Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Our Approach</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>When you work with our {{ service.title }} team, we:</p>
+                        <ol>
+                            <li><strong>Listen carefully</strong> to understand your specific needs and goals</li>
+                            <li><strong>Analyze your situation</strong> thoroughly to identify all relevant legal issues</li>
+                            <li><strong>Develop a strategic plan</strong> tailored to your unique circumstances</li>
+                            <li><strong>Implement solutions</strong> that protect your interests and advance your objectives</li>
+                            <li><strong>Communicate clearly</strong> throughout the process, keeping you informed and involved</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Related Case Studies -->
+                {% if related_cases %}
+                <div class="mt-5">
+                    <h3 class="mb-4">Related Case Studies</h3>
+                    <div class="row">
+                        {% for case in related_cases %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 case-study-card">
+                                <div class="card-body p-4">
+                                    <h4 class="card-title h5">{{ case.title }}</h4>
+                                    {% if case.client %}
+                                    <p class="text-muted mb-3">Client: {{ case.client }}</p>
+                                    {% endif %}
+                                    <p class="card-text">{{ case.summary|truncate(100) }}</p>
+                                    <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="btn btn-outline-primary mt-3">Read Case Study</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Contact Sidebar -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 mb-0">Contact Us</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Need assistance with {{ service.title }}? Contact our team for a consultation.</p>
+                        <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-primary w-100 mb-3">Request a Consultation</a>
+                        <div class="mt-4">
+                            <p class="mb-2"><i class="fas fa-phone me-2"></i>(555) 123-4567</p>
+                            <p class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:info@lawfirmname.com">info@lawfirmname.com</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services Sidebar -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Other Services</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% for other_service in services if other_service.id != service.id %}
+                            <li class="list-group-item">
+                                <a href="{{ url_for('main.service_detail', slug=other_service.slug) }}">{{ other_service.title }}</a>
+                            </li>
+                            {% else %}
+                            <li class="list-group-item">No other services available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- FAQ Sidebar -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Frequently Asked Questions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item">
+                                <h4 class="accordion-header" id="faqOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        How long will my case take?
+                                    </button>
+                                </h4>
+                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="faqOne" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        The timeline for each case varies depending on its complexity, the court's schedule, and other factors. During your consultation, we can provide an estimated timeline based on your specific situation.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h4 class="accordion-header" id="faqTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        What are your fees?
+                                    </button>
+                                </h4>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Our fee structure depends on the type of case and services required. We offer various fee arrangements, including hourly rates, flat fees, and contingency fees for certain cases. We'll discuss fees during your initial consultation.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h4 class="accordion-header" id="faqThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Do I need an attorney for my situation?
+                                    </button>
+                                </h4>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        While not every legal matter requires attorney representation, having professional legal counsel often leads to better outcomes. Contact us for a consultation to determine if you would benefit from our services.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Ready to Get Started?</h2>
+                <p class="lead mb-5">Our team is ready to help you with your {{ service.title }} needs. Contact us today to schedule a consultation.</p>
+                <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-primary btn-lg">Contact Us Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

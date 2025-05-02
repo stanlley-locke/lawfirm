@@ -1,0 +1,181 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">Our Legal Team</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Our Team</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Team Introduction -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2>Meet Our Attorneys</h2>
+                <p class="lead">Our team of experienced legal professionals is dedicated to providing exceptional service and achieving the best possible outcomes for our clients.</p>
+            </div>
+        </div>
+        
+        {% if team_members %}
+        <div class="row">
+            {% for member in team_members %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 team-card">
+                    <div class="card-body text-center p-4">
+                        {% if member.photo_url %}
+                        <div class="mb-3">
+                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 180px; height: 180px; object-fit: cover;">
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle" style="font-size: 6rem;"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="card-title h4">{{ member.name }}</h3>
+                        <p class="text-muted mb-3">{{ member.position }}</p>
+                        <p class="card-text">{{ member.bio|truncate(120) }}</p>
+                        <div class="team-social mb-3">
+                            {% if member.email %}
+                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            {% endif %}
+                            {% if member.linkedin %}
+                            <a href="{{ member.linkedin }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            {% endif %}
+                            {% if member.twitter %}
+                            <a href="{{ member.twitter }}" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="btn btn-outline-primary">View Full Profile</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center">
+            <p>Our team information is currently being updated. Please check back soon or contact us for more information.</p>
+            <a href="{{ url_for('contact.contact') }}" class="btn btn-primary mt-3">Contact Us</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Team Values Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2>Our Team Values</h2>
+                <p class="lead">What drives us to provide exceptional legal services</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="card-title h5">Excellence</h3>
+                        <p class="card-text">We are committed to excellence in all aspects of our legal practice, striving to deliver the highest quality service and results for our clients.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 class="card-title h5">Integrity</h3>
+                        <p class="card-text">We uphold the highest ethical standards in all our interactions, providing honest guidance and maintaining transparency with our clients.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="card-title h5">Collaboration</h3>
+                        <p class="card-text">We work collaboratively with our clients and within our team to develop effective strategies and achieve optimal results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Professional Development Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="mb-4">Professional Development</h2>
+                <p>At LawFirm Name, we recognize that the law is constantly evolving. That's why we are committed to ongoing professional development and staying current with legal trends and changes.</p>
+                <p>Our attorneys regularly participate in continuing legal education, attend specialized training, and contribute to professional legal organizations. This commitment to growth ensures that we can provide our clients with the most current and effective legal strategies.</p>
+                <p>We also foster mentorship within our firm, with senior attorneys guiding junior team members to develop their skills and expertise. This collaborative approach strengthens our team and enhances the quality of service we provide.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-dark border-0">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Our Professional Affiliations</h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-certificate text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>State Bar Association</h5>
+                                    <p>All our attorneys are active members of the State Bar Association.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-certificate text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>American Bar Association</h5>
+                                    <p>We participate in ABA sections relevant to our practice areas.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-certificate text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Local Legal Organizations</h5>
+                                    <p>We are active in county and city bar associations and legal committees.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <i class="fas fa-certificate text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Specialized Practice Groups</h5>
+                                    <p>Our attorneys belong to specialized legal associations related to their practice areas.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Work with Our Team</h2>
+                <p class="lead mb-5">Contact us today to discuss how our experienced legal team can help with your specific needs.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Schedule a Consultation</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

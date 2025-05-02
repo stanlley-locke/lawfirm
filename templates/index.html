@@ -1,0 +1,204 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white text-center" style="background-image: url('https://images.unsplash.com/photo-1505664194779-8beaceb93744?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');">
+    <div class="container hero-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">Legal Excellence You Can Trust</h1>
+                <p class="lead mb-5">We provide expert legal services tailored to your specific needs with a commitment to achieving the best possible outcome for every client.</p>
+                <div>
+                    <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg me-2">Contact Us</a>
+                    <a href="{{ url_for('main.services') }}" class="btn btn-outline-light btn-lg">Our Services</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Introduction Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="mb-4">Welcome to LawFirm Name</h2>
+                <p class="lead">A modern law firm dedicated to providing expert legal counsel and representation.</p>
+                <p>At LawFirm Name, we combine extensive legal knowledge with a client-centered approach to deliver exceptional results. Our team of experienced attorneys is committed to understanding your needs and crafting solutions that protect your interests.</p>
+                <p>Whether you're facing a complex business challenge, dealing with personal legal issues, or planning for the future, our diverse expertise allows us to provide comprehensive guidance every step of the way.</p>
+                <a href="{{ url_for('main.about') }}" class="btn btn-primary mt-3">Learn More About Us</a>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-dark border-0">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Why Choose Us?</h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <h5>Expert Legal Team</h5>
+                                    <p>Our attorneys bring decades of combined experience across various practice areas.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <h5>Client-Focused Approach</h5>
+                                    <p>We prioritize your needs and develop customized strategies for your specific situation.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <h5>Proven Track Record</h5>
+                                    <p>Our history of successful outcomes speaks to our dedication and expertise.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <h5>Clear Communication</h5>
+                                    <p>We keep you informed throughout the process, explaining complex legal matters in understandable terms.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Our Legal Services</h2>
+            <p class="lead">Comprehensive legal solutions for your personal and business needs</p>
+        </div>
+        <div class="row">
+            {% if services %}
+                {% for service in services %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 service-card">
+                        <div class="card-body text-center p-4">
+                            {% if service.icon %}
+                            <div class="service-icon text-primary">
+                                <i class="{{ service.icon }}"></i>
+                            </div>
+                            {% else %}
+                            <div class="service-icon text-primary">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            {% endif %}
+                            <h3 class="card-title h5">{{ service.title }}</h3>
+                            <p class="card-text">{{ service.description|truncate(100) }}</p>
+                            <a href="{{ url_for('main.service_detail', slug=service.slug) }}" class="btn btn-outline-primary mt-3">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>Our services are currently being updated. Please check back soon.</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.services') }}" class="btn btn-primary">View All Services</a>
+        </div>
+    </div>
+</section>
+
+<!-- Case Studies Section -->
+{% if case_studies %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Featured Case Studies</h2>
+            <p class="lead">See how we've helped clients achieve successful outcomes</p>
+        </div>
+        <div class="row">
+            {% for case in case_studies %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 case-study-card">
+                    <div class="card-body p-4">
+                        <h3 class="card-title h5">{{ case.title }}</h3>
+                        {% if case.client %}
+                        <p class="text-muted mb-3">Client: {{ case.client }}</p>
+                        {% endif %}
+                        <p class="card-text">{{ case.summary|truncate(150) }}</p>
+                        <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="btn btn-outline-primary mt-3">Read Case Study</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.case_studies') }}" class="btn btn-primary">View All Case Studies</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Team Section -->
+{% if team_members %}
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Meet Our Legal Team</h2>
+            <p class="lead">Dedicated professionals committed to your success</p>
+        </div>
+        <div class="row">
+            {% for member in team_members %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 team-card text-center">
+                    <div class="card-body p-4">
+                        {% if member.photo_url %}
+                        <div class="mb-3">
+                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="card-title h5">{{ member.name }}</h3>
+                        <p class="text-muted">{{ member.position }}</p>
+                        <div class="team-social mt-3">
+                            {% if member.email %}
+                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            {% endif %}
+                            {% if member.linkedin %}
+                            <a href="{{ member.linkedin }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            {% endif %}
+                            {% if member.twitter %}
+                            <a href="{{ member.twitter }}" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="btn btn-outline-primary mt-3">View Profile</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.team') }}" class="btn btn-primary">View Full Team</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Contact CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Ready to Work with Us?</h2>
+                <p class="lead mb-5">Contact our team today for a consultation about your legal needs. We're here to help you navigate the complexities of the law and achieve the best possible outcome.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Contact Us Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-4">About Our Firm</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">About</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- About Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="mb-4">Our History</h2>
+                <p>Established in 2005, LawFirm Name has grown from a small practice to a respected legal firm serving clients across the region. Our founding partners shared a vision of creating a firm that would provide exceptional legal services while maintaining the highest ethical standards.</p>
+                <p>Over the years, we've expanded our team and practice areas to meet the evolving needs of our clients. Despite our growth, we've remained true to our core values of integrity, excellence, and client-centered service.</p>
+                <p>Today, we're proud to be recognized as a leading law firm, known for our expertise, professionalism, and commitment to achieving the best possible outcomes for our clients.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-dark border-0">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Our Core Values</h3>
+                        <ul class="list-unstyled">
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-balance-scale text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Integrity</h5>
+                                    <p>We uphold the highest ethical standards in all our actions and advice.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-star text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Excellence</h5>
+                                    <p>We strive for excellence in our legal work, client service, and professional development.</p>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <i class="fas fa-handshake text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Collaboration</h5>
+                                    <p>We work closely with clients and colleagues to achieve optimal results.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <i class="fas fa-users text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h5>Client Focus</h5>
+                                    <p>We place our clients' interests at the center of everything we do.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Approach Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Our Approach</h2>
+            <p class="lead">How we work with clients to achieve successful outcomes</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="card-title h5">Thorough Assessment</h3>
+                        <p class="card-text">We begin by understanding your specific situation, goals, and concerns through comprehensive consultation and case evaluation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <h3 class="card-title h5">Strategic Planning</h3>
+                        <p class="card-text">We develop customized legal strategies that address your unique circumstances and align with your objectives.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="display-4 text-primary mb-3">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <h3 class="card-title h5">Decisive Action</h3>
+                        <p class="card-text">We implement your legal strategy with skill and determination, keeping you informed and involved throughout the process.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Our Legal Team</h2>
+            <p class="lead">Meet the professionals dedicated to serving your legal needs</p>
+        </div>
+        
+        {% if team_members %}
+        <div class="row">
+            {% for member in team_members %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 team-card text-center">
+                    <div class="card-body p-4">
+                        {% if member.photo_url %}
+                        <div class="mb-3">
+                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="card-title h5">{{ member.name }}</h3>
+                        <p class="text-muted">{{ member.position }}</p>
+                        <div class="team-social mt-3">
+                            {% if member.email %}
+                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            {% endif %}
+                            {% if member.linkedin %}
+                            <a href="{{ member.linkedin }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            {% endif %}
+                            {% if member.twitter %}
+                            <a href="{{ member.twitter }}" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="btn btn-outline-primary mt-3">View Profile</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center">
+            <p>Our team information is currently being updated. Please check back soon.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>What Our Clients Say</h2>
+            <p class="lead">Hear about the experiences of those we've helped</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <p class="card-text mb-4">The team at LawFirm Name provided exceptional guidance through my complex business litigation. Their expertise and strategic approach led to a favorable outcome that exceeded my expectations.</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0">John Smith</h5>
+                                <p class="text-muted small mb-0">Business Owner</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <p class="card-text mb-4">I was impressed by the personal attention and care I received from LawFirm Name. They explained complex legal matters in simple terms and were always available to address my concerns.</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0">Sarah Johnson</h5>
+                                <p class="text-muted small mb-0">Individual Client</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <p class="card-text mb-4">Working with LawFirm Name has been a game-changer for our company. Their proactive legal counsel has helped us navigate regulatory challenges and expand our operations with confidence.</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h5 class="mb-0">Michael Chen</h5>
+                                <p class="text-muted small mb-0">CEO, Tech Company</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Ready to Work with Us?</h2>
+                <p class="lead mb-5">Contact our team today for a consultation about your legal needs. We're here to help you navigate the complexities of the law and achieve the best possible outcome.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Contact Us Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
