@@ -88,15 +88,21 @@ with app.app_context():
     db.create_all()
     
     # Create default admin account if it doesn't exist
-    admin_user = User.query.filter_by(username='admin').first()
+    admin_user = User.query.filter_by(username=os.environ.get('ADMIN_USERNAME', 'admin')).first()
     if not admin_user:
         admin_user = User(
-            username='admin',
+            username=os.environ.get('ADMIN_USERNAME', 'admin'),
             email=os.environ.get('ADMIN_EMAIL', 'admin@example.com'),
             is_admin=True
         )
-        admin_user.set_password(os.environ.get('ADMIN_PASSWORD', 'admin@2025'))
+        admin_user.set_password(os.environ.get('ADMIN_PASSWORD', 'lawfirm2025'))
         db.session.add(admin_user)
+        db.session.commit()
+    else:
+        # Update existing admin credentials if they changed in .env
+        admin_user.username = os.environ.get('ADMIN_USERNAME', 'admin')
+        admin_user.email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
+        admin_user.set_password(os.environ.get('ADMIN_PASSWORD', 'lawfirm2025'))
         db.session.commit()
 
 @login_manager.user_loader
