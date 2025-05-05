@@ -12,27 +12,51 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # If the user is already authenticated, redirect to admin dashboard
     if current_user.is_authenticated:
         return redirect(url_for('admin.dashboard'))
     
+    # Rate limiting using client IP
+    ip = request.remote_addr
+    failed_attempts = session.get('failed_attempts', {})
+    if ip in failed_attempts:
+        attempts, timestamp = failed_attempts[ip]
+        if attempts >= 5 and (datetime.utcnow() - timestamp).seconds < 300:
+            flash('Too many login attempts. Please try again in 5 minutes.', 'danger')
+            return render_template('auth/login.html', title='Login', form=LoginForm())
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         
-        # Check if the user exists and the password is correct
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password', 'danger')
+        if not user or not user.check_password(form.password.data):
+            # Update failed attempts
+            if ip in failed_attempts:
+                attempts, _ = failed_attempts[ip]
+                failed_attempts[ip] = (attempts + 1, datetime.utcnow())
+            else:
+                failed_attempts[ip] = (1, datetime.utcnow())
+            session['failed_attempts'] = failed_attempts
+            
+            flash('Invalid credentials. Please check your username and password.', 'danger')
             return redirect(url_for('auth.login'))
         
-        # Log in the user
+        if not user.is_admin:
+            flash('Access denied. Admin privileges required.', 'danger')
+            return redirect(url_for('auth.login'))
+
+        # Reset failed attempts on successful login
+        if ip in failed_attempts:
+            del failed_attempts[ip]
+            session['failed_attempts'] = failed_attempts
+            
         login_user(user, remember=form.remember.data)
         
-        # Check if there is a next page to redirect to
         next_page = request.args.get('next')
         if not next_page or urlparse(next_page).netloc != '':
             next_page = url_for('admin.dashboard')
         
+        # Log successful login
+        logging.info(f'Admin login successful: {user.username} from IP {ip}')
         flash('You have been logged in successfully!', 'success')
         return redirect(next_page)
     
