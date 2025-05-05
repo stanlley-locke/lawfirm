@@ -17,4 +17,5 @@ dependencies = [
     "eventlet>=0.39.1",
     "gevent>=25.4.2",
     "gevent-websocket>=0.10.1",
+    "python-dotenv>=1.1.0",
 ]
