@@ -13,6 +13,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from flask_wtf.csrf import CSRFProtect
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -25,6 +26,7 @@ db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 migrate = Migrate()
 mail = Mail()
+csrf = CSRFProtect()
 socketio = SocketIO()
 
 # Create the app
@@ -65,7 +67,8 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
 migrate.init_app(app, db)
 mail.init_app(app)
-socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
+csrf.init_app(app)
+socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent', ping_timeout=60)
 
 with app.app_context():
     # Import models to ensure they're registered with SQLAlchemy

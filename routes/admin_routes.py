@@ -273,7 +273,11 @@ def delete_case(id):
 @admin_required
 def messages():
     messages = ContactMessage.query.order_by(desc(ContactMessage.created_at)).all()
-    return render_template('admin/messages.html', title='Contact Messages', messages=messages)
+    unread_messages_count = ContactMessage.query.filter_by(is_read=False).count()
+    return render_template('admin/messages.html', 
+                         title='Contact Messages', 
+                         messages=messages,
+                         unread_messages_count=unread_messages_count)
 
 @admin_bp.route('/messages/view/<int:id>')
 @admin_required
