@@ -1,375 +1,293 @@
+{# templates/client_chat.html #}
 {% extends "layout.html" %}
 
 {% block title %}Chat with Our Legal Team{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">
-                        <i class="fas fa-comments me-2"></i> Chat with Our Legal Team
-                    </h3>
-                </div>
-                <div id="chat-container">
-                    <!-- Initial User Information Form -->
-                    <div id="user-info-form" class="card-body">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
-                            <h4>Welcome to our Live Chat</h4>
-                            <p class="text-muted">Please provide your information to start chatting with our legal team.</p>
-                        </div>
-                        <form id="start-chat-form" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="client-name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="client-name" placeholder="Enter your name" required>
-                                <div class="invalid-feedback">
-                                    Please enter your name.
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="client-email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="client-email" placeholder="Enter your email address" required>
-                                <div class="invalid-feedback">
-                                    Please enter a valid email address.
-                                </div>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="privacy-consent" required>
-                                <label class="form-check-label" for="privacy-consent">
-                                    I understand that this chat is for general inquiries only and should not include sensitive personal information.
-                                </label>
-                                <div class="invalid-feedback">
-                                    You must agree before submitting.
-                                </div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-comment me-2"></i> Start Chat
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <!-- Chat Interface (Initially Hidden) -->
-                    <div id="chat-interface" class="d-none">
-                        <div class="chat-messages p-3" id="chat-messages" style="height: 350px; overflow-y: auto;">
-                            <div class="text-center text-muted py-5" id="no-messages">
-                                <i class="fas fa-comment-dots fa-3x mb-3"></i>
-                                <p>Your chat session has started.</p>
-                                <p>Type a message below to begin.</p>
-                            </div>
-                        </div>
-                        <div class="card-footer p-3">
-                            <form id="message-form" class="d-flex">
-                                <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message...">
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <!-- Connection Status (Initially Hidden) -->
-                    <div id="connection-status" class="card-footer bg-light d-none">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small>
-                                <span id="status-indicator" class="badge bg-success me-2">Connected</span>
-                                <span id="status-text">Chat session active</span>
-                            </small>
-                            <button id="end-chat-btn" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-times me-1"></i> End Chat
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card mt-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>Chat Guidelines
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-0">
-                        <li>This chat service is for general inquiries only.</li>
-                        <li>Do not share sensitive personal or case information in this chat.</li>
-                        <li>For detailed legal advice, please schedule a proper consultation.</li>
-                        <li>Our representatives are available during business hours (9am-5pm).</li>
-                        <li>If the chat is disconnected, you can refresh the page to reconnect.</li>
-                    </ul>
-                </div>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-comments me-2"></i> Chat with Our Legal Team
+          </h3>
         </div>
+        <div id="chat-container">
+          <!-- Initial User Information Form -->
+          <div id="user-info-form" class="card-body">
+            <div class="text-center mb-4">
+              <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+              <h4>Welcome to our Live Chat</h4>
+              <p class="text-muted">Please provide your information to start chatting with our legal team.</p>
+            </div>
+            <form id="start-chat-form" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="client-name" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="client-name" placeholder="Enter your name" required>
+                <div class="invalid-feedback">Please enter your name.</div>
+              </div>
+              <div class="mb-3">
+                <label for="client-email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="client-email" placeholder="Enter your email address" required>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="privacy-consent" required>
+                <label class="form-check-label" for="privacy-consent">
+                  I understand that this chat is for general inquiries only and should not include sensitive personal information.
+                </label>
+                <div class="invalid-feedback">You must agree before submitting.</div>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-comment me-2"></i> Start Chat
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Chat Interface (Initially Hidden) -->
+          <div id="chat-interface" class="d-none">
+            <div id="chat-messages" class="chat-messages p-3"
+                 style="height: 350px; overflow-y: auto;">
+              <div class="text-center text-muted py-5" id="no-messages">
+                <i class="fas fa-comment-dots fa-3x mb-3"></i>
+                <p>Your chat session has started.</p>
+                <p>Type a message below to begin.</p>
+              </div>
+            </div>
+            <div class="card-footer p-3">
+              <form id="message-form" class="d-flex">
+                <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message...">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Connection Status (Initially Hidden) -->
+          <div id="connection-status" class="card-footer bg-light d-none">
+            <div class="d-flex justify-content-between align-items-center">
+              <small>
+                <span id="status-indicator" class="badge bg-success me-2">Connected</span>
+                <span id="status-text">Chat session active</span>
+              </small>
+              <button id="end-chat-btn" class="btn btn-sm btn-outline-danger">
+                <i class="fas fa-times me-1"></i> End Chat
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Chat Guidelines</h5>
+        </div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li>This chat service is for general inquiries only.</li>
+            <li>Do not share sensitive personal or case information in this chat.</li>
+            <li>For detailed legal advice, please schedule a proper consultation.</li>
+            <li>Our representatives are available during business hours (9am-5pm).</li>
+            <li>If the chat is disconnected, you can refresh the page to reconnect.</li>
+          </ul>
+        </div>
+      </div>
+
     </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
 <script>
-    // DOM Elements
-    const userInfoForm = document.getElementById('user-info-form');
-    const startChatForm = document.getElementById('start-chat-form');
-    const chatInterface = document.getElementById('chat-interface');
-    const connectionStatus = document.getElementById('connection-status');
-    const chatMessages = document.getElementById('chat-messages');
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const noMessagesDiv = document.getElementById('no-messages');
-    const statusIndicator = document.getElementById('status-indicator');
-    const statusText = document.getElementById('status-text');
-    const endChatBtn = document.getElementById('end-chat-btn');
-    
-    // Socket.io connection (will be initialized when chat starts)
-    let socket;
-    let roomId;
-    let clientName;
-    let clientEmail;
-    
-    // Form validation and submission
-    startChatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Check form validity
-        if (!this.checkValidity()) {
-            e.stopPropagation();
-            this.classList.add('was-validated');
-            return;
-        }
-        
-        // Get client info
-        clientName = document.getElementById('client-name').value.trim();
-        clientEmail = document.getElementById('client-email').value.trim();
-        
-        // Initialize chat
-        initializeChat(clientName, clientEmail);
+  // Grab CSRF token from meta
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  // DOM Elements
+  const userInfoForm   = document.getElementById('user-info-form');
+  const startChatForm  = document.getElementById('start-chat-form');
+  const chatInterface  = document.getElementById('chat-interface');
+  const connectionStatus = document.getElementById('connection-status');
+  const chatMessages   = document.getElementById('chat-messages');
+  const messageForm    = document.getElementById('message-form');
+  const messageInput   = document.getElementById('message-input');
+  const noMessagesDiv  = document.getElementById('no-messages');
+  const statusIndicator = document.getElementById('status-indicator');
+  const statusText     = document.getElementById('status-text');
+  const endChatBtn     = document.getElementById('end-chat-btn');
+
+  let socket, roomId, clientName, clientEmail;
+
+  // Validate & submit initial form
+  startChatForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!this.checkValidity()) {
+      e.stopPropagation();
+      this.classList.add('was-validated');
+      return;
+    }
+    clientName  = document.getElementById('client-name').value.trim();
+    clientEmail = document.getElementById('client-email').value.trim();
+    initializeChat(clientName, clientEmail);
+  });
+
+  // Initialize chat via POST + CSRF
+  function initializeChat(name, email) {
+    fetch('/chat/start', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type':   'application/json',
+        'X-CSRFToken':    csrfToken
+      },
+      body: JSON.stringify({ name, email })
+    })
+    .then(res => {
+      if (!res.ok) {
+        return res.json()
+          .then(err => Promise.reject(new Error(err.error || JSON.stringify(err))))
+          .catch(() => Promise.reject(new Error(`HTTP ${res.status}: ${res.statusText}`)));
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data.success) throw new Error(data.error || 'Unknown error');
+      roomId = data.room_id;
+      userInfoForm.classList.add('d-none');
+      chatInterface.classList.remove('d-none');
+      connectionStatus.classList.remove('d-none');
+      loadExistingMessages(roomId);
+      initializeSocketConnection(roomId, name, email);
+      addSystemMessage('Chat session started. A member of our legal team will be with you shortly.');
+    })
+    .catch(err => {
+      console.error('Error starting chat:', err);
+      alert(`Failed to start chat: ${err.message}`);
     });
-    
-    // Initialize chat function
-    function initializeChat(name, email) {
-        // Make API request to start chat
-        fetch('/chat/start', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                email: email
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                roomId = data.room_id;
-                
-                // Hide form, show chat interface
-                userInfoForm.classList.add('d-none');
-                chatInterface.classList.remove('d-none');
-                connectionStatus.classList.remove('d-none');
-                
-                // Load existing messages first
-                loadExistingMessages(roomId, name, email);
-                
-                // Initialize socket connection
-                initializeSocketConnection(roomId, name, email);
-                
-                // Add welcome message
-                addSystemMessage('Chat session started. A member of our legal team will be with you shortly.');
-            } else {
-                // Show error
-                alert('Failed to start chat: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error starting chat:', error);
-            alert('Failed to start chat. Please try again later.');
+  }
+
+  // Load any pre-existing messages
+  function loadExistingMessages(room) {
+    {% if messages %}
+      if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
+        chatMessages.removeChild(noMessagesDiv);
+      }
+      {% for message in messages %}
+        addMessage({
+          id: {{ message.id }},
+          content: '{{ message.content|safe }}',
+          is_from_client: {{ 'true' if message.is_from_client else 'false' }},
+          user: '{{ message.user.username if message.user else "" }}',
+          timestamp: '{{ message.timestamp }}'
         });
-    }
-    
-    // Load existing messages for the chat room
-    function loadExistingMessages(room, name, email) {
-        // Get existing messages from the server (they're already in the template)
-        {% if messages %}
-            // Remove the no messages div if there are messages
-            if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
-                chatMessages.removeChild(noMessagesDiv);
-            }
-            
-            // Add existing messages to the chat
-            {% for message in messages %}
-                const messageData = {
-                    id: {{ message.id }},
-                    content: '{{ message.content|safe }}',
-                    is_from_client: {% if message.is_from_client %}true{% else %}false{% endif %},
-                    client_name: '{{ message.client_name if message.client_name else "" }}',
-                    user: '{{ message.user.username if message.user else "" }}',
-                    timestamp: '{{ message.timestamp }}'
-                };
-                addMessage(messageData);
-            {% endfor %}
-        {% endif %}
-    }
-    
-    // Initialize socket connection
-    function initializeSocketConnection(room, name, email) {
-        // Initialize Socket.IO connection
-        socket = io();
-        
-        // Socket event listeners
-        socket.on('connect', () => {
-            console.log('Connected to server');
-            updateConnectionStatus(true);
-            
-            // Join room
-            socket.emit('join', {
-                room: room,
-                client_name: name,
-                client_email: email
-            });
-        });
-        
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            updateConnectionStatus(false);
-        });
-        
-        socket.on('message', (data) => {
-            addMessage(data);
-        });
-        
-        socket.on('status', (data) => {
-            console.log(data.msg);
-            if (data.joined && data.user === 'staff') {
-                addSystemMessage('A legal representative has joined the chat.');
-            }
-        });
-    }
-    
-    // Message form submission
-    messageForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const message = messageInput.value.trim();
-        
-        if (message && socket && roomId) {
-            // Send message to server
-            socket.emit('message', {
-                room: roomId,
-                message: message,
-                is_from_client: true,
-                client_name: clientName,
-                client_email: clientEmail
-            });
-            
-            // Clear input field
-            messageInput.value = '';
-        }
+      {% endfor %}
+    {% endif %}
+  }
+
+  // Set up Socket.IO and handlers
+  function initializeSocketConnection(room, name, email) {
+    socket = io();
+    socket.on('connect', () => {
+      updateConnectionStatus(true);
+      socket.emit('join', { room, client_name: name, client_email: email });
     });
-    
-    // End chat button
-    endChatBtn.addEventListener('click', function() {
-        if (confirm('Are you sure you want to end this chat session?')) {
-            if (socket) {
-                socket.emit('leave', { room: roomId });
-                socket.disconnect();
-            }
-            
-            // Show a message that chat has ended
-            addSystemMessage('You have ended the chat session. You can close this window or refresh to start a new chat.');
-            
-            // Disable the input form
-            messageInput.disabled = true;
-            messageForm.querySelector('button').disabled = true;
-            endChatBtn.disabled = true;
-            
-            // Update status
-            updateConnectionStatus(false, 'Chat session ended');
-        }
+    socket.on('disconnect', () => updateConnectionStatus(false));
+    socket.on('message', data => addMessage(data));
+    socket.on('status', data => {
+      if (data.joined && data.user === 'staff') {
+        addSystemMessage('A legal representative has joined the chat.');
+      }
     });
-    
-    // Add a message to the chat
-    function addMessage(data) {
-        // Remove the no messages div if present
-        if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
-            chatMessages.removeChild(noMessagesDiv);
-        }
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message mb-3 ${data.is_from_client ? 'message-client' : 'message-staff'}`;
-        
-        const messageContent = document.createElement('div');
-        messageContent.className = `message-content p-3 rounded ${data.is_from_client ? 'bg-light text-dark ms-auto' : 'bg-primary text-white'}`;
-        messageContent.textContent = data.content;
-        
-        const messageMeta = document.createElement('div');
-        messageMeta.className = `message-meta small text-muted mt-1 ${data.is_from_client ? 'text-end' : ''}`;
-        
-        // Format the timestamp
-        let timeString;
-        if (data.timestamp) {
-            const timestamp = new Date(data.timestamp);
-            timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        
-        let sender;
-        if (data.is_from_client) {
-            sender = 'You';
-        } else if (data.user) {
-            sender = data.user;
-        } else {
-            sender = 'Legal Team';
-        }
-        
-        messageMeta.textContent = `${sender} | ${timeString}`;
-        
-        messageDiv.appendChild(messageContent);
-        messageDiv.appendChild(messageMeta);
-        
-        chatMessages.appendChild(messageDiv);
-        scrollToBottom();
+  }
+
+  // Sending a message
+  messageForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (text && socket && roomId) {
+      socket.emit('message', {
+        room: roomId,
+        message: text,
+        is_from_client: true,
+        client_name: clientName,
+        client_email: clientEmail
+      });
+      messageInput.value = '';
     }
-    
-    // Add a system message to the chat
-    function addSystemMessage(message) {
-        // Remove the no messages div if present
-        if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
-            chatMessages.removeChild(noMessagesDiv);
-        }
-        
-        const systemDiv = document.createElement('div');
-        systemDiv.className = 'text-center my-3';
-        
-        const systemAlert = document.createElement('div');
-        systemAlert.className = 'alert alert-secondary py-2 px-3 d-inline-block';
-        systemAlert.textContent = message;
-        
-        systemDiv.appendChild(systemAlert);
-        chatMessages.appendChild(systemDiv);
-        scrollToBottom();
+  });
+
+  // Ending the chat
+  endChatBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to end this chat session?')) {
+      if (socket) {
+        socket.emit('leave', { room: roomId });
+        socket.disconnect();
+      }
+      addSystemMessage('You have ended the chat session. Refresh to start again.');
+      messageInput.disabled = true;
+      messageForm.querySelector('button').disabled = true;
+      endChatBtn.disabled = true;
+      updateConnectionStatus(false, 'Chat session ended');
     }
-    
-    // Update connection status
-    function updateConnectionStatus(connected, customText) {
-        if (connected) {
-            statusIndicator.textContent = 'Connected';
-            statusIndicator.className = 'badge bg-success me-2';
-            statusText.textContent = customText || 'Chat session active';
-        } else {
-            statusIndicator.textContent = 'Disconnected';
-            statusIndicator.className = 'badge bg-danger me-2';
-            statusText.textContent = customText || 'Connection lost. Please wait...';
-        }
+  });
+
+  // Append a chat bubble
+  function addMessage(data) {
+    if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
+      chatMessages.removeChild(noMessagesDiv);
     }
-    
-    // Scroll chat to bottom
-    function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    const wrapper = document.createElement('div');
+    wrapper.className = `message mb-3 ${data.is_from_client ? 'message-client' : 'message-staff'}`;
+    const content = document.createElement('div');
+    content.className = `message-content p-3 rounded ${
+      data.is_from_client ? 'bg-light text-dark ms-auto' : 'bg-primary text-white'
+    }`;
+    content.textContent = data.content;
+    const meta = document.createElement('div');
+    meta.className = `message-meta small text-muted mt-1 ${
+      data.is_from_client ? 'text-end' : ''
+    }`;
+    const ts = data.timestamp
+      ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const sender = data.is_from_client ? 'You' : (data.user || 'Legal Team');
+    meta.textContent = `${sender} | ${ts}`;
+    wrapper.append(content, meta);
+    chatMessages.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  // System notifications
+  function addSystemMessage(msg) {
+    if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
+      chatMessages.removeChild(noMessagesDiv);
     }
+    const div = document.createElement('div');
+    div.className = 'text-center my-3';
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-secondary py-2 px-3 d-inline-block';
+    alert.textContent = msg;
+    div.appendChild(alert);
+    chatMessages.appendChild(div);
+    scrollToBottom();
+  }
+
+  // Update status badge
+  function updateConnectionStatus(connected, customText) {
+    statusIndicator.textContent = connected ? 'Connected' : 'Disconnected';
+    statusIndicator.className = connected ? 'badge bg-success me-2' : 'badge bg-danger me-2';
+    statusText.textContent = customText || (connected ? 'Chat session active' : 'Connection lost');
+  }
+
+  // Always scroll down
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 </script>
 {% endblock %}

@@ -89,7 +89,7 @@ with app.app_context():
 
     # Create all database tables
     db.create_all()
-    
+
     # Create default admin account if it doesn't exist
     admin_user = User.query.filter_by(username=os.environ.get('ADMIN_USERNAME', 'admin')).first()
     if not admin_user:
