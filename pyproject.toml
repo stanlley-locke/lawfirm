@@ -15,4 +15,6 @@ dependencies = [
     "flask-mail>=0.10.0",
     "flask-socketio>=5.5.1",
     "eventlet>=0.39.1",
+    "gevent>=25.4.2",
+    "gevent-websocket>=0.10.1",
 ]

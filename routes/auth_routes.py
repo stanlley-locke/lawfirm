@@ -47,27 +47,31 @@ def logout():
 
 # This route is for demonstration purposes only
 # In a production environment, user creation should be more secure
-@auth_bp.route('/create-admin', methods=['GET'])
+@auth_bp.route('/create-admin', methods=['POST'])
+@login_required
 def create_admin():
-    # Check if admin already exists
-    admin = User.query.filter_by(username='admin').first()
-    if admin:
-        flash('Admin user already exists!', 'warning')
-        return redirect(url_for('auth.login'))
+    if not current_user.is_admin:
+        abort(403)
+        
+    data = request.get_json()
+    if not data or 'username' not in data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Missing required fields'}), 400
+        
+    existing_admin = User.query.filter_by(username=data['username']).first()
+    if existing_admin:
+        return jsonify({'error': 'Username already exists'}), 400
     
-    # Create admin user
     admin = User(
-        username='admin',
-        email='admin@lawfirm.com',
+        username=data['username'],
+        email=data['email'],
         is_admin=True
     )
-    admin.set_password('adminpassword')
+    admin.set_password(data['password'])
     
     db.session.add(admin)
     db.session.commit()
     
-    flash('Admin user has been created! You can now log in.', 'success')
-    return redirect(url_for('auth.login'))
+    return jsonify({'message': 'Admin created successfully'})
 
 # Secret admin login page - not linked from anywhere in the UI
 @auth_bp.route('/secret', methods=['GET', 'POST'])

@@ -51,7 +51,7 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
 migrate.init_app(app, db)
 mail.init_app(app)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio.init_app(app, cors_allowed_origins="*", async_mode='gevent')
 
 with app.app_context():
     # Import models to ensure they're registered with SQLAlchemy

@@ -12,6 +12,10 @@ chat_bp = Blueprint('chat', __name__)
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
+    if current_user.is_authenticated:
+        current_user.is_online = True
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 @socketio.on('disconnect')
 def handle_disconnect():
