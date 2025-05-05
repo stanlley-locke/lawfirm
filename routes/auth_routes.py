@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, session
 from flask_login import login_user, logout_user, login_required, current_user
+from datetime import datetime, timedelta
+import random
+import string
 from urllib.parse import urlparse
 import random
 import string
@@ -118,23 +121,29 @@ def create_admin():
 # Secret admin login page - not linked from anywhere in the UI
 @auth_bp.route('/secret', methods=['GET', 'POST'])
 def secret_login():
-    # If already logged in, redirect to dashboard
     if current_user.is_authenticated:
         return redirect(url_for('admin.dashboard'))
-        
-    # Generate a random access code if one doesn't exist in the session
-    if 'secret_access_code' not in session:
-        session['secret_access_code'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    
+    # Generate new access code with expiration
+    if 'secret_access_code' not in session or 'code_expiry' not in session or \
+       datetime.utcnow() > datetime.fromisoformat(session['code_expiry']):
+        session['secret_access_code'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        session['code_expiry'] = (datetime.utcnow() + timedelta(minutes=5)).isoformat()
     
     form = SecretLoginForm()
     if form.validate_on_submit():
+        # Check if code is expired
+        if datetime.utcnow() > datetime.fromisoformat(session['code_expiry']):
+            flash('Access code expired. Please refresh for a new code.', 'danger')
+            return redirect(url_for('auth.secret_login'))
+            
         # Verify the access code
         if form.access_code.data != session['secret_access_code']:
             flash('Invalid access code', 'danger')
             return redirect(url_for('auth.secret_login'))
             
-        # Check password matches the super admin password
-        correct_password = 'lawyer@2025' # A hardcoded password for the example
+        # Check password - using environment variable for security
+        correct_password = os.environ.get('ADMIN_SECRET_PASSWORD', 'lawyer@2025')
         if form.password.data != correct_password:
             flash('Invalid password', 'danger')
             return redirect(url_for('auth.secret_login'))

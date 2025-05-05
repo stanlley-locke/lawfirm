@@ -86,6 +86,18 @@ with app.app_context():
 
     # Create all database tables
     db.create_all()
+    
+    # Create default admin account if it doesn't exist
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        admin_user = User(
+            username='admin',
+            email=os.environ.get('ADMIN_EMAIL', 'admin@example.com'),
+            is_admin=True
+        )
+        admin_user.set_password(os.environ.get('ADMIN_PASSWORD', 'admin@2025'))
+        db.session.add(admin_user)
+        db.session.commit()
 
 @login_manager.user_loader
 def load_user(user_id):
