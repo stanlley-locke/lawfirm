@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}Admin - Live Chats {% endblock %}
+{% block title %}Admin - Live Chats{% endblock %}
 
 {% block head_scripts %}
-<script src="{{ url_for('static', filename='js/admin-chat.js') }}" defer></script>
+  {# Expose CSRF token for AJAX posts #}
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <script src="{{ url_for('static', filename='js/admin-chat.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -34,7 +36,9 @@
                             <span class="badge bg-success" id="active-chats-count">0</span>
                         </div>
                         <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="active-chats-progress"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                                 id="active-chats-progress"></div>
                         </div>
                     </div>
                     
@@ -44,7 +48,9 @@
                             <span class="badge bg-danger" id="unread-chat-count">0</span>
                         </div>
                         <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="unread-chat-progress"></div>
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                                 id="unread-chat-progress"></div>
                         </div>
                     </div>
                     
@@ -158,10 +164,12 @@
                                                     {% endif %}
                                                 </td>
                                                 <td>
-                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}" class="btn btn-sm btn-primary">
+                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}"
+                                                       class="btn btn-sm btn-primary">
                                                         <i class="fas fa-comments me-1"></i> Open Chat
                                                     </a>
-                                                    <button class="btn btn-sm btn-danger close-chat-btn" data-room-id="{{ room.room_id }}">
+                                                    <button class="btn btn-sm btn-danger close-chat-btn"
+                                                            data-room-id="{{ room.room_id }}">
                                                         <i class="fas fa-times me-1"></i> Close
                                                     </button>
                                                 </td>
@@ -213,13 +221,14 @@
                                                 <td>
                                                     {% set duration = (room.last_activity - room.created_at).total_seconds() / 60 %}
                                                     {% if duration < 1 %}
-                                                        < 1 minute
+                                                        &lt; 1 minute
                                                     {% else %}
                                                         {{ duration|int }} minutes
                                                     {% endif %}
                                                 </td>
                                                 <td>
-                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}" class="btn btn-sm btn-secondary">
+                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}"
+                                                       class="btn btn-sm btn-secondary">
                                                         <i class="fas fa-history me-1"></i> View History
                                                     </a>
                                                 </td>
@@ -247,65 +256,67 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Helper to read the CSRF token from the meta tag
+        function getCsrfToken() {
+            const el = document.querySelector('meta[name="csrf-token"]');
+            return el ? el.getAttribute('content') : '';
+        }
+
         // Update the progress bars based on counts
         function updateProgressBars() {
-            const activeCount = parseInt(document.getElementById('active-chats-count').textContent);
-            const unreadCount = parseInt(document.getElementById('unread-chat-count').textContent);
-            
-            // Set max value (for visual appearance)
-            const maxValue = 10;
-            
-            // Update active chats progress
+            const activeCount   = parseInt(document.getElementById('active-chats-count').textContent);
+            const unreadCount   = parseInt(document.getElementById('unread-chat-count').textContent);
+            const maxValue      = 10;
+
             const activeProgress = document.getElementById('active-chats-progress');
-            const activePercentage = Math.min((activeCount / maxValue) * 100, 100);
-            activeProgress.style.width = activePercentage + '%';
+            const activePct      = Math.min((activeCount / maxValue) * 100, 100);
+            activeProgress.style.width       = activePct + '%';
             activeProgress.setAttribute('aria-valuenow', activeCount);
-            
-            // Update unread progress
+
             const unreadProgress = document.getElementById('unread-chat-progress');
-            const unreadPercentage = Math.min((unreadCount / maxValue) * 100, 100);
-            unreadProgress.style.width = unreadPercentage + '%';
+            const unreadPct      = Math.min((unreadCount / maxValue) * 100, 100);
+            unreadProgress.style.width       = unreadPct + '%';
             unreadProgress.setAttribute('aria-valuenow', unreadCount);
-            
-            // Update last updated text
+
             document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
         }
-        
-        // Update progress bars when chat stats are updated
-        const originalUpdateChatStats = window.updateChatStats;
-        window.updateChatStats = function() {
-            originalUpdateChatStats();
-            setTimeout(updateProgressBars, 500); // Give time for counts to update
-        };
-        
-        // Set up close chat button functionality
-        const closeButtons = document.querySelectorAll('.close-chat-btn');
-        closeButtons.forEach(button => {
+
+        // Hook into existing updateChatStats if present
+        if (window.updateChatStats) {
+            const orig = window.updateChatStats;
+            window.updateChatStats = function() {
+                orig();
+                setTimeout(updateProgressBars, 500);
+            };
+        }
+
+        // Close-chat buttons now send CSRF token header
+        document.querySelectorAll('.close-chat-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const roomId = this.getAttribute('data-room-id');
-                if (confirm('Are you sure you want to close this chat session?')) {
-                    fetch(`/admin/chat/${roomId}/close`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Reload the page to refresh the chat list
-                            window.location.reload();
-                        }
-                    })
-                    .catch(error => console.error('Error closing chat:', error));
-                }
+                if (!confirm('Are you sure you want to close this chat session?')) return;
+
+                fetch(`/admin/chat/${roomId}/close`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) window.location.reload();
+                })
+                .catch(err => console.error('Error closing chat:', err));
             });
         });
-        
-        // Run initial progress update
+
+        // Initial bar update + polling
         updateProgressBars();
-        
-        // Update stats every 30 seconds
         setInterval(updateProgressBars, 30000);
     });
 </script>

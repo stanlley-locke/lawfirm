@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSRF token for AJAX/Fetch calls -->
+     
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{% if title %}{{ title }} – {% endif %}LawFirm Name</title>
+    <title>{% if title %}{{ title }} – {% endif %}Stanlley & CO Advocates</title>
     
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
@@ -27,8 +28,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-balance-scale me-2"></i>LawFirm Name
-            </a>
+                <i class="fas fa-balance-scale me-2"></i>Stanlley & CO Advocates</a>
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false"
@@ -111,12 +111,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-4"><i class="fas fa-balance-scale me-2"></i>LawFirm Name</h5>
+                    <h5 class="mb-4"><i class="fas fa-balance-scale me-2"></i>Stanlley & CO Advocates</h5>
                     <p>Providing exceptional legal services with a commitment to excellence, integrity, and client satisfaction.</p>
                     <div class="social-icons">
-                        <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/stanlley_locke/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/stanley_wasonga" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/in/stanley-locke-a4b430327/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4 mb-md-0">
@@ -135,12 +135,12 @@
                     <ul class="list-unstyled">
                         <li class="mb-2">
                           <i class="fas fa-map-marker-alt me-2"></i>
-                          123 Legal Avenue, Suite 101<br>City, State 12345
+                          Kisumu, Kenya
                         </li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i>(555) 123-4567</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+254 752032884</li>
                         <li class="mb-2">
                           <i class="fas fa-envelope me-2"></i>
-                          <a href="mailto:info@lawfirmname.com">info@lawfirmname.com</a>
+                          <a href="mailto:info@lawfirmname.com">info@stanlley&coadvocates.com</a>
                         </li>
                         <li class="mb-2"><i class="fas fa-clock me-2"></i>Monday–Friday: 9 AM–5 PM</li>
                     </ul>
@@ -149,7 +149,7 @@
             <hr>
             <div class="row">
                 <div class="col-md-6 text-center text-md-start">
-                    <p>&copy; {{ now.year }} LawFirm Name. All rights reserved.</p>
+                    <p>&copy; {{ now.year  }} Stanlley & CO Advocates. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>

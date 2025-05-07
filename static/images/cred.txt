@@ -1,0 +1,12 @@
+frkapidnttktojxa
+
+python3 - <<EOF
+import smtplib
+smtp = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
+smtp.starttls()
+smtp.login('stanlleylocke@gmail.com', 'frkapidnttktojxa')
+smtp.sendmail('stanlleylocke@gmail.com', 'stanlleywasonga@gmail.com',
+              'Subject: SMTP Test\n\nIt’s working!')
+smtp.quit()
+print("SMTP via Gmail OK")
+EOF
