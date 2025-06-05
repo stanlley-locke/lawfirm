@@ -2,7 +2,7 @@ import os
 import logging
 from dotenv import load_dotenv
 
-# Load environment variables
+# 1) Load .env as early as possible
 load_dotenv()
 
 from flask import Flask
@@ -18,7 +18,7 @@ from flask_wtf.csrf import CSRFProtect
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Base for models
+# Base class for SQLAlchemy models
 definable_Base = DeclarativeBase  # for typing
 class Base(definable_Base):
     pass
@@ -37,19 +37,20 @@ def create_app():
     app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    # Database config for SQLite
+    # Database configuration
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///lawfirm.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # Email config
-    app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
-    app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
-    app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS", "True").lower() in ["true", "1", "t"]
-    app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
-    app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
-    app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER", "stanlleylocke@gmail.com")
+    # —— EMAIL CONFIGURATION —— #
+    app.config["MAIL_SERVER"] = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    app.config["MAIL_PORT"] = int(os.environ.get("SMTP_PORT", 587))
+    app.config["MAIL_USE_TLS"] = os.environ.get("SMTP_USE_TLS", "True").lower() in ["true", "1", "t"]
+    app.config["MAIL_USE_SSL"] = False
+    app.config["MAIL_USERNAME"] = os.environ.get("SMTP_USER")             # ← from .env: SMTP_USER
+    app.config["MAIL_PASSWORD"] = os.environ.get("SMTP_PASS")             # ← from .env: SMTP_PASS
+    app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("SMTP_USER")       # ← ensures “From” matches your Gmail
 
-    # Init extensions
+    # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
@@ -65,7 +66,7 @@ def create_app():
         from models import User
         return User.query.get(int(user_id))
 
-    # Context processor\    
+    # Inject current UTC time into templates
     @app.context_processor
     def inject_now():
         from datetime import datetime
@@ -84,17 +85,19 @@ def create_app():
     app.register_blueprint(contact_bp)
     app.register_blueprint(chat_bp)
 
-    return app
+    return app  
 
 
-# Create the app for CLI and WSGI
+# Create the Flask app for CLI and WSGI
 app = create_app()
 
 if __name__ == "__main__":
-    # perform initial DB setup
+    # Perform initial DB setup (creates tables and default admin if needed)
     with app.app_context():
         from models import User, Service, TeamMember, CaseStudy, ContactMessage, ChatMessage, ChatRoom
+
         db.create_all()
+
         admin_user = User.query.filter_by(username=os.environ.get('ADMIN_USERNAME', 'admin')).first()
         if not admin_user:
             admin_user = User(
