@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 import os
 
-from app import db
+from extensions import db
 from models import User
 from forms import LoginForm, SecretLoginForm
 

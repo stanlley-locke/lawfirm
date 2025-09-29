@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from flask_login import current_user, login_required
 from flask_socketio import emit, join_room, leave_room
-from app import db, socketio
+from extensions import db, socketio
 from models import User, ChatMessage, ChatRoom
 import uuid
 from datetime import datetime

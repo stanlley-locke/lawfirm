@@ -15,6 +15,10 @@ from flask_mail import Mail
 from flask_socketio import SocketIO
 from flask_wtf.csrf import CSRFProtect
 
+# 2) Import extensions from a separate module to avoid circular imports
+from extensions import db, login_manager, migrate, mail, csrf, socketio
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -23,13 +27,7 @@ definable_Base = DeclarativeBase  # for typing
 class Base(definable_Base):
     pass
 
-# Initialize extensions (no app binding yet)
-db = SQLAlchemy(model_class=Base)
-login_manager = LoginManager()
-migrate = Migrate()
-mail = Mail()
-csrf = CSRFProtect()
-socketio = SocketIO()
+
 
 
 def create_app():

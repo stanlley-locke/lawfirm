@@ -2,7 +2,7 @@
 
 import os
 from flask import Blueprint, render_template, flash, redirect, url_for, current_app
-from app import db
+from extensions import db
 from models import Service, ContactMessage, User
 from forms import ContactForm
 from flask_login import login_user

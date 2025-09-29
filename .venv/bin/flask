@@ -1,4 +1,4 @@
-#!/mnt/c/Users/user/lawfirm/.venv/bin/python3
+#!/workspaces/lawfirm/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
