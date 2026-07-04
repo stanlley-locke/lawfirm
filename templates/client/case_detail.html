@@ -1,0 +1,159 @@
+{% extends "client/layout.html" %}
+
+{% block client_title %}Matter Details: {{ case.case_number }}{% endblock %}
+
+{% block client_content %}
+<div class="container-fluid">
+    <!-- Breadcrumb Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div class="text-start">
+            <div class="mb-2">
+                <a href="{{ url_for('client.dashboard') }}" class="text-decoration-none text-muted small">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: var(--doa-navy);">{{ case.title }}</h3>
+            <p class="text-muted mb-0 small">Case Number: <span class="font-monospace fw-bold text-dark">{{ case.case_number }}</span> | Reference Code: <span class="font-monospace fw-bold text-dark">{{ case.reference_code }}</span></p>
+        </div>
+        <div>
+            {% if case.status == 'Active' %}
+                <span class="badge bg-success" style="border-radius: 0; padding: 0.5em 1em; font-size: 0.85rem;">Active / In Progress</span>
+            {% elif case.status == 'Pending' %}
+                <span class="badge bg-warning text-dark" style="border-radius: 0; padding: 0.5em 1em; font-size: 0.85rem;">Pending Review</span>
+            {% else %}
+                <span class="badge bg-secondary" style="border-radius: 0; padding: 0.5em 1em; font-size: 0.85rem;">Closed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Case Details grid -->
+    <div class="row">
+        <!-- Timeline (Left Column) -->
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary text-uppercase tracking-wider">Case Milestones &amp; Progress</h5>
+                </div>
+                <div class="card-body p-4 text-start">
+                    {% if case.milestones %}
+                        <div class="case-timeline">
+                            {% for milestone in case.milestones|sort(attribute='date', reverse=true) %}
+                                <div class="timeline-item d-flex mb-4">
+                                    <div class="timeline-marker-col text-center me-3">
+                                        <div class="timeline-marker {% if milestone.status == 'Completed' %}bg-success text-white{% else %}bg-light text-muted border{% endif %} rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; min-width: 36px;">
+                                            {% if milestone.status == 'Completed' %}
+                                                <i class="fas fa-check" style="font-size: 0.85rem;"></i>
+                                            {% else %}
+                                                <i class="fas fa-clock" style="font-size: 0.85rem;"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="timeline-line bg-light h-100 mx-auto" style="width: 2px; min-height: 30px;"></div>
+                                    </div>
+                                    <div class="timeline-content-col bg-light p-3 border w-100" style="border-radius: 0;">
+                                        <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                                            <h6 class="mb-0 fw-bold text-dark">{{ milestone.title }}</h6>
+                                            <span class="small text-muted font-monospace"><i class="far fa-calendar-alt me-1"></i> {{ milestone.date.strftime('%b %d, %Y') }}</span>
+                                        </div>
+                                        {% if milestone.description %}
+                                            <p class="mb-0 text-muted small" style="line-height: 1.5;">{{ milestone.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-route fa-3x mb-3 text-light"></i>
+                            <p class="mb-0">No milestones registered yet for this case.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents & Invoices (Right Column) -->
+        <div class="col-lg-5 mb-4">
+            <!-- Document Manager -->
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary text-uppercase tracking-wider">Shared Documents</h5>
+                </div>
+                <div class="card-body p-4 text-start">
+                    {% if case.documents %}
+                        <ul class="list-group list-group-flush mb-4">
+                            {% for doc in case.documents %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom">
+                                    <div class="pe-2 overflow-hidden">
+                                        <div class="fw-semibold text-truncate text-dark" style="max-width: 240px; font-size: 0.9rem;">{{ doc.original_name }}</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">
+                                            Uploaded by: {{ doc.uploaded_by.username }} | {{ doc.uploaded_at.strftime('%Y-%m-%d') }}
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('client.download_document', doc_id=doc.id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 0;">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted text-center py-4 mb-4" style="font-size: 0.9rem;">No documents shared yet.</p>
+                    {% endif %}
+
+                    <!-- Document Upload Form -->
+                    <div class="border p-3 bg-light" style="border-radius: 0;">
+                        <h6 class="fw-bold text-uppercase tracking-wider text-muted mb-3" style="font-size: 0.75rem;">Upload Case Document</h6>
+                        <form method="POST" action="{{ url_for('client.upload_document', case_id=case.id) }}" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="document" name="document" required style="border-radius: 0; font-size: 0.85rem;">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary w-100" style="border-radius: 0; font-weight: 600;">Upload Document</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Manager -->
+            <div class="card shadow-sm border-0" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary text-uppercase tracking-wider">Invoices &amp; Statements</h5>
+                </div>
+                <div class="card-body p-4 text-start">
+                    {% if case.invoices %}
+                        <ul class="list-group list-group-flush">
+                            {% for invoice in case.invoices %}
+                                <li class="list-group-item px-0 py-3 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+                                    <div>
+                                        <div class="fw-bold font-monospace text-dark" style="font-size: 0.9rem;">{{ invoice.invoice_number }}</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">Due Date: {{ invoice.due_date.strftime('%Y-%m-%d') }}</div>
+                                        <div class="h6 mb-0 mt-1 fw-bold text-primary" style="font-size: 1.1rem;">KES {{ "{:,.2f}".format(invoice.amount) }}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if invoice.status == 'Paid' %}
+                                            <span class="badge bg-success px-3 py-2 text-uppercase mb-1" style="border-radius: 0; font-size: 0.75rem;">Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-danger px-3 py-2 text-uppercase mb-2 d-inline-block" style="border-radius: 0; font-size: 0.75rem;">Unpaid</span>
+                                            <form method="POST" action="{{ url_for('client.pay_invoice', invoice_id=invoice.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-primary" style="border-radius: 0; font-weight: 600;">Pay Invoice</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No invoices generated for this case.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline-item:last-child .timeline-line {
+        display: none;
+    }
+</style>
+{% endblock %}

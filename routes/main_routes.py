@@ -184,3 +184,17 @@ def sitemap():
         xml.append('  </url>')
     xml.append('</urlset>')
     return Response('\n'.join(xml), mimetype='application/xml')
+
+
+@main_bp.route('/track-case', methods=['GET', 'POST'])
+def track_case():
+    from models import LegalCase
+    code = request.args.get('code') or request.form.get('code')
+    case = None
+    error = None
+    if code:
+        case = LegalCase.query.filter_by(reference_code=code.strip()).first()
+        if not case:
+            error = "No case found with that Reference Code. Please check and try again."
+    return render_template('case_tracker.html', title='Case Tracker', case=case, code=code, error=error)
+

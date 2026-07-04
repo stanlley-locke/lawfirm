@@ -1,0 +1,132 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body d-flex justify-content-between align-items-center" style="border-radius: 0;">
+                    <div>
+                        <span class="text-muted text-uppercase small font-monospace d-block">Case Number: {{ case.case_number }}</span>
+                        <h1 class="h3 mb-0">{{ case.title }} - Invoices</h1>
+                    </div>
+                    <a href="{{ url_for('admin.client_cases') }}" class="btn btn-outline-secondary" style="border-radius: 0;">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Cases
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Add Invoice Form -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3" style="border-radius: 0;">
+                    <h3 class="h6 mb-0 text-uppercase tracking-wider fw-bold text-muted">Add Invoice</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.invoice_number.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                            {{ form.invoice_number(class="form-control" + (" is-invalid" if form.invoice_number.errors else ""), placeholder="e.g. INV-2025-0043", style="border-radius: 0;") }}
+                            {% for error in form.invoice_number.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.amount.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                            {{ form.amount(class="form-control" + (" is-invalid" if form.amount.errors else ""), type="number", step="0.01", placeholder="Amount in KES", style="border-radius: 0;") }}
+                            {% for error in form.amount.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.due_date.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                            {{ form.due_date(class="form-control" + (" is-invalid" if form.due_date.errors else ""), type="date", style="border-radius: 0;") }}
+                            {% for error in form.due_date.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.status.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                            {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else ""), style="border-radius: 0;") }}
+                            {% for error in form.status.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 0;">Add Invoice</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoices List -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3" style="border-radius: 0;">
+                    <h3 class="h6 mb-0 text-uppercase tracking-wider fw-bold text-muted">Billed Invoices</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="text-uppercase small font-monospace tracking-wider text-muted">
+                                    <th class="ps-4">Invoice #</th>
+                                    <th>Amount (KES)</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th class="pe-4 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if case.invoices %}
+                                    {% for invoice in case.invoices %}
+                                        <tr>
+                                            <td class="ps-4 font-monospace fw-bold">{{ invoice.invoice_number }}</td>
+                                            <td class="fw-bold text-primary">KES {{ "{:,.2f}".format(invoice.amount) }}</td>
+                                            <td class="font-monospace">{{ invoice.due_date.strftime('%Y-%m-%d') }}</td>
+                                            <td>
+                                                {% if invoice.status == 'Paid' %}
+                                                    <span class="badge bg-success" style="border-radius: 0;">Paid</span>
+                                                {% elif invoice.status == 'Unpaid' %}
+                                                    <span class="badge bg-danger" style="border-radius: 0;">Unpaid</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark" style="border-radius: 0;">Overdue</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <form id="delete-invoice-{{ invoice.id }}" action="{{ url_for('admin.delete_invoice', case_id=case.id, invoice_id=invoice.id) }}" method="POST" class="d-inline">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" style="border-radius: 0;"
+                                                            onclick="confirmDelete('delete-invoice-{{ invoice.id }}', 'invoice')">
+                                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5 text-muted">
+                                            No invoices billed yet. Add one using the form on the left.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

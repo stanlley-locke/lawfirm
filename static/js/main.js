@@ -11,6 +11,17 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
+    // Auto-dismiss alerts after 4 seconds (4000ms)
+    const alertDismissList = document.querySelectorAll('.alert-dismissible');
+    alertDismissList.forEach(function(alert) {
+        setTimeout(function() {
+            var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            if (bsAlert) {
+                bsAlert.close();
+            }
+        }, 4000);
+    });
+
     // For service filtering on case studies page
     const serviceFilter = document.getElementById('serviceFilter');
     if (serviceFilter) {

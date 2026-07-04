@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block chat_widget %}{% endblock %}
+{% block flash_messages %}{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard-container">
+    <script>
+        if (localStorage.getItem('admin-theme') === 'dark') {
+            document.querySelector('.admin-dashboard-container').classList.add('dark-theme');
+        }
+    </script>
+    
+    <!-- Client Portal Sidebar Panel -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-header">
+            <a href="{{ url_for('client.dashboard') }}" class="d-flex align-items-center text-decoration-none">
+                <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}" alt="Dan Ochieng & Company Advocates Logo" class="sidebar-logo me-2">
+                <span class="sidebar-brand-name">Client Portal</span>
+            </a>
+        </div>
+        <nav class="admin-sidebar-nav">
+            <a href="{{ url_for('client.dashboard') }}" class="nav-item {% if request.endpoint == 'client.dashboard' %}active{% endif %}" title="My Cases">
+                <i class="fas fa-folder-open"></i> <span>My Matters</span>
+            </a>
+            <a href="{{ url_for('client.chat') }}" class="nav-item {% if request.endpoint == 'client.chat' %}active{% endif %}" title="Live Chat Support">
+                <i class="fas fa-comments"></i> <span>Live Support</span>
+            </a>
+            <a href="{{ url_for('contact.contact') }}" class="nav-item" title="Contact Us">
+                <i class="fas fa-envelope"></i> <span>Contact Office</span>
+            </a>
+            <a href="{{ url_for('main.index') }}" class="nav-item" title="Back to Main Site">
+                <i class="fas fa-home"></i> <span>Back to Website</span>
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span class="username-text">{{ current_user.username }}</span>
+            </div>
+            <div class="footer-actions">
+                <a href="{{ url_for('main.index') }}" title="View Website"><i class="fas fa-external-link-alt"></i></a>
+                <a href="{{ url_for('auth.logout') }}" title="Sign Out"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-content-wrapper">
+        <!-- Impersonation Indicator -->
+        {% if session.get('impersonator_id') %}
+        <div class="bg-warning text-dark py-2 text-center small fw-bold shadow-sm border-bottom d-flex align-items-center justify-content-center" style="z-index: 1050; gap: 10px;">
+            <span><i class="fas fa-user-secret me-2"></i> Impersonating <strong>{{ current_user.username }}</strong>.</span>
+            <form action="{{ url_for('client.stop_impersonation') }}" method="POST" class="m-0">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-dark btn-xs py-0 px-2 font-monospace text-uppercase" style="font-size: 0.7rem; border-radius: 0; line-height: 1.5;">
+                    Switch Back to Admin
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <header class="admin-topbar shadow-sm">
+            <button class="sidebar-toggle btn d-lg-none" id="sidebarToggleBtn" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary me-3 d-none d-lg-inline-block" id="desktopSidebarToggleBtn" aria-label="Collapse Sidebar" style="border-radius: 0;">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-title h4 mb-0 d-none d-md-block">
+                {% block client_title %}Client Portal{% endblock %}
+            </div>
+            <div class="topbar-actions ms-auto d-flex align-items-center">
+                <!-- Theme Switcher Toggler -->
+                <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary me-3" aria-label="Toggle Theme" style="border-radius: 0; padding: 0.35rem 0.6rem;">
+                    <i class="fas fa-moon" id="themeToggleIcon"></i>
+                </button>
+                <span class="text-muted me-3 d-none d-sm-inline">Logged in as: <strong>{{ current_user.username }}</strong></span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger" style="border-radius: 0;">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </header>
+        
+        <div class="admin-page-content p-4">
+            <!-- Flash alerts inside the dashboard layout context -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="admin-flash-container mb-4">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block client_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const sidebar = document.getElementById('adminSidebar');
+        
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function(e) {
+                sidebar.classList.toggle('show');
+                e.stopPropagation();
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+        
+        const desktopToggle = document.getElementById('desktopSidebarToggleBtn');
+        const container = document.querySelector('.admin-dashboard-container');
+        if (desktopToggle && container) {
+            desktopToggle.addEventListener('click', function() {
+                container.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('sidebar-collapsed', container.classList.contains('sidebar-collapsed') ? 'true' : 'false');
+            });
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                container.classList.add('sidebar-collapsed');
+            }
+        }
+        
+        const themeToggle = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeToggleIcon');
+        if (themeToggle && container) {
+            themeToggle.addEventListener('click', function() {
+                container.classList.toggle('dark-theme');
+                const isDark = container.classList.contains('dark-theme');
+                localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
+                if (themeIcon) {
+                    themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                }
+            });
+            const activeTheme = localStorage.getItem('admin-theme') || 'light';
+            if (themeIcon) {
+                themeIcon.className = activeTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+    });
+</script>
+{% block client_scripts %}{% endblock %}
+{% endblock %}

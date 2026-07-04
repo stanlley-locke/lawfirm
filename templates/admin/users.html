@@ -1,29 +1,63 @@
-{% extends "layout.html" %}
+{% extends "admin/layout.html" %}
 
-{% block content %}
+{% block admin_title %}Manage System Users{% endblock %}
+
+{% block admin_content %}
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">Admin Users</h1>
-    <a href="{{ url_for('admin.new_user') }}" class="btn btn-primary">New User</a>
+    <h1 class="h3">System Users (Admins &amp; Clients)</h1>
+    <a href="{{ url_for('admin.new_user') }}" class="btn btn-primary" style="border-radius: 0;">
+      <i class="fas fa-user-plus me-1"></i> New User
+    </a>
   </div>
-  <div class="card">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3" style="border-radius: 0;">
+      <h2 class="h5 mb-0 text-uppercase tracking-wider fw-bold text-muted">All Registered Users</h2>
+    </div>
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead><tr><th>Username</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr class="text-uppercase small font-monospace tracking-wider text-muted">
+            <th class="ps-4">Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="pe-4 text-end">Actions</th>
+          </tr>
+        </thead>
         <tbody>
           {% for user in users %}
           <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
+            <td class="ps-4 fw-bold">{{ user.username }}</td>
+            <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
             <td>
-              {% if user.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+              {% if user.is_admin %}
+                <span class="badge bg-primary" style="border-radius: 0;">Admin</span>
+              {% else %}
+                <span class="badge bg-info text-dark" style="border-radius: 0;">Client</span>
+              {% endif %}
             </td>
             <td>
-              <a href="{{ url_for('admin.edit_user', id=user.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+              {% if user.is_active %}
+                <span class="badge bg-success" style="border-radius: 0;">Active</span>
+              {% else %}
+                <span class="badge bg-secondary" style="border-radius: 0;">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="pe-4 text-end">
+              {% if not user.is_admin %}
+              <form action="{{ url_for('admin.impersonate_user', id=user.id) }}" method="POST" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-info me-1" style="border-radius: 0;">
+                  <i class="fas fa-user-secret me-1"></i> Login As
+                </button>
+              </form>
+              {% endif %}
+              <a href="{{ url_for('admin.edit_user', id=user.id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 0;">Edit</a>
               {% if user.is_active and user.id != current_user.id %}
               <form action="{{ url_for('admin.deactivate_user', id=user.id) }}" method="POST" class="d-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-sm btn-outline-warning">Deactivate</button>
+                <button type="submit" class="btn btn-sm btn-outline-warning" style="border-radius: 0;">Deactivate</button>
               </form>
               {% endif %}
             </td>

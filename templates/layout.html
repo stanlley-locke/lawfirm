@@ -48,6 +48,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
+    {% block navbar %}
     <div class="doa-navbar-float" id="doaNavbarFloat">
         <nav class="navbar navbar-expand-xl navbar-light doa-navbar" id="doaNavbar">
             <div class="doa-navbar-inner px-3 px-lg-4">
@@ -291,6 +292,7 @@
                             <span>0745 819 632</span>
                         </a>
                         {% if current_user.is_authenticated %}
+                            {% if current_user.is_admin %}
                             <div class="dropdown doa-nav-admin">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -314,6 +316,19 @@
                                     <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                                 </ul>
                             </div>
+                            {% else %}
+                            <div class="dropdown doa-nav-admin">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>Client Portal
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('client.dashboard') }}">Dashboard</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                                </ul>
+                            </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -321,7 +336,21 @@
         </nav>
     </div>
     <div class="doa-navbar-spacer" id="doaNavbarSpacer" aria-hidden="true"></div>
+    {% endblock %}
 
+    {% if session.get('impersonator_id') %}
+    <div class="bg-warning text-dark py-2 text-center small fw-bold shadow-sm border-bottom position-sticky top-0" style="z-index: 1050;">
+        <i class="fas fa-user-secret me-2"></i> You are currently viewing this client portal as <strong>{{ current_user.username }}</strong>.
+        <form action="{{ url_for('client.stop_impersonation') }}" method="POST" class="d-inline ms-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-dark btn-xs py-0 px-2 font-monospace text-uppercase" style="font-size: 0.7rem; border-radius: 0; line-height: 1.5;">
+                Switch Back to Admin
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% block flash_messages %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="container mt-3">
@@ -334,11 +363,15 @@
             </div>
         {% endif %}
     {% endwith %}
+    {% endblock %}
 
+    {% block main_container %}
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
+    {% endblock %}
 
+    {% block footer %}
     <footer class="footer mt-auto">
         <div class="container">
             <div class="row">
@@ -403,7 +436,9 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
+    {% block chat_widget %}
     {% if not current_user.is_authenticated %}
         <div class="chat-widget-container">
             <a href="{{ url_for('chat.client_chat') }}"
@@ -413,6 +448,7 @@
             </a>
         </div>
     {% endif %}
+    {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

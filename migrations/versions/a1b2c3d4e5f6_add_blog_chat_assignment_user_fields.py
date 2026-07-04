@@ -17,8 +17,8 @@ depends_on = None
 
 def upgrade():
     with op.batch_alter_table('user', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('is_active', sa.Boolean(), nullable=True))
-        batch_op.add_column(sa.Column('is_online', sa.Boolean(), nullable=True))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), nullable=True, server_default=sa.text('1')))
+        batch_op.add_column(sa.Column('is_online', sa.Boolean(), nullable=True, server_default=sa.text('0')))
         batch_op.add_column(sa.Column('last_seen', sa.DateTime(), nullable=True))
 
     with op.batch_alter_table('team_member', schema=None) as batch_op:

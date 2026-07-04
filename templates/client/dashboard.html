@@ -1,0 +1,192 @@
+{% extends "client/layout.html" %}
+
+{% block client_title %}Client Dashboard{% endblock %}
+
+{% block client_content %}
+<div class="container-fluid">
+    <!-- Welcome banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 bg-white" style="border-radius: 0;">
+                <div class="card-body p-4 text-start">
+                    <h3 class="fw-bold mb-1" style="color: var(--doa-navy);">Welcome, {{ current_user.username }}</h3>
+                    <p class="text-muted mb-0">Manage and track your legal matters, view milestones, and exchange documents with our advocates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Metrics Cards -->
+    {% set pending_invoices = [] %}
+    {% for case in cases %}
+        {% if case.invoices %}
+            {% for invoice in case.invoices %}
+                {% if invoice.status == 'Pending' %}
+                    {% set _ = pending_invoices.append(invoice) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="row mb-4 g-3">
+        <!-- Card 1: Active Cases -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 0; background-color: rgba(8, 32, 104, 0.05); border-left: 4px solid var(--doa-navy) !important;">
+                <div class="card-body text-start d-flex align-items-center">
+                    <div class="me-3 bg-white p-3 text-primary shadow-sm" style="border-radius: 0;">
+                        <i class="fas fa-folder-open fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase small fw-bold text-muted mb-1">Active Matters</h6>
+                        <h2 class="fw-bold mb-0 text-dark">{{ cases|selectattr('status', 'equalto', 'Active')|list|length }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 2: Total Matters -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 0; background-color: rgba(0, 200, 248, 0.05); border-left: 4px solid var(--doa-cyan) !important;">
+                <div class="card-body text-start d-flex align-items-center">
+                    <div class="me-3 bg-white p-3 text-info shadow-sm" style="border-radius: 0;">
+                        <i class="fas fa-gavel fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase small fw-bold text-muted mb-1">Total Matters</h6>
+                        <h2 class="fw-bold mb-0 text-dark">{{ cases|length }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card 3: Pending Invoices -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 0; background-color: rgba(255, 193, 7, 0.08); border-left: 4px solid #ffc107 !important;">
+                <div class="card-body text-start d-flex align-items-center">
+                    <div class="me-3 bg-white p-3 text-warning shadow-sm" style="border-radius: 0;">
+                        <i class="fas fa-file-invoice-dollar fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase small fw-bold text-muted mb-1">Pending Invoices</h6>
+                        <h2 class="fw-bold mb-0 text-dark">{{ pending_invoices|length }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Need to speak banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm p-4 text-white" style="background: linear-gradient(135deg, #082068 0%, #001060 100%); border-radius: 0;">
+                <div class="row align-items-center">
+                    <div class="col-md-8 text-start">
+                        <h3 class="h5 text-white mb-2 fw-bold">Need to speak with your advocate?</h3>
+                        <p class="mb-0 text-white-50">Our team is available during business hours. Use our Live Chat system or contact our offices directly.</p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <a href="{{ url_for('client.chat') }}" class="btn btn-light me-2" style="border-radius: 0; font-weight: 600;">
+                            <i class="fas fa-comments me-2 text-primary"></i>Start Live Chat
+                        </a>
+                        <a href="{{ url_for('contact.contact') }}" class="btn btn-outline-light" style="border-radius: 0; font-weight: 600;">
+                            Contact Office
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active legal matters table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary text-uppercase tracking-wider">Your Registered Legal Matters</h5>
+                    <div class="input-group" style="max-width: 320px;">
+                        <span class="input-group-text bg-light border-end-0" style="border-radius: 0; padding: 0.35rem 0.6rem;"><i class="fas fa-search text-muted" style="font-size: 0.8rem;"></i></span>
+                        <input type="text" id="matterSearchInput" class="form-control bg-light border-start-0" placeholder="Search Ref Code or Case Number..." style="border-radius: 0; font-size: 0.85rem; padding: 0.35rem 0.6rem;">
+                    </div>
+                </div>
+                <div class="card-body p-0 text-start">
+                    {% if cases %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="text-uppercase small font-monospace tracking-wider text-muted">
+                                        <th class="ps-4">Case / Matter</th>
+                                        <th>Reference Code</th>
+                                        <th>Type</th>
+                                        <th>Current Status</th>
+                                        <th>Last Update</th>
+                                        <th class="pe-4 text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for case in cases %}
+                                        <tr>
+                                            <td class="ps-4 py-3">
+                                                <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ case.title }}</div>
+                                                <div class="small text-muted font-monospace" style="font-size: 0.75rem;">{{ case.case_number }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="font-monospace fw-bold" style="font-size: 0.85rem;">{{ case.reference_code }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">{{ case.case_type or 'General' }}</span>
+                                            </td>
+                                            <td>
+                                                {% if case.status == 'Active' %}
+                                                    <span class="badge bg-success" style="border-radius: 0;">Active</span>
+                                                {% elif case.status == 'Pending' %}
+                                                    <span class="badge bg-warning text-dark" style="border-radius: 0;">Pending</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary" style="border-radius: 0;">Closed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="text-muted small">{{ case.updated_at.strftime('%Y-%m-%d') }}</span>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <a href="{{ url_for('client.case_detail', case_id=case.id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 0; font-weight: 600;">
+                                                    Manage Matter <i class="fas fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="display-6 text-muted mb-3"><i class="fas fa-folder-open"></i></div>
+                            <h5 class="fw-bold text-dark">No active cases found</h5>
+                            <p class="text-muted small px-3">Please contact our offices if your legal case is not registered here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block client_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('matterSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

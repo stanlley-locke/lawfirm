@@ -1,0 +1,103 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_title %}Manage Client Cases{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body d-flex justify-content-between align-items-center" style="border-radius: 0;">
+                    <h1 class="h3 mb-0">Client Matters &amp; Cases</h1>
+                    <a href="{{ url_for('admin.new_client_case') }}" class="btn btn-primary" style="border-radius: 0;">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Case
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3" style="border-radius: 0;">
+                    <h2 class="h5 mb-0 text-uppercase tracking-wider fw-bold text-muted">All Client Cases</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="text-uppercase small font-monospace tracking-wider text-muted">
+                                    <th class="ps-4">Case Details</th>
+                                    <th>Client</th>
+                                    <th>Ref Code</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th class="pe-4 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if cases %}
+                                    {% for case in cases %}
+                                        <tr>
+                                            <td class="ps-4 py-3">
+                                                <div class="fw-bold text-primary">{{ case.title }}</div>
+                                                <div class="small text-muted font-monospace">{{ case.case_number }}</div>
+                                            </td>
+                                            <td>
+                                                <div>{{ case.client.username }}</div>
+                                                <div class="small text-muted">{{ case.client.email }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="font-monospace fw-bold">{{ case.reference_code }}</span>
+                                            </td>
+                                            <td>{{ case.case_type }}</td>
+                                            <td>
+                                                {% if case.status == 'Active' %}
+                                                    <span class="badge bg-success" style="border-radius: 0;">Active</span>
+                                                {% elif case.status == 'Pending' %}
+                                                    <span class="badge bg-warning text-dark" style="border-radius: 0;">Pending</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary" style="border-radius: 0;">Closed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ url_for('admin.case_milestones', case_id=case.id) }}" class="btn btn-outline-info" title="Milestones" style="border-radius: 0;">
+                                                        <i class="fas fa-list-ol me-1"></i> Milestones
+                                                    </a>
+                                                    <a href="{{ url_for('admin.case_invoices', case_id=case.id) }}" class="btn btn-outline-warning" title="Invoices" style="border-radius: 0;">
+                                                        <i class="fas fa-file-invoice-dollar me-1"></i> Invoices
+                                                    </a>
+                                                    <a href="{{ url_for('admin.edit_client_case', id=case.id) }}" class="btn btn-outline-primary" title="Edit" style="border-radius: 0;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form id="delete-form-{{ case.id }}" action="{{ url_for('admin.delete_client_case', id=case.id) }}" method="POST" class="d-inline">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="button" class="btn btn-outline-danger" title="Delete" style="border-radius: 0;"
+                                                                onclick="confirmDelete('delete-form-{{ case.id }}', 'client case')">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="display-6 text-muted mb-3"><i class="fas fa-folder-open"></i></div>
+                                            <h5>No client cases found</h5>
+                                            <p class="text-muted mb-0">Click "Add New Case" above to get started.</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -152,3 +152,86 @@ class ChatRoom(db.Model):
 
     def __repr__(self):
         return f'<ChatRoom {self.room_id}>'
+
+
+class LegalCase(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_number = db.Column(db.String(50), unique=True, nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text)
+    client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(50), default='Active')  # e.g., Active, Pending, Closed
+    case_type = db.Column(db.String(100))  # e.g., Conveyancing, Commercial, Litigation
+    reference_code = db.Column(db.String(50), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    client = db.relationship('User', backref=db.backref('cases', lazy=True))
+
+    def __repr__(self):
+        return f'<LegalCase {self.case_number} - {self.title}>'
+
+
+class CaseMilestone(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('legal_case.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text)
+    date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), default='Upcoming')  # e.g., Upcoming, Completed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    case = db.relationship('LegalCase', backref=db.backref('milestones', lazy=True, cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return f'<CaseMilestone {self.title} for {self.case_id}>'
+
+
+class CaseDocument(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('legal_case.id'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    original_name = db.Column(db.String(255), nullable=False)
+    uploaded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    case = db.relationship('LegalCase', backref=db.backref('documents', lazy=True, cascade="all, delete-orphan"))
+    uploaded_by = db.relationship('User', backref=db.backref('uploaded_documents', lazy=True))
+
+    def __repr__(self):
+        return f'<CaseDocument {self.original_name}>'
+
+
+class CaseInvoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    case_id = db.Column(db.Integer, db.ForeignKey('legal_case.id'), nullable=False)
+    invoice_number = db.Column(db.String(50), unique=True, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    due_date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), default='Unpaid')  # e.g., Unpaid, Paid, Overdue
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    case = db.relationship('LegalCase', backref=db.backref('invoices', lazy=True, cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return f'<CaseInvoice {self.invoice_number} - {self.amount}>'
+
+
+class CannedResponse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shortcut = db.Column(db.String(50), unique=True, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<CannedResponse {self.shortcut}>'
+
+
+class ChatSetting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(100), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<ChatSetting {self.key}>'
+

@@ -25,7 +25,7 @@ def _send_async(app, params):
             logger.exception('Failed to send email via Resend')
 
 
-def send_email(subject, recipients, text_body, html_body=None, reply_to=None):
+def send_email(subject, recipients, text_body, html_body=None, reply_to=None, attachments=None):
     """
     Asynchronously send an email via Resend.
 
@@ -34,6 +34,7 @@ def send_email(subject, recipients, text_body, html_body=None, reply_to=None):
     :param text_body: Plain-text body
     :param html_body: Optional HTML body
     :param reply_to: Optional reply-to address
+    :param attachments: Optional list of dicts with 'content' (base64 string) and 'filename'
     """
     if not recipients:
         return
@@ -49,6 +50,8 @@ def send_email(subject, recipients, text_body, html_body=None, reply_to=None):
         params['html'] = html_body
     if reply_to:
         params['reply_to'] = reply_to
+    if attachments:
+        params['attachments'] = attachments
 
     Thread(
         target=_send_async,

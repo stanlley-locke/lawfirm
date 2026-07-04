@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body_class %}admin-login-body{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block chat_widget %}{% endblock %}
+{% block flash_messages %}{% endblock %}
+
+{% block content %}
+<div class="admin-login-fullscreen d-flex align-items-center justify-content-center">
+    <div class="admin-login-card shadow-lg bg-white">
+        <div class="text-center mb-4">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                     alt="Dan Ochieng & Company Advocates" class="login-logo mb-2" style="height: 64px;">
+            </a>
+            <h1 class="h4 mt-2 login-title">Client Portal</h1>
+            <p class="text-muted small">Access your cases, milestones &amp; invoices</p>
+        </div>
+        
+        <!-- Alerts inside the card context for clean layout -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-3">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show small py-2 px-3" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('client.login') }}">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.username.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                {{ form.username(class="form-control admin-login-input", placeholder="Enter username") }}
+            </div>
+            <div class="mb-3">
+                {{ form.password.label(class="form-label text-uppercase small tracking-wider fw-semibold text-muted") }}
+                {{ form.password(class="form-control admin-login-input", placeholder="Enter password") }}
+            </div>
+            <div class="form-check mb-4">
+                {{ form.remember(class="form-check-input") }}
+                {{ form.remember.label(class="form-check-label small text-muted") }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 btn-login">Sign In</button>
+        </form>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.index') }}" class="back-to-web-link"><i class="fas fa-arrow-left me-1"></i> Back to Website</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

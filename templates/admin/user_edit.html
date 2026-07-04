@@ -1,20 +1,84 @@
-{% extends "layout.html" %}
+{% extends "admin/layout.html" %}
 
-{% block content %}
+{% block admin_title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
 <div class="container py-4">
-  <h1 class="h3 mb-4">{{ title }}</h1>
-  <form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">{{ form.username.label(class="form-label") }}{{ form.username(class="form-control") }}</div>
-    <div class="mb-3">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}</div>
-    <div class="mb-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}
-      {% if user %}<small class="text-muted">Leave blank to keep current password.</small>{% endif %}
+    <div class="row">
+        <div class="col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-sm border-0" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary">{{ title }}</h5>
+                </div>
+                <div class="card-body text-start">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Username -->
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label small fw-bold text-muted text-uppercase") }}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), style="border-radius: 0;") }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label small fw-bold text-muted text-uppercase") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), style="border-radius: 0;") }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label small fw-bold text-muted text-uppercase") }}
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), style="border-radius: 0;") }}
+                            {% if user %}
+                                <small class="form-text text-muted">Leave blank to keep the current password.</small>
+                            {% endif %}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-3">
+                            {{ form.password2.label(class="form-label small fw-bold text-muted text-uppercase") }}
+                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else ""), style="border-radius: 0;") }}
+                            {% for error in form.password2.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Privileges Toggles -->
+                        <div class="form-check form-switch mb-3 text-start">
+                            {{ form.is_admin(class="form-check-input", style="cursor: pointer;") }}
+                            {{ form.is_admin.label(class="form-check-label small fw-bold text-muted text-uppercase ms-2", style="cursor: pointer;") }}
+                            {% for error in form.is_admin.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-check form-switch mb-4 text-start">
+                            {{ form.is_active(class="form-check-input", style="cursor: pointer;") }}
+                            {{ form.is_active.label(class="form-check-label small fw-bold text-muted text-uppercase ms-2", style="cursor: pointer;") }}
+                            {% for error in form.is_active.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" style="border-radius: 0;">Save User</button>
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary" style="border-radius: 0;">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">{{ form.password2.label(class="form-label") }}{{ form.password2(class="form-control") }}</div>
-    <div class="mb-3 form-check">{{ form.is_admin(class="form-check-input") }}{{ form.is_admin.label(class="form-check-label") }}</div>
-    <div class="mb-3 form-check">{{ form.is_active(class="form-check-input") }}{{ form.is_active.label(class="form-check-label") }}</div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary">Cancel</a>
-  </form>
 </div>
 {% endblock %}

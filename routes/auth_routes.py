@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 import logging
 
@@ -20,13 +20,15 @@ def login():
     failed = session_failed_attempts()
     if ip in failed:
         attempts, ts = failed[ip]
-        if attempts >= 5 and (datetime.utcnow() - ts).total_seconds() < 300:
+        if attempts >= 5 and (datetime.now(timezone.utc) - ts).total_seconds() < 300:
             flash('Too many login attempts. Try again in 5 minutes.', 'danger')
             return render_template('auth/login.html', title='Login', form=LoginForm())
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter(
+            (User.username == form.username.data) | (User.email == form.username.data)
+        ).first()
 
         if not user or not user.is_active or not user.check_password(form.password.data):
             record_failed_attempt(ip)
@@ -67,7 +69,7 @@ def record_failed_attempt(ip):
     from flask import session
     failed = session.get('failed_attempts', {})
     cnt, _ = failed.get(ip, (0, None))
-    failed[ip] = (cnt + 1, datetime.utcnow())
+    failed[ip] = (cnt + 1, datetime.now(timezone.utc))
     session['failed_attempts'] = failed
 
 

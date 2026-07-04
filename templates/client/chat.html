@@ -1,0 +1,234 @@
+{% extends "client/layout.html" %}
+
+{% block client_title %}Live Chat Support{% endblock %}
+
+{% block client_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-sm border-0 bg-white" style="border-radius: 0;">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between" style="border-radius: 0;">
+                    <h5 class="fw-bold mb-0 text-primary"><i class="fas fa-headset me-2"></i>Live Chat Support</h5>
+                    <span class="badge bg-success d-flex align-items-center" id="chat-status-badge">Connected</span>
+                </div>
+                <div class="card-body p-0 text-start" style="height: 500px; display: flex; flex-direction: column;">
+                    <!-- Chat Messages List -->
+                    <div id="clientChatMessages" class="p-3 flex-grow-1 overflow-y-auto" style="background-color: #f8fafc; min-height: 380px;">
+                        <div class="text-center text-muted py-5" id="no-messages-placeholder" style="display: none;">
+                            <i class="fas fa-comments fa-3x mb-3 text-light"></i>
+                            <p>No messages yet. Send a message to start chatting with our legal team.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Input Controls -->
+                    <div class="p-3 border-top bg-white">
+                        <div id="typing-indicator" class="small text-muted mb-2 d-none">Representative is typing...</div>
+                        <form id="clientMessageForm" class="d-flex gap-2 mb-2">
+                            <input type="text" class="form-control" id="clientMessageInput" placeholder="Type your message..." required style="border-radius: 0; font-size: 0.9rem;" autocomplete="off">
+                            <button class="btn btn-primary" type="submit" style="border-radius: 0; padding: 0.375rem 1.25rem;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                        <form id="clientUploadForm" class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2 border-top">
+                            <div class="d-flex align-items-center">
+                                <label for="clientChatFile" class="form-label small text-muted mb-0 me-2 fw-bold text-uppercase" style="font-size: 0.75rem;">Attach document:</label>
+                                <input type="file" class="form-control form-control-sm" id="clientChatFile" accept=".png,.jpg,.jpeg,.gif,.webp,.pdf" style="border-radius: 0; font-size: 0.8rem; width: auto; max-width: 250px;">
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" type="submit" style="border-radius: 0; font-size: 0.8rem; font-weight: 600;">Upload File (max 5MB)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4 shadow-sm border-0" style="border-radius: 0;">
+                <div class="card-header bg-white border-bottom py-3" style="border-radius: 0;">
+                    <h6 class="fw-bold mb-0 text-muted text-uppercase tracking-wider" style="font-size: 0.75rem;"><i class="fas fa-info-circle me-2"></i>Live Chat Guidelines</h6>
+                </div>
+                <div class="card-body text-start small text-muted" style="line-height: 1.6;">
+                    <ul class="mb-0 ps-3">
+                        <li>This portal chat is secure, but please avoid uploading highly confidential legal files here. Use the <strong>Shared Documents</strong> section inside your Matter details page instead.</li>
+                        <li>Advocates respond during official business hours (9:00 AM - 5:00 PM, East Africa Time).</li>
+                        <li>An email copy of missed replies will be sent to your registered address automatically.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block client_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const messagePane = document.getElementById('clientChatMessages');
+        const messageForm = document.getElementById('clientMessageForm');
+        const messageInput = document.getElementById('clientMessageInput');
+        const uploadForm = document.getElementById('clientUploadForm');
+        const fileInput = document.getElementById('clientChatFile');
+        const statusBadge = document.getElementById('chat-status-badge');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const placeholder = document.getElementById('no-messages-placeholder');
+
+        const roomId = "{{ room }}";
+        const clientName = "{{ current_user.username }}";
+        const clientEmail = "{{ current_user.email }}";
+
+        let socket = null;
+        let typingTimeout = null;
+
+        // Load existing messages
+        const initialMessages = [
+            {% for message in messages %}
+            {
+                id: {{ message.id }},
+                content: {{ message.content|tojson }},
+                is_from_client: {{ 'true' if message.is_from_client else 'false' }},
+                user: {{ (message.user.username if message.user else "")|tojson }},
+                timestamp: {{ message.timestamp.isoformat()|tojson }},
+                attachment_url: {{ (url_for('static', filename='uploads/chat/' + message.attachment_filename) if message.attachment_filename else '')|tojson }},
+                attachment_name: {{ (message.attachment_original_name or '')|tojson }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        if (initialMessages.length === 0) {
+            placeholder.style.display = 'block';
+        } else {
+            initialMessages.forEach(msg => appendMessage(msg));
+        }
+
+        // Establish Socket Connection
+        socket = io();
+
+        socket.on('connect', () => {
+            statusBadge.textContent = 'Connected';
+            statusBadge.className = 'badge bg-success d-flex align-items-center';
+            socket.emit('join', { room: roomId, client_name: clientName, client_email: clientEmail });
+        });
+
+        socket.on('disconnect', () => {
+            statusBadge.textContent = 'Disconnected';
+            statusBadge.className = 'badge bg-danger d-flex align-items-center';
+        });
+
+        socket.on('message', (data) => {
+            appendMessage(data);
+        });
+
+        socket.on('typing', (data) => {
+            if (data.is_staff) {
+                typingIndicator.classList.toggle('d-none', !data.is_typing);
+            }
+        });
+
+        // Handle text input typing events
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', { room: roomId, is_typing: true, client_name: clientName });
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('typing', { room: roomId, is_typing: false, client_name: clientName });
+            }, 1500);
+        });
+
+        // Submit Text Messages
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text) {
+                socket.emit('message', {
+                    room: roomId,
+                    message: text,
+                    is_from_client: true,
+                    client_name: clientName,
+                    client_email: clientEmail
+                });
+                messageInput.value = '';
+            }
+        });
+
+        // Submit File Uploads
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!fileInput.files.length) return;
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            fetch('/chat/upload', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.message) {
+                    appendMessage(data.message);
+                } else {
+                    alert(data.error || 'Upload failed');
+                }
+                fileInput.value = '';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Upload failed');
+            });
+        });
+
+        // Append message bubble helper
+        function appendMessage(data) {
+            placeholder.style.display = 'none';
+            const wrapper = document.createElement('div');
+            wrapper.className = `d-flex flex-column mb-3 ${data.is_from_client ? 'align-items-end' : 'align-items-start'}`;
+
+            const bubble = document.createElement('div');
+            bubble.style.maxWidth = '75%';
+            bubble.style.borderRadius = '0';
+            
+            if (data.is_from_client) {
+                bubble.className = 'p-3 bg-primary text-white text-start shadow-sm';
+            } else {
+                bubble.className = 'p-3 bg-white text-dark border text-start shadow-sm';
+            }
+
+            const textDiv = document.createElement('div');
+            textDiv.textContent = data.content;
+            textDiv.style.lineHeight = '1.5';
+            textDiv.style.fontSize = '0.9rem';
+            bubble.appendChild(textDiv);
+
+            if (data.attachment_url) {
+                const attachmentDiv = document.createElement('div');
+                attachmentDiv.className = 'mt-2 pt-2 border-top small';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-paperclip me-1';
+                const link = document.createElement('a');
+                link.href = data.attachment_url;
+                link.textContent = data.attachment_name || 'Download Attachment';
+                link.target = '_blank';
+                link.className = data.is_from_client ? 'text-white text-decoration-underline' : 'text-primary text-decoration-none';
+                attachmentDiv.appendChild(icon);
+                attachmentDiv.appendChild(link);
+                bubble.appendChild(attachmentDiv);
+            }
+
+            const meta = document.createElement('div');
+            meta.className = 'small text-muted mt-1 font-monospace';
+            meta.style.fontSize = '0.7rem';
+            const ts = data.timestamp 
+                ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const sender = data.is_from_client ? 'You' : (data.user || 'Legal Team');
+            meta.textContent = `${sender} | ${ts}`;
+
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(meta);
+            messagePane.appendChild(wrapper);
+            messagePane.scrollTop = messagePane.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}

@@ -30,13 +30,25 @@ function updateNavBadge() {
     fetch('/admin/chat/unread-count')
         .then(response => response.json())
         .then(data => {
-            const navBadge = document.getElementById('chat-nav-badge');
-            if (navBadge) {
+            // Update sidebar badge
+            const sidebarBadge = document.getElementById('chat-sidebar-badge');
+            if (sidebarBadge) {
                 if (data.count > 0) {
-                    navBadge.textContent = data.count;
-                    navBadge.classList.remove('d-none');
+                    sidebarBadge.textContent = data.count;
+                    sidebarBadge.classList.remove('d-none');
                 } else {
-                    navBadge.classList.add('d-none');
+                    sidebarBadge.classList.add('d-none');
+                }
+            }
+            
+            // Update topbar badge
+            const topbarBadge = document.getElementById('topbar-chat-badge');
+            if (topbarBadge) {
+                if (data.count > 0) {
+                    topbarBadge.textContent = data.count;
+                    topbarBadge.classList.remove('d-none');
+                } else {
+                    topbarBadge.classList.add('d-none');
                 }
             }
         })

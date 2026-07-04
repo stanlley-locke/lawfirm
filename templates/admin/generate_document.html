@@ -1,0 +1,154 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_title %}Document Template Generator{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3" style="border-radius: 0;">
+                    <h2 class="h5 mb-0 text-uppercase tracking-wider fw-bold text-muted">Generate Legal Documents</h2>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form id="docGenForm" method="POST" action="{{ url_for('admin.generate_document') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label for="template_type" class="form-label text-uppercase small tracking-wider fw-semibold text-muted">Select Template Type</label>
+                            <select id="template_type" name="template_type" class="form-select form-select-lg" style="border-radius: 0;">
+                                <option value="nda">Mutual Non-Disclosure Agreement (NDA)</option>
+                                <option value="sales_agreement">Agreement of Sale (Goods/Property)</option>
+                                <option value="demand_letter">Formal Letter of Demand (Debt Recovery)</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- NDA Form Fields -->
+                        <div id="fields-nda" class="template-fields">
+                            <h3 class="h6 mb-3 text-uppercase font-monospace text-primary">NDA Agreement Parameters</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="disclosing_party" class="form-label small text-muted">Disclosing Party Name</label>
+                                    <input type="text" id="disclosing_party" name="disclosing_party" class="form-control" placeholder="e.g. Dan Ochieng & Co Advocates" value="Dan Ochieng & Company Advocates" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="receiving_party" class="form-label small text-muted">Receiving Party Name</label>
+                                    <input type="text" id="receiving_party" name="receiving_party" class="form-control" placeholder="e.g. Acme Corp" style="border-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="agreement_date_nda" class="form-label small text-muted">Agreement Date</label>
+                                    <input type="date" id="agreement_date_nda" name="agreement_date" class="form-control" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="purpose" class="form-label small text-muted">Purpose of Disclosure</label>
+                                    <input type="text" id="purpose" name="purpose" class="form-control" placeholder="e.g. evaluating a strategic partnership" value="evaluating a potential business partnership" style="border-radius: 0;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sales Agreement Fields -->
+                        <div id="fields-sales_agreement" class="template-fields d-none">
+                            <h3 class="h6 mb-3 text-uppercase font-monospace text-primary">Sales Agreement Parameters</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="seller" class="form-label small text-muted">Seller Full Name / Entity</label>
+                                    <input type="text" id="seller" name="seller" class="form-control" placeholder="Seller Details" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="buyer" class="form-label small text-muted">Buyer Full Name / Entity</label>
+                                    <input type="text" id="buyer" name="buyer" class="form-control" placeholder="Buyer Details" style="border-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="item" class="form-label small text-muted">Item / Property Description</label>
+                                <textarea id="item" name="item" class="form-control" rows="2" placeholder="e.g. Motor Vehicle Reg No KAA 123A, Toyota Prado" style="border-radius: 0;"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="price" class="form-label small text-muted">Purchase Price (KES)</label>
+                                    <input type="number" id="price" name="price" class="form-control" placeholder="e.g. 2500000" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="agreement_date_sales" class="form-label small text-muted">Agreement Date</label>
+                                    <input type="date" id="agreement_date_sales" name="agreement_date" class="form-control" style="border-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment_terms" class="form-label small text-muted">Payment Terms</label>
+                                <input type="text" id="payment_terms" name="payment_terms" class="form-control" placeholder="e.g. KES 1,000,000 on signing, balance in 30 days" value="Paid in full upon signing of this agreement" style="border-radius: 0;">
+                            </div>
+                        </div>
+
+                        <!-- Letter of Demand Fields -->
+                        <div id="fields-demand_letter" class="template-fields d-none">
+                            <h3 class="h6 mb-3 text-uppercase font-monospace text-primary">Letter of Demand Parameters</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="debtor_name" class="form-label small text-muted">Debtor Full Name</label>
+                                    <input type="text" id="debtor_name" name="debtor_name" class="form-control" placeholder="Debtor Name" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="debtor_address" class="form-label small text-muted">Debtor Address</label>
+                                    <input type="text" id="debtor_address" name="debtor_address" class="form-control" placeholder="Address / Location" style="border-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="amount" class="form-label small text-muted">Debt Amount (KES)</label>
+                                    <input type="number" id="amount" name="amount" class="form-control" placeholder="e.g. 450000" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="deadline_date" class="form-label small text-muted">Payment Deadline</label>
+                                    <input type="text" id="deadline_date" name="deadline_date" class="form-control" placeholder="e.g. 7 days from the date of this letter" value="seven (7) days from the date of this letter" style="border-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="reason" class="form-label small text-muted">Debt Background / Reason</label>
+                                    <input type="text" id="reason" name="reason" class="form-control" placeholder="e.g. unpaid invoice number INV-1002" style="border-radius: 0;">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="advocate_name" class="form-label small text-muted">Issuing Advocate</label>
+                                    <input type="text" id="advocate_name" name="advocate_name" class="form-control" value="Dan Ochieng, Advocate" style="border-radius: 0;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4" style="border-radius: 0;">
+                            <i class="fas fa-file-pdf me-2"></i>Generate &amp; Download PDF Document
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selector = document.getElementById('template_type');
+        const sections = document.querySelectorAll('.template-fields');
+        
+        // Set date inputs to today's date by default
+        const todayStr = new Date().toISOString().substring(0, 10);
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.value = todayStr;
+        });
+
+        selector.addEventListener('change', function() {
+            const selectedVal = this.value;
+            sections.forEach(sec => {
+                if (sec.id === 'fields-' + selectedVal) {
+                    sec.classList.remove('d-none');
+                } else {
+                    sec.classList.add('d-none');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

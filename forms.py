@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, PasswordField, BooleanField, SelectField, IntegerField, FileField
+from wtforms import StringField, TextAreaField, PasswordField, BooleanField, SelectField, IntegerField, FileField, DateField, FloatField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, URL, ValidationError
 from models import User
 
@@ -94,3 +94,47 @@ class AdminUserForm(FlaskForm):
 class ReplyForm(FlaskForm):
     subject = StringField('Subject', validators=[DataRequired(), Length(max=200)])
     body = TextAreaField('Message', validators=[DataRequired()])
+
+
+class ClientCaseForm(FlaskForm):
+    case_number = StringField('Case Number', validators=[DataRequired(), Length(max=50)])
+    title = StringField('Case Title', validators=[DataRequired(), Length(max=150)])
+    description = TextAreaField('Description', validators=[Optional()])
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    case_type = SelectField('Case Type', choices=[
+        ('Land Law', 'Land Law'),
+        ('Commercial Law', 'Commercial Law'),
+        ('Company Law', 'Company Law'),
+        ('Property & Conveyance', 'Property & Conveyance'),
+        ('Family Law', 'Family Law'),
+        ('Criminal Law', 'Criminal Law'),
+        ('Civil Litigation', 'Civil Litigation'),
+    ], validators=[DataRequired()])
+    status = SelectField('Status', choices=[
+        ('Active', 'Active'),
+        ('Pending', 'Pending'),
+        ('Closed', 'Closed'),
+    ], default='Active', validators=[DataRequired()])
+    reference_code = StringField('Reference Code (Optional, leave blank to auto-generate)', validators=[Optional(), Length(max=50)])
+
+
+class MilestoneForm(FlaskForm):
+    title = StringField('Milestone Title', validators=[DataRequired(), Length(max=150)])
+    description = TextAreaField('Description', validators=[Optional()])
+    date = DateField('Target Date', format='%Y-%m-%d', validators=[DataRequired()])
+    status = SelectField('Status', choices=[
+        ('Upcoming', 'Upcoming'),
+        ('Completed', 'Completed'),
+    ], default='Upcoming', validators=[DataRequired()])
+
+
+class InvoiceForm(FlaskForm):
+    invoice_number = StringField('Invoice Number', validators=[DataRequired(), Length(max=50)])
+    amount = FloatField('Amount (KES)', validators=[DataRequired()])
+    due_date = DateField('Due Date', format='%Y-%m-%d', validators=[DataRequired()])
+    status = SelectField('Status', choices=[
+        ('Unpaid', 'Unpaid'),
+        ('Paid', 'Paid'),
+        ('Overdue', 'Overdue'),
+    ], default='Unpaid', validators=[DataRequired()])
+

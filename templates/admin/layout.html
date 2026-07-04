@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block chat_widget %}{% endblock %}
+{% block flash_messages %}{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard-container">
+    <script>
+        if (localStorage.getItem('admin-theme') === 'dark') {
+            document.querySelector('.admin-dashboard-container').classList.add('dark-theme');
+        }
+    </script>
+    <!-- Admin Sidebar Panel -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-header">
+            <a href="{{ url_for('admin.dashboard') }}" class="d-flex align-items-center text-decoration-none">
+                <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}" alt="Dan Ochieng & Company Advocates Logo" class="sidebar-logo me-2">
+                <span class="sidebar-brand-name">DOA Advocates</span>
+            </a>
+        </div>
+        <nav class="admin-sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" title="Dashboard">
+                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin.services') }}" class="nav-item {% if request.endpoint in ['admin.services', 'admin.new_service', 'admin.edit_service'] %}active{% endif %}" title="Services">
+                <i class="fas fa-briefcase"></i> <span>Services</span>
+            </a>
+            <a href="{{ url_for('chat.admin_chats') }}" class="nav-item {% if request.endpoint == 'chat.admin_chats' %}active{% endif %}" title="Live Chats">
+                <i class="fas fa-comments"></i> <span>Live Chats</span>
+                <span id="chat-sidebar-badge" class="badge bg-danger ms-auto d-none">0</span>
+            </a>
+            <a href="{{ url_for('admin.messages') }}" class="nav-item {% if request.endpoint in ['admin.messages', 'admin.reply_message'] %}active{% endif %}" title="Messages">
+                <i class="fas fa-envelope"></i> <span>Messages</span>
+                {% if unread_messages_count and unread_messages_count > 0 %}
+                <span class="badge bg-danger ms-auto badge-label">{{ unread_messages_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('admin.team') }}" class="nav-item {% if request.endpoint in ['admin.team', 'admin.new_team_member', 'admin.edit_team_member'] %}active{% endif %}" title="Our Team">
+                <i class="fas fa-users"></i> <span>Our Team</span>
+            </a>
+            <a href="{{ url_for('admin.cases') }}" class="nav-item {% if request.endpoint in ['admin.cases', 'admin.new_case', 'admin.edit_case'] %}active{% endif %}" title="Case Studies">
+                <i class="fas fa-folder-open"></i> <span>Case Studies</span>
+            </a>
+            <a href="{{ url_for('admin.client_cases') }}" class="nav-item {% if request.endpoint in ['admin.client_cases', 'admin.new_client_case', 'admin.edit_client_case', 'admin.case_milestones', 'admin.case_invoices'] %}active{% endif %}" title="Client Cases">
+                <i class="fas fa-gavel"></i> <span>Client Cases</span>
+            </a>
+            <a href="{{ url_for('admin.generate_document') }}" class="nav-item {% if request.endpoint == 'admin.generate_document' %}active{% endif %}" title="Doc Generator">
+                <i class="fas fa-file-contract"></i> <span>Doc Generator</span>
+            </a>
+            <a href="{{ url_for('admin.blog_posts') }}" class="nav-item {% if request.endpoint in ['admin.blog_posts', 'admin.new_blog_post', 'admin.edit_blog_post'] %}active{% endif %}" title="Blog/News">
+                <i class="fas fa-newspaper"></i> <span>Blog/News</span>
+            </a>
+            <a href="{{ url_for('admin.users') }}" class="nav-item {% if request.endpoint in ['admin.users', 'admin.edit_user'] %}active{% endif %}" title="Users">
+                <i class="fas fa-user-cog"></i> <span>Users</span>
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span class="username-text">{{ current_user.username }}</span>
+            </div>
+            <div class="footer-actions">
+                <a href="{{ url_for('main.index') }}" target="_blank" title="View Website"><i class="fas fa-external-link-alt"></i></a>
+                <a href="{{ url_for('auth.logout') }}" title="Sign Out"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-content-wrapper">
+        <header class="admin-topbar shadow-sm">
+            <button class="sidebar-toggle btn d-lg-none" id="sidebarToggleBtn" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary me-3 d-none d-lg-inline-block" id="desktopSidebarToggleBtn" aria-label="Collapse Sidebar" style="border-radius: 0;">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-title h4 mb-0 d-none d-md-block">
+                {% block admin_title %}Admin Control Panel{% endblock %}
+            </div>
+            <div class="topbar-actions ms-auto d-flex align-items-center">
+                <!-- Theme Switcher Toggler -->
+                <button id="themeToggleBtn" class="btn btn-sm btn-outline-secondary me-2" aria-label="Toggle Theme" style="border-radius: 0; padding: 0.35rem 0.6rem;">
+                    <i class="fas fa-moon" id="themeToggleIcon"></i>
+                </button>
+                <!-- Unread Live Chats topbar badge -->
+                <a href="{{ url_for('chat.admin_chats') }}" class="btn btn-sm btn-outline-secondary me-2 position-relative" title="Unread Chats" style="border-radius: 0; padding: 0.35rem 0.6rem;">
+                    <i class="fas fa-comments"></i>
+                    <span id="topbar-chat-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                </a>
+                <!-- Unread messages topbar badge -->
+                <a href="{{ url_for('admin.messages') }}" class="btn btn-sm btn-outline-secondary me-3 position-relative" title="Unread Messages" style="border-radius: 0; padding: 0.35rem 0.6rem;">
+                    <i class="fas fa-envelope"></i>
+                    {% if unread_messages_count and unread_messages_count > 0 %}
+                    <span id="topbar-messages-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                <span class="text-muted me-3 d-none d-sm-inline">Logged in as: <strong>{{ current_user.username }}</strong></span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger btn-logout-topbar">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </header>
+        
+        <div class="admin-page-content p-4">
+            <!-- Flash alerts inside the dashboard layout context -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="admin-flash-container mb-4">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin-chat.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const sidebar = document.getElementById('adminSidebar');
+        
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function(e) {
+                sidebar.classList.toggle('show');
+                e.stopPropagation();
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+
+        // Desktop Sidebar Collapse Toggle
+        const desktopToggleBtn = document.getElementById('desktopSidebarToggleBtn');
+        const dashboardContainer = document.querySelector('.admin-dashboard-container');
+        
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            if (dashboardContainer) dashboardContainer.classList.add('sidebar-collapsed');
+        }
+        
+        if (desktopToggleBtn && dashboardContainer) {
+            desktopToggleBtn.addEventListener('click', function() {
+                dashboardContainer.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('sidebar-collapsed', dashboardContainer.classList.contains('sidebar-collapsed'));
+            });
+        }
+
+        // Theme Switcher Toggle
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeToggleIcon = document.getElementById('themeToggleIcon');
+        
+        // Initial theme load
+        if (localStorage.getItem('admin-theme') === 'dark') {
+            if (dashboardContainer) dashboardContainer.classList.add('dark-theme');
+            if (themeToggleIcon) {
+                themeToggleIcon.className = 'fas fa-sun';
+            }
+        } else {
+            if (themeToggleIcon) {
+                themeToggleIcon.className = 'fas fa-moon';
+            }
+        }
+        
+        if (themeToggleBtn && dashboardContainer) {
+            themeToggleBtn.addEventListener('click', function() {
+                dashboardContainer.classList.toggle('dark-theme');
+                const isDark = dashboardContainer.classList.contains('dark-theme');
+                localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
+                if (themeToggleIcon) {
+                    themeToggleIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                }
+            });
+        }
+    });
+</script>
+{% block admin_scripts %}{% endblock %}
+{% endblock %}

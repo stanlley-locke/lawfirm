@@ -42,15 +42,36 @@ def reject_socket(reason='Unauthorized'):
 def is_within_business_hours(app):
     """Return True if current time is within configured business hours."""
     from datetime import datetime
+    from models import ChatSetting
+    
+    # Fetch settings from database with fallback to default configurations
+    tz_setting = ChatSetting.query.filter_by(key='business_hours_tz').first()
+    tz_val = tz_setting.value if tz_setting else app.config.get('BUSINESS_HOURS_TZ', 'Africa/Nairobi')
+    
     try:
         from zoneinfo import ZoneInfo
-        tz = ZoneInfo(app.config.get('BUSINESS_HOURS_TZ', 'Africa/Nairobi'))
+        tz = ZoneInfo(tz_val)
     except Exception:
         tz = None
 
     now = datetime.now(tz) if tz else datetime.utcnow()
-    if now.weekday() not in app.config.get('BUSINESS_HOURS_DAYS', [0, 1, 2, 3, 4]):
+    
+    days_setting = ChatSetting.query.filter_by(key='business_hours_days').first()
+    if days_setting and days_setting.value:
+        try:
+            days_val = [int(d) for d in days_setting.value.split(',')]
+        except Exception:
+            days_val = [0, 1, 2, 3, 4]
+    else:
+        days_val = app.config.get('BUSINESS_HOURS_DAYS', [0, 1, 2, 3, 4])
+        
+    if now.weekday() not in days_val:
         return False
-    start = app.config.get('BUSINESS_HOURS_START', 9)
-    end = app.config.get('BUSINESS_HOURS_END', 17)
-    return start <= now.hour < end
+        
+    start_setting = ChatSetting.query.filter_by(key='business_hours_start').first()
+    start_val = int(start_setting.value) if (start_setting and start_setting.value) else app.config.get('BUSINESS_HOURS_START', 9)
+    
+    end_setting = ChatSetting.query.filter_by(key='business_hours_end').first()
+    end_val = int(end_setting.value) if (end_setting and end_setting.value) else app.config.get('BUSINESS_HOURS_END', 17)
+    
+    return start_val <= now.hour < end_val

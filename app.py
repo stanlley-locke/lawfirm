@@ -15,6 +15,24 @@ from extensions import db, login_manager, migrate, csrf, socketio
 logging.basicConfig(level=logging.INFO)
 
 
+def bootstrap_initial_admin():
+    """Create the first admin user if none exists."""
+    from models import User
+
+    admin_user = User.query.filter_by(is_admin=True).first()
+    if admin_user:
+        return
+
+    username = os.environ.get('ADMIN_USERNAME', 'admin')
+    email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
+    password = os.environ.get('ADMIN_PASSWORD', 'lawfirm2025')
+
+    admin_user = User(username=username, email=email, is_admin=True, is_active=True)
+    admin_user.set_password(password)
+    db.session.add(admin_user)
+    db.session.commit()
+
+
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.environ.get('FLASK_ENV', 'development')
@@ -116,43 +134,27 @@ def create_app(config_name=None):
     from routes.main_routes import main_bp
     from routes.contact_routes import contact_bp
     from routes.chat_routes import chat_bp
+    from routes.client_routes import client_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(contact_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(client_bp)
+
+    if not app.config.get('TESTING'):
+        with app.app_context():
+            bootstrap_initial_admin()
 
     from commands import register_commands
     register_commands(app)
 
     validate_production_config(app)
     return app
-
-
-def ensure_initial_admin():
-    """Create the first admin user if none exists."""
-    from models import User
-
-    admin_user = User.query.filter_by(is_admin=True).first()
-    if admin_user:
-        return
-
-    username = os.environ.get('ADMIN_USERNAME', 'admin')
-    email = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
-    password = os.environ.get('ADMIN_PASSWORD', 'lawfirm2025')
-
-    admin_user = User(username=username, email=email, is_admin=True, is_active=True)
-    admin_user.set_password(password)
-    db.session.add(admin_user)
-    db.session.commit()
-
-
 app = create_app()
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        ensure_initial_admin()
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=app.debug)

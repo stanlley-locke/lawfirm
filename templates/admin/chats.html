@@ -1,265 +1,320 @@
-{% extends "layout.html" %}
+{% extends "admin/layout.html" %}
+
+{% block admin_title %}Live Chats Workspace{% endblock %}
 
 {% block title %}Admin - Live Chats{% endblock %}
 
 {% block head_scripts %}
   {# Expose CSRF token for AJAX posts #}
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <script src="{{ url_for('static', filename='js/admin-chat.js') }}" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
 {% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <h1 class="h3 mb-0">Live Chat Management</h1>
-                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-                    </a>
-                </div>
-            </div>
+{% block admin_content %}
+<div class="container-fluid py-3">
+    <!-- Compact Unified Header Line -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+            <h1 class="h3 mb-0 text-dark fw-bold" style="color: var(--doa-navy) !important;">Live Chat Hub</h1>
+            <ul class="nav nav-pills gap-2" id="chatsWorkspaceTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active font-monospace text-uppercase" id="workspace-tab" data-bs-toggle="pill" data-bs-target="#chats-workspace" type="button" role="tab" style="border-radius: 0; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                        <i class="fas fa-comments me-2"></i> Chat Console
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link font-monospace text-uppercase" id="templates-tab" data-bs-toggle="pill" data-bs-target="#reply-templates" type="button" role="tab" style="border-radius: 0; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                        <i class="fas fa-file-alt me-2"></i> Reply Templates
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link font-monospace text-uppercase" id="settings-tab" data-bs-toggle="pill" data-bs-target="#chat-hours-settings" type="button" role="tab" style="border-radius: 0; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                        <i class="fas fa-clock me-2"></i> Business Hours
+                    </button>
+                </li>
+            </ul>
         </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm" style="border-radius: 0; padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Live Chat Status</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <strong>Active Chats:</strong>
-                            <span class="badge bg-success" id="active-chats-count">0</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"
-                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                                 id="active-chats-progress"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <strong>Unread Messages:</strong>
-                            <span class="badge bg-danger" id="unread-chat-count">0</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 0%;"
-                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                                 id="unread-chat-progress"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <strong>Total Chat Sessions:</strong>
-                            <span class="badge bg-info">{{ total_chats }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <strong>Average Response Time:</strong>
-                            <span class="badge bg-secondary">< 5 min</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Last updated: <span id="last-updated">Just now</span></small>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-8">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Live Chat Guidelines</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <h6 class="fw-bold">Welcome Messages</h6>
-                        <p>Start each chat with a professional greeting. Introduce yourself by name and ask how you can assist the client today.</p>
-                        <div class="bg-light p-2 rounded mb-2">
-                            <small class="text-muted"><em>"Hello! My name is [Your Name] from [Law Firm Name]. How may I assist you today?"</em></small>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6 class="fw-bold">Response Time</h6>
-                        <p>Aim to respond to all chat messages within 2-5 minutes. If you need more time to research an answer, let the client know you're working on it.</p>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6 class="fw-bold">Confidentiality</h6>
-                        <p>Remember that chat conversations are for general inquiries only. Advise clients not to share sensitive case details or personal information in the chat.</p>
-                    </div>
-                    
-                    <div>
-                        <h6 class="fw-bold">Closing Chats</h6>
-                        <p>Always thank clients for contacting your firm and ask if there's anything else they need help with before closing the chat.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mb-3">
-        <div class="col-12">
-            <form method="get" class="d-flex align-items-center gap-2">
-                <label for="assignee" class="form-label mb-0">Filter by assignee:</label>
-                <select name="assignee" id="assignee" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
-                    <option value="">All</option>
-                    {% for member in staff %}
-                    <option value="{{ member.id }}" {% if assignee_filter == member.id %}selected{% endif %}>{{ member.username }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-        </div>
-    </div>
-    
+
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-dark">
-                    <ul class="nav nav-tabs card-header-tabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="active-tab" data-bs-toggle="tab" href="#active-chats">Active Chats</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="archived-tab" data-bs-toggle="tab" href="#archived-chats">Archived Chats</a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="card-body">
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="active-chats">
-                            {% if active_rooms %}
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Client</th>
-                                                <th>Email</th>
-                                                <th>Started</th>
-                                                <th>Last Activity</th>
-                                                <th>Assignee</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for room in active_rooms %}
-                                            <tr>
-                                                <td>
-                                                    {% if room.client_name %}
-                                                        {{ room.client_name }}
-                                                    {% else %}
-                                                        <span class="text-muted">Anonymous</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if room.client_email %}
-                                                        <a href="mailto:{{ room.client_email }}">{{ room.client_email }}</a>
-                                                    {% else %}
-                                                        <span class="text-muted">—</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ room.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                                <td>{{ room.last_activity.strftime('%Y-%m-%d %H:%M') }}</td>
-                                                <td>{{ room.assignee.username if room.assignee else '—' }}</td>
-                                                <td>
-                                                    {% if room.has_unread %}
-                                                        <span class="badge bg-danger">Unread Messages</span>
-                                                    {% else %}
-                                                        <span class="badge bg-success">Active</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}"
-                                                       class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-comments me-1"></i> Open Chat
-                                                    </a>
-                                                    <button class="btn btn-sm btn-danger close-chat-btn"
-                                                            data-room-id="{{ room.room_id }}">
-                                                        <i class="fas fa-times me-1"></i> Close
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            {% else %}
-                                <div class="text-center py-5">
-                                    <i class="fas fa-comments fa-3x mb-3 text-muted"></i>
-                                    <p class="lead">No active chat sessions at the moment.</p>
-                                    <p>When clients start new chats, they will appear here.</p>
-                                </div>
-                            {% endif %}
-                        </div>
+            <div class="tab-content" id="chatsWorkspaceContent">
+                <!-- Tab 1: Split-pane Chat Console -->
+                <div class="tab-pane fade show active" id="chats-workspace" role="tabpanel" aria-labelledby="workspace-tab">
+                    <div class="row g-0 rounded border bg-white overflow-hidden shadow-sm" style="height: 650px;">
                         
-                        <div class="tab-pane fade" id="archived-chats">
-                            {% if archived_rooms %}
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Client</th>
-                                                <th>Email</th>
-                                                <th>Date</th>
-                                                <th>Duration</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for room in archived_rooms %}
-                                            <tr>
-                                                <td>
-                                                    {% if room.client_name %}
-                                                        {{ room.client_name }}
-                                                    {% else %}
-                                                        <span class="text-muted">Anonymous</span>
+                        <!-- Sidebar: Left Pane (List of Chat Rooms) -->
+                        <div class="col-4 border-end d-flex flex-column h-100 bg-light">
+                            <div class="p-3 border-bottom bg-white text-start">
+                                <h4 class="fw-bold mb-1 text-dark" style="font-size: 1.25rem;">Chat</h4>
+                                <p class="text-muted small mb-3" style="font-size: 0.8rem;">Messages and conversations.</p>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 0; padding: 0.4rem 0.6rem;"><i class="fas fa-search text-muted" style="font-size: 0.8rem;"></i></span>
+                                    <input type="text" id="chatSearchInput" class="form-control bg-light border-start-0" placeholder="Search conversations..." style="border-radius: 0; font-size: 0.85rem; padding: 0.4rem 0.6rem;">
+                                </div>
+                            </div>
+                            <!-- Folder Tabs: Active vs Archived Rooms -->
+                            <div class="bg-white border-bottom">
+                                <ul class="nav nav-tabs nav-fill border-0 d-flex flex-row flex-nowrap" id="chatDirTab" role="tablist">
+                                    <li class="nav-item" style="width: 50%;">
+                                        <a class="nav-link active py-2 small font-monospace text-uppercase text-center" id="dir-active-tab" data-bs-toggle="tab" href="#dir-active" role="tab" style="border-radius: 0; font-size: 0.75rem;">Active</a>
+                                    </li>
+                                    <li class="nav-item" style="width: 50%;">
+                                        <a class="nav-link py-2 small font-monospace text-uppercase text-center" id="dir-archived-tab" data-bs-toggle="tab" href="#dir-archived" role="tab" style="border-radius: 0; font-size: 0.75rem;">Archived</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Directory Lists -->
+                            <div class="tab-content flex-grow-1 overflow-y-auto" id="chatDirContent">
+                                <!-- Active Directory -->
+                                <div class="tab-pane fade show active" id="dir-active" role="tabpanel">
+                                    <div class="list-group list-group-flush chat-room-list" id="activeRoomList">
+                                        {% if active_rooms %}
+                                            {% set colors = ['#082068', '#10b981', '#7c3aed', '#db2777', '#ea580c', '#0284c7', '#0d9488'] %}
+                                            {% for room in active_rooms %}
+                                                {% set name_len = (room.client_name|length if room.client_name else 0) %}
+                                                {% set color_idx = (name_len + 3) % 7 %}
+                                                <button class="list-group-item list-group-item-action d-flex align-items-center py-3 border-bottom chat-room-item" 
+                                                        data-room-id="{{ room.room_id }}"
+                                                        data-client-name="{{ room.client_name or 'Anonymous' }}"
+                                                        data-client-email="{{ room.client_email or '' }}"
+                                                        data-assigned-id="{{ room.assigned_to_id or '' }}">
+                                                    <!-- Initials Avatar with dynamic color -->
+                                                    <div class="avatar-initials text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px; font-weight: 700; font-size: 0.9rem; background-color: {{ colors[color_idx] }} !important;">
+                                                        {{ (room.client_name or 'A')[0]|upper }}{{ (room.client_name or 'N')[1]|upper if (room.client_name and room.client_name|length > 1) else '' }}
+                                                    </div>
+                                                    <div class="w-100 overflow-hidden text-start">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h6 class="mb-0 text-truncate fw-bold {% if room.has_unread %}text-primary{% endif %}" style="max-width: 70%; font-size: 0.9rem;">{{ room.client_name or 'Anonymous' }}</h6>
+                                                            <small class="text-muted font-monospace" style="font-size: 0.7rem;">{{ room.last_message_time }}</small>
+                                                        </div>
+                                                        <p class="mb-0 small text-truncate text-muted" style="font-size: 0.75rem;">{{ room.last_message_content }}</p>
+                                                    </div>
+                                                    {% if room.unread_count and room.unread_count > 0 %}
+                                                        <span class="badge bg-primary rounded-circle ms-2 px-2 py-1" style="font-size: 0.7rem;">{{ room.unread_count }}</span>
                                                     {% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if room.client_email %}
-                                                        <a href="mailto:{{ room.client_email }}">{{ room.client_email }}</a>
-                                                    {% else %}
-                                                        <span class="text-muted">—</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ room.created_at.strftime('%Y-%m-%d') }}</td>
-                                                <td>
-                                                    {% set duration = (room.last_activity - room.created_at).total_seconds() / 60 %}
-                                                    {% if duration < 1 %}
-                                                        &lt; 1 minute
-                                                    {% else %}
-                                                        {{ duration|int }} minutes
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="{{ url_for('chat.admin_chat_room', room_id=room.room_id) }}"
-                                                       class="btn btn-sm btn-secondary">
-                                                        <i class="fas fa-history me-1"></i> View History
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                                </button>
                                             {% endfor %}
-                                        </tbody>
-                                    </table>
+                                        {% else %}
+                                            <div class="text-center py-5 text-muted">No active chats</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% else %}
-                                <div class="text-center py-5">
-                                    <i class="fas fa-archive fa-3x mb-3 text-muted"></i>
-                                    <p class="lead">No archived chat sessions.</p>
-                                    <p>Closed chat sessions will be archived here for future reference.</p>
+                                <!-- Archived Directory -->
+                                <div class="tab-pane fade" id="dir-archived" role="tabpanel">
+                                    <div class="list-group list-group-flush chat-room-list" id="archivedRoomList">
+                                        {% if archived_rooms %}
+                                            {% set colors = ['#64748b', '#475569', '#334155'] %}
+                                            {% for room in archived_rooms %}
+                                                {% set name_len = (room.client_name|length if room.client_name else 0) %}
+                                                {% set color_idx = (name_len + 3) % 3 %}
+                                                <button class="list-group-item list-group-item-action d-flex align-items-center py-3 border-bottom chat-room-item" 
+                                                        data-room-id="{{ room.room_id }}"
+                                                        data-client-name="{{ room.client_name or 'Anonymous' }}"
+                                                        data-client-email="{{ room.client_email or '' }}"
+                                                        data-assigned-id="{{ room.assigned_to_id or '' }}">
+                                                    <div class="avatar-initials text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px; font-weight: 700; font-size: 0.9rem; background-color: {{ colors[color_idx] }} !important;">
+                                                        {{ (room.client_name or 'A')[0]|upper }}{{ (room.client_name or 'N')[1]|upper if (room.client_name and room.client_name|length > 1) else '' }}
+                                                    </div>
+                                                    <div class="w-100 overflow-hidden text-start">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h6 class="mb-0 text-truncate fw-bold" style="max-width: 70%; font-size: 0.9rem;">{{ room.client_name or 'Anonymous' }}</h6>
+                                                            <small class="text-muted font-monospace" style="font-size: 0.7rem;">{{ room.last_message_time }}</small>
+                                                        </div>
+                                                        <p class="mb-0 small text-truncate text-muted" style="font-size: 0.75rem;">{{ room.last_message_content }}</p>
+                                                    </div>
+                                                </button>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="text-center py-5 text-muted">No archived chats</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Detail Area: Right Pane -->
+                        <div class="col-8 d-flex flex-column h-100 bg-white" id="chatDetailPane">
+                            <!-- Placeholder -->
+                            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5" id="noChatSelectedPlaceholder">
+                                <i class="fas fa-comments text-muted fa-4x mb-3"></i>
+                                <h5 class="fw-bold">Select a conversation</h5>
+                                <p class="text-muted">Choose a conversation from the list to start messaging.</p>
+                            </div>
+
+                            <!-- Conversation flow view (hidden initially) -->
+                            <div class="d-none flex-column h-100" id="chatActiveFlow">
+                                <!-- Active Chat TopBar -->
+                                <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                                    <div class="text-start">
+                                        <h5 class="fw-bold mb-0 text-primary" id="activeClientName">Client Name</h5>
+                                        <small class="text-muted" id="activeClientEmail">client@email.com</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <span id="chat-status-badge" class="badge bg-success d-flex align-items-center" style="padding: 0.5rem 0.8rem; border-radius: 0;">Connected</span>
+                                        <button class="btn btn-sm btn-outline-danger" id="closeActiveChatBtn" title="Close Chat Session"><i class="fas fa-times me-1"></i> Close</button>
+                                        <button class="btn btn-sm btn-outline-success d-none" id="reopenActiveChatBtn" title="Re-open Chat Session"><i class="fas fa-undo-alt me-1"></i> Re-open</button>
+                                        <button class="btn btn-sm btn-outline-danger" id="deleteActiveChatBtn" title="Permanently Delete Session"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- Messages List Flow -->
+                                <div class="flex-grow-1 p-3 overflow-y-auto" id="activeChatMessages" style="background-color: #fafbfc !important;">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+
+                                <!-- Actions & Tools footer bar -->
+                                <div class="p-2 border-top bg-light d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <label class="small fw-bold text-muted mb-0 font-monospace text-uppercase" style="font-size: 0.7rem;">Canned replies:</label>
+                                        <select id="activeCannedSelect" class="form-select form-select-sm" style="border-radius: 0; width: auto; font-size: 0.8rem;">
+                                            <option value="">-- Insert Template --</option>
+                                            {% for canned in canned_responses %}
+                                            <option value="{{ canned.content }}">{{ canned.shortcut }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <label class="small fw-bold text-muted mb-0 font-monospace text-uppercase" style="font-size: 0.7rem;">Assign staff:</label>
+                                        <select id="activeAssignSelect" class="form-select form-select-sm" style="border-radius: 0; width: auto; font-size: 0.8rem;">
+                                            <option value="">Unassigned</option>
+                                            {% for member in staff %}
+                                            <option value="{{ member.id }}">{{ member.username }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <a href="#" id="activeExportPdfBtn" target="_blank" class="btn btn-sm btn-outline-secondary" title="Export PDF" style="border-radius: 0;"><i class="fas fa-file-pdf"></i></a>
+                                        <button id="activeEmailExportBtn" class="btn btn-sm btn-outline-secondary" title="Email Transcript" style="border-radius: 0;"><i class="fas fa-envelope"></i></button>
+                                    </div>
+                                </div>
+
+                                <!-- Message Textbox Footer -->
+                                <div class="p-3 border-top bg-white">
+                                    <form id="message-form" class="d-flex">
+                                        <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message..." style="border-radius: 0;" autocomplete="off">
+                                        <button class="btn btn-primary" type="submit" style="border-radius: 0;">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Tab 2: Reply Templates Management -->
+                <div class="tab-pane fade" id="reply-templates" role="tabpanel" aria-labelledby="templates-tab">
+                    <div class="card shadow-sm border-0" style="border-radius: 0;">
+                        <div class="card-header bg-white py-3" style="border-radius: 0;">
+                            <h5 class="fw-bold mb-0 text-primary">Canned Reply Templates</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Create Form -->
+                                <div class="col-md-4 border-end">
+                                    <h6 class="fw-bold mb-3 text-muted">Create / Edit Template</h6>
+                                    <form id="cannedResponseForm">
+                                        <input type="hidden" name="id" id="cannedId">
+                                        <div class="mb-3 text-start">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Shortcut Tag (e.g. /greet)</label>
+                                            <input type="text" class="form-control" name="shortcut" id="cannedShortcut" placeholder="/greet" required style="border-radius: 0;">
+                                        </div>
+                                        <div class="mb-3 text-start">
+                                            <label class="form-label small fw-bold text-muted text-uppercase">Response Text</label>
+                                            <textarea class="form-control" name="content" id="cannedContent" rows="4" placeholder="Hello! How can we help you today?" required style="border-radius: 0;"></textarea>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 0;">Save Template</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCancelCanned" style="border-radius: 0;">Clear</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- Listing Table -->
+                                <div class="col-md-8 ps-md-4 text-start">
+                                    <h6 class="fw-bold mb-3 text-muted">Existing Templates</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead class="table-light">
+                                                <tr class="text-uppercase small font-monospace tracking-wider text-muted">
+                                                    <th>Shortcut</th>
+                                                    <th>Response text</th>
+                                                    <th class="text-end">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cannedResponsesTableBody">
+                                                {% if canned_responses %}
+                                                    {% for canned in canned_responses %}
+                                                    <tr id="canned-row-{{ canned.id }}">
+                                                        <td class="fw-bold text-primary font-monospace">{{ canned.shortcut }}</td>
+                                                        <td>{{ canned.content|truncate(80) }}</td>
+                                                        <td class="text-end">
+                                                            <div class="d-flex gap-1 justify-content-end">
+                                                                <button class="btn btn-xs btn-outline-primary edit-canned-btn" 
+                                                                        data-id="{{ canned.id }}" 
+                                                                        data-shortcut="{{ canned.shortcut }}" 
+                                                                        data-content="{{ canned.content }}"
+                                                                        style="font-size: 0.7rem; border-radius: 0;"><i class="fas fa-edit"></i></button>
+                                                                <button class="btn btn-xs btn-outline-danger delete-canned-btn" 
+                                                                        data-id="{{ canned.id }}"
+                                                                        style="font-size: 0.7rem; border-radius: 0;"><i class="fas fa-trash-alt"></i></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="3" class="text-center py-4 text-muted">No canned responses created yet.</td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Active Business Hours Config -->
+                <div class="tab-pane fade" id="chat-hours-settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="card shadow-sm border-0" style="border-radius: 0;">
+                        <div class="card-header bg-white py-3" style="border-radius: 0;">
+                            <h5 class="fw-bold mb-0 text-primary">Chat Settings &amp; Active Hours</h5>
+                        </div>
+                        <div class="card-body text-start">
+                            <form id="chatSettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Start hour (24h format)</label>
+                                        <input type="number" name="business_hours_start" class="form-control" min="0" max="23" value="{{ settings.business_hours_start }}" required style="border-radius: 0;">
+                                        <div class="form-text small text-muted">Hour when live chat becomes online (e.g. 9 for 9:00 AM).</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">End hour (24h format)</label>
+                                        <input type="number" name="business_hours_end" class="form-control" min="0" max="23" value="{{ settings.business_hours_end }}" required style="border-radius: 0;">
+                                        <div class="form-text small text-muted">Hour when live chat goes offline (e.g. 17 for 5:00 PM).</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Working days</label>
+                                        <input type="text" name="business_hours_days" class="form-control" value="{{ settings.business_hours_days }}" required style="border-radius: 0;">
+                                        <div class="form-text small text-muted">Comma-separated weekday numbers (0=Mon, 6=Sun. Default: 0,1,2,3,4).</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Timezone</label>
+                                        <input type="text" name="business_hours_tz" class="form-control" value="{{ settings.business_hours_tz }}" required style="border-radius: 0;">
+                                        <div class="form-text small text-muted">Valid ZoneInfo timezone name (Default: Africa/Nairobi).</div>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Offline/Closed message</label>
+                                        <textarea name="closed_message" class="form-control" rows="3" required style="border-radius: 0;">{{ settings.closed_message }}</textarea>
+                                        <div class="form-text small text-muted">Message sent to visitors who try to chat outside business hours.</div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="border-radius: 0;">Save Settings</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -272,68 +327,433 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Helper to read the CSRF token from the meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        let activeRoomId = null;
+        let socket = null;
+
+        // Helper to get CSRF token
         function getCsrfToken() {
-            const el = document.querySelector('meta[name="csrf-token"]');
-            return el ? el.getAttribute('content') : '';
+            return csrfToken;
         }
 
-        // Update the progress bars based on counts
-        function updateProgressBars() {
-            const activeCount   = parseInt(document.getElementById('active-chats-count').textContent);
-            const unreadCount   = parseInt(document.getElementById('unread-chat-count').textContent);
-            const maxValue      = 10;
+        // Establish SocketIO Connection
+        function connectSocket() {
+            if (socket) return;
+            socket = io();
+            
+            socket.on('connect', () => {
+                const statusBadge = document.getElementById('chat-status-badge');
+                if (statusBadge) {
+                    statusBadge.textContent = 'Connected';
+                    statusBadge.className = 'badge bg-success d-flex align-items-center';
+                }
+                if (activeRoomId) {
+                    socket.emit('join', { room: activeRoomId });
+                }
+            });
 
-            const activeProgress = document.getElementById('active-chats-progress');
-            const activePct      = Math.min((activeCount / maxValue) * 100, 100);
-            activeProgress.style.width       = activePct + '%';
-            activeProgress.setAttribute('aria-valuenow', activeCount);
+            socket.on('disconnect', () => {
+                const statusBadge = document.getElementById('chat-status-badge');
+                if (statusBadge) {
+                    statusBadge.textContent = 'Disconnected';
+                    statusBadge.className = 'badge bg-danger d-flex align-items-center';
+                }
+            });
 
-            const unreadProgress = document.getElementById('unread-chat-progress');
-            const unreadPct      = Math.min((unreadCount / maxValue) * 100, 100);
-            unreadProgress.style.width       = unreadPct + '%';
-            unreadProgress.setAttribute('aria-valuenow', unreadCount);
+            socket.on('message', (data) => {
+                if (activeRoomId && data.room === activeRoomId) {
+                    appendMessage(data);
+                }
+            });
 
-            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+            socket.on('typing', (data) => {
+                if (activeRoomId && data.room === activeRoomId && !data.is_staff) {
+                    const statusBadge = document.getElementById('chat-status-badge');
+                    if (statusBadge) {
+                        statusBadge.textContent = data.is_typing ? 'Client typing...' : 'Connected';
+                    }
+                }
+            });
         }
 
-        // Hook into existing updateChatStats if present
-        if (window.updateChatStats) {
-            const orig = window.updateChatStats;
-            window.updateChatStats = function() {
-                orig();
-                setTimeout(updateProgressBars, 500);
-            };
+        // Load a chat room dynamic message content
+        function loadRoom(roomId, clientName, clientEmail, assignedId) {
+            // Disconnect/leave previous room socket
+            if (socket && activeRoomId) {
+                socket.emit('leave', { room: activeRoomId });
+            }
+            
+            activeRoomId = roomId;
+            
+            // UI elements update
+            document.getElementById('noChatSelectedPlaceholder').classList.add('d-none');
+            const flowView = document.getElementById('chatActiveFlow');
+            flowView.classList.remove('d-none');
+            flowView.classList.add('d-flex');
+            
+            document.getElementById('activeClientName').textContent = clientName;
+            document.getElementById('activeClientEmail').textContent = clientEmail || 'Anonymous Visitor';
+            
+            const messagePane = document.getElementById('activeChatMessages');
+            messagePane.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+            
+            // Connect socket if not connected
+            connectSocket();
+
+            // Load messages via API
+            fetch(`/admin/chat/${roomId}/messages`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) throw new Error('Failed to load messages');
+                
+                // Set assignee value
+                document.getElementById('activeAssignSelect').value = data.assigned_to_id || '';
+                
+                // Toggle close/reopen buttons based on active state
+                const closeBtn = document.getElementById('closeActiveChatBtn');
+                const reopenBtn = document.getElementById('reopenActiveChatBtn');
+                if (data.is_active) {
+                    closeBtn.classList.remove('d-none');
+                    reopenBtn.classList.add('d-none');
+                } else {
+                    closeBtn.classList.add('d-none');
+                    reopenBtn.classList.remove('d-none');
+                }
+                
+                // Update Export PDF link
+                document.getElementById('activeExportPdfBtn').href = `/admin/chat/${roomId}/export/pdf`;
+                
+                // Clear and render messages
+                messagePane.innerHTML = '';
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        appendMessage(msg);
+                    });
+                } else {
+                    messagePane.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-comment fa-3x mb-2"></i><p>No messages yet. Start the conversation!</p></div>';
+                }
+                scrollToBottom();
+                
+                // Join new room socket
+                if (socket && socket.connected) {
+                    socket.emit('join', { room: activeRoomId });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                messagePane.innerHTML = '<div class="text-center py-5 text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><p>Error loading messages.</p></div>';
+            });
         }
 
-        // Close-chat buttons now send CSRF token header
-        document.querySelectorAll('.close-chat-btn').forEach(button => {
-            button.addEventListener('click', function() {
+        // Render message utility
+        function appendMessage(data) {
+            const messagePane = document.getElementById('activeChatMessages');
+            
+            // Remove empty messages placeholder
+            const placeholder = messagePane.querySelector('.text-center.text-muted');
+            if (placeholder) placeholder.remove();
+
+            const isClient = data.is_from_client;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `d-flex flex-column mb-3 ${isClient ? 'align-items-start' : 'align-items-end'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `p-3 rounded shadow-sm text-start ${isClient ? 'bg-light text-dark' : 'bg-primary text-white'}`;
+            contentDiv.style.maxWidth = '75%';
+            contentDiv.style.borderRadius = isClient ? '18px 18px 18px 0px' : '18px 18px 0px 18px';
+            
+            // Plain text or attachments content
+            if (data.attachment_url) {
+                contentDiv.innerHTML = `<a href="${data.attachment_url}" target="_blank" class="${isClient ? 'text-primary' : 'text-white'} fw-bold text-decoration-none"><i class="fas fa-file-download me-2"></i>${data.attachment_name || 'Download Attachment'}</a>`;
+            } else {
+                contentDiv.textContent = data.content;
+            }
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'small text-muted mt-1';
+            
+            let sender = 'Staff';
+            if (isClient) {
+                sender = data.client_name || 'Client';
+            } else if (data.user) {
+                sender = data.user;
+            }
+            
+            let timeString = '';
+            if (data.timestamp) {
+                const parts = data.timestamp.split(' ');
+                timeString = parts.length > 1 ? parts[1].substring(0, 5) : data.timestamp;
+            } else {
+                timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            metaDiv.textContent = `${sender} | ${timeString}`;
+            
+            msgDiv.appendChild(contentDiv);
+            msgDiv.appendChild(metaDiv);
+            messagePane.appendChild(msgDiv);
+            
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const pane = document.getElementById('activeChatMessages');
+            pane.scrollTop = pane.scrollHeight;
+        }
+
+        // Room clicks
+        document.querySelectorAll('.chat-room-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Highlight active list item
+                document.querySelectorAll('.chat-room-item').forEach(i => i.classList.remove('active', 'bg-primary', 'text-white'));
+                this.classList.add('active');
+                
                 const roomId = this.getAttribute('data-room-id');
-                if (!confirm('Are you sure you want to close this chat session?')) return;
-
-                fetch(`/admin/chat/${roomId}/close`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCsrfToken()
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error(`Status ${res.status}`);
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.success) window.location.reload();
-                })
-                .catch(err => console.error('Error closing chat:', err));
+                const name = this.getAttribute('data-client-name');
+                const email = this.getAttribute('data-client-email');
+                const assigned = this.getAttribute('data-assigned-id');
+                
+                // Clear unread badge dynamically
+                const unreadBadge = this.querySelector('.badge');
+                if (unreadBadge) unreadBadge.remove();
+                
+                loadRoom(roomId, name, email, assigned);
             });
         });
 
-        // Initial bar update + polling
-        updateProgressBars();
-        setInterval(updateProgressBars, 30000);
+        // Typing and Send listener
+        const messageInput = document.getElementById('message-input');
+        messageInput.addEventListener('input', () => {
+            if (socket && activeRoomId) {
+                socket.emit('typing', { room: activeRoomId, is_typing: true });
+                clearTimeout(window._typingTimer);
+                window._typingTimer = setTimeout(() => {
+                    socket.emit('typing', { room: activeRoomId, is_typing: false });
+                }, 1000);
+            }
+        });
+
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message && activeRoomId && socket) {
+                socket.emit('message', {
+                    room: activeRoomId,
+                    message: message,
+                    is_from_client: false
+                });
+                messageInput.value = '';
+            }
+        });
+
+        // Assign Staff Event
+        document.getElementById('activeAssignSelect').addEventListener('change', function() {
+            if (!activeRoomId) return;
+            const val = this.value;
+            fetch(`/admin/chat/${activeRoomId}/assign`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({ assigned_to_id: val ? parseInt(val) : null })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update dataset on item button
+                    const item = document.querySelector(`.chat-room-item[data-room-id="${activeRoomId}"]`);
+                    if (item) item.setAttribute('data-assigned-id', val || '');
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Canned replies select change
+        document.getElementById('activeCannedSelect').addEventListener('change', function() {
+            if (this.value) {
+                messageInput.value = this.value;
+                this.value = '';
+                messageInput.focus();
+            }
+        });
+
+        // Close Chat Action
+        document.getElementById('closeActiveChatBtn').addEventListener('click', function() {
+            if (!activeRoomId) return;
+            if (!confirm('Are you sure you want to close this chat session?')) return;
+            
+            fetch(`/admin/chat/${activeRoomId}/close`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Re-open Chat Action
+        document.getElementById('reopenActiveChatBtn').addEventListener('click', function() {
+            if (!activeRoomId) return;
+            if (!confirm('Are you sure you want to re-open this chat session?')) return;
+            
+            fetch(`/admin/chat/${activeRoomId}/reopen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Delete Chat Action
+        document.getElementById('deleteActiveChatBtn').addEventListener('click', function() {
+            if (!activeRoomId) return;
+            if (!confirm('Are you sure you want to permanently delete this chat session? This will purge all message logs.')) return;
+            
+            fetch(`/admin/chat/${activeRoomId}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Email Transcript Action
+        document.getElementById('activeEmailExportBtn').addEventListener('click', function() {
+            if (!activeRoomId) return;
+            fetch(`/admin/chat/${activeRoomId}/export/email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Transcript emailed successfully.');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Filter / Search Conversations in Left Pane
+        document.getElementById('chatSearchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            document.querySelectorAll('.chat-room-item').forEach(item => {
+                const clientName = item.getAttribute('data-client-name').toLowerCase();
+                const clientEmail = item.getAttribute('data-client-email').toLowerCase();
+                if (clientName.includes(query) || clientEmail.includes(query)) {
+                    item.classList.remove('d-none');
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+        });
+
+        // --- Canned Templates CRUD handlers ---
+        const cannedForm = document.getElementById('cannedResponseForm');
+        cannedForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('csrf_token', getCsrfToken());
+
+            fetch('/admin/chat/canned', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Edit canned
+        document.querySelectorAll('.edit-canned-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('cannedId').value = this.getAttribute('data-id');
+                document.getElementById('cannedShortcut').value = this.getAttribute('data-shortcut');
+                document.getElementById('cannedContent').value = this.getAttribute('data-content');
+            });
+        });
+
+        // Delete canned
+        document.querySelectorAll('.delete-canned-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                if (!confirm('Are you sure you want to delete this canned template?')) return;
+                
+                const formData = new FormData();
+                formData.append('csrf_token', getCsrfToken());
+                
+                fetch(`/admin/chat/canned/${id}/delete`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('canned-row-' + id).remove();
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+        });
+
+        document.getElementById('btnCancelCanned').addEventListener('click', () => {
+            cannedForm.reset();
+            document.getElementById('cannedId').value = '';
+        });
+
+        // --- Active Hours / Settings handlers ---
+        const settingsForm = document.getElementById('chatSettingsForm');
+        settingsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const startVal = this.querySelector('input[name="business_hours_start"]').value;
+            const endVal = this.querySelector('input[name="business_hours_end"]').value;
+            const daysVal = this.querySelector('input[name="business_hours_days"]').value;
+            const tzVal = this.querySelector('input[name="business_hours_tz"]').value;
+            const msgVal = this.querySelector('textarea[name="closed_message"]').value;
+
+            fetch('/admin/chat/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+                body: JSON.stringify({
+                    business_hours_start: startVal,
+                    business_hours_end: endVal,
+                    business_hours_days: daysVal,
+                    business_hours_tz: tzVal,
+                    closed_message: msgVal
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Settings saved successfully.');
+                }
+            })
+            .catch(err => console.error(err));
+        });
     });
 </script>
 {% endblock %}

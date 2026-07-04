@@ -1,6 +1,8 @@
-{% extends "layout.html" %}
+{% extends "admin/layout.html" %}
 
-{% block content %}
+{% block admin_title %}Reply Message{% endblock %}
+
+{% block admin_content %}
 <div class="container py-4">
   <h1 class="h3 mb-4">Reply to {{ message.name }}</h1>
   <p class="text-muted">To: {{ message.email }} | Original: {{ message.subject }}</p>
