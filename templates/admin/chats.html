@@ -107,6 +107,20 @@
         </div>
     </div>
     
+    <div class="row mb-3">
+        <div class="col-12">
+            <form method="get" class="d-flex align-items-center gap-2">
+                <label for="assignee" class="form-label mb-0">Filter by assignee:</label>
+                <select name="assignee" id="assignee" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    {% for member in staff %}
+                    <option value="{{ member.id }}" {% if assignee_filter == member.id %}selected{% endif %}>{{ member.username }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+    
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -133,6 +147,7 @@
                                                 <th>Email</th>
                                                 <th>Started</th>
                                                 <th>Last Activity</th>
+                                                <th>Assignee</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -156,6 +171,7 @@
                                                 </td>
                                                 <td>{{ room.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                                 <td>{{ room.last_activity.strftime('%Y-%m-%d %H:%M') }}</td>
+                                                <td>{{ room.assignee.username if room.assignee else '—' }}</td>
                                                 <td>
                                                     {% if room.has_unread %}
                                                         <span class="badge bg-danger">Unread Messages</span>

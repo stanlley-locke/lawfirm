@@ -41,8 +41,8 @@
                                     <tr>
                                         <td>{{ member.id }}</td>
                                         <td>
-                                            {% if member.photo_url %}
-                                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                            {% if member.photo_src %}
+                                            <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                                             {% else %}
                                             <i class="fas fa-user-circle me-2"></i>
                                             {% endif %}

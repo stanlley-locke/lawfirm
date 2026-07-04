@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Manage Blog</h1>
+    <a href="{{ url_for('admin.new_blog_post') }}" class="btn btn-primary">New Post</a>
+  </div>
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Title</th><th>Status</th><th>Published</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for post in posts %}
+          <tr>
+            <td>{{ post.title }}</td>
+            <td>{% if post.is_published %}<span class="badge bg-success">Published</span>{% else %}<span class="badge bg-secondary">Draft</span>{% endif %}</td>
+            <td>{{ post.published_at.strftime('%Y-%m-%d') if post.published_at else '-' }}</td>
+            <td>
+              <a href="{{ url_for('admin.edit_blog_post', id=post.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+              <form action="{{ url_for('admin.delete_blog_post', id=post.id) }}" method="POST" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this post?')">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center">No blog posts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

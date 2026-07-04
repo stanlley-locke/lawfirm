@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Our Blog</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">News</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="section-block section-cream">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-subtitle">Legal news, insights, and updates from our team</p>
+        </div>
+        {% if posts %}
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-4 mb-4">
+                <article class="blog-card">
+                    <div class="blog-thumb mb-3"></div>
+                    <div class="blog-date">{{ post.published_at.strftime('%B %d, %Y') if post.published_at }}</div>
+                    <h2 class="h5"><a href="{{ url_for('main.blog_detail', slug=post.slug) }}">{{ post.title }}</a></h2>
+                    <p class="text-muted small">{{ post.summary|striptags|truncate(100) }}</p>
+                    <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="link-arrow">Read more</a>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No blog posts published yet.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

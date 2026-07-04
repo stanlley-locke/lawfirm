@@ -1,21 +1,32 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "lawfirm"
+version = "1.0.0"
+description = "Dan Ochieng & Company Advocates — Flask law firm website"
 requires-python = ">=3.12"
 dependencies = [
+    "bleach>=6.2.0",
     "email-validator>=2.2.0",
-    "flask-login>=0.6.3",
-    "flask>=3.1.0",
-    "flask-sqlalchemy>=3.1.1",
-    "gunicorn>=23.0.0",
-    "psycopg2-binary>=2.9.10",
-    "flask-wtf>=1.2.2",
-    "flask-migrate>=4.1.0",
-    "flask-mail>=0.10.0",
-    "flask-socketio>=5.5.1",
     "eventlet>=0.39.1",
-    "gevent>=25.4.2",
-    "gevent-websocket>=0.10.1",
+    "flask>=3.1.0",
+    "flask-login>=0.6.3",
+    "flask-migrate>=4.1.0",
+    "flask-socketio>=5.5.1",
+    "flask-sqlalchemy>=3.1.1",
+    "flask-wtf>=1.2.2",
+    "gunicorn>=23.0.0",
     "python-dotenv>=1.1.0",
+    "reportlab>=4.2.5",
+    "resend>=2.6.0",
 ]
+
+[project.optional-dependencies]
+postgres = [
+    "psycopg2-binary>=2.9.10",
+]
+dev = [
+    "pytest>=8.3.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Book an Appointment</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Appointments</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<section class="section-block section-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <p class="text-center text-muted mb-4">Schedule a consultation with our legal team using the calendar below.</p>
+                <div class="calendly-inline-widget" data-url="{{ calendly_url }}" style="min-width:320px;height:700px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+{% endblock %}

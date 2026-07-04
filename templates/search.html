@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Search</h1>
+        <form action="{{ url_for('main.search') }}" method="get" class="mt-4 mx-auto" style="max-width: 520px;">
+            <div class="input-group">
+                <input type="search" name="q" class="form-control" value="{{ query }}" placeholder="Search services, cases, blog...">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+<section class="section-block section-cream">
+    <div class="container">
+        {% if query %}
+        <h2 class="h4 mb-4">Results for "{{ query }}"</h2>
+        {% if results.services or results.cases or results.posts %}
+            {% if results.services %}
+            <h3 class="h5">Services</h3>
+            <ul class="list-group mb-4">
+                {% for item in results.services %}
+                <li class="list-group-item"><a href="{{ url_for('main.service_detail', slug=item.slug) }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if results.cases %}
+            <h3 class="h5">Case Studies</h3>
+            <ul class="list-group mb-4">
+                {% for item in results.cases %}
+                <li class="list-group-item"><a href="{{ url_for('main.case_study_detail', slug=item.slug) }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if results.posts %}
+            <h3 class="h5">Blog Posts</h3>
+            <ul class="list-group mb-4">
+                {% for item in results.posts %}
+                <li class="list-group-item"><a href="{{ url_for('main.blog_detail', slug=item.slug) }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% else %}
+            <p class="text-muted">No results found.</p>
+        {% endif %}
+        {% else %}
+        <p class="text-muted text-center">Enter a search term above.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

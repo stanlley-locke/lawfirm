@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-4">Reply to {{ message.name }}</h1>
+  <p class="text-muted">To: {{ message.email }} | Original: {{ message.subject }}</p>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">{{ form.subject.label(class="form-label") }}{{ form.subject(class="form-control") }}</div>
+    <div class="mb-3">{{ form.body.label(class="form-label") }}{{ form.body(class="form-control", rows=8) }}</div>
+    <button type="submit" class="btn btn-primary">Send Reply</button>
+    <a href="{{ url_for('admin.view_message', id=message.id) }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

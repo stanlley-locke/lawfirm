@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
 <div class="page-header">
     <div class="container">
-        <h1 class="display-4">{{ team_member.name }}</h1>
+        <h1>{{ team_member.name }}</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -16,15 +17,15 @@
 </div>
 
 <!-- Team Member Profile Section -->
-<section class="py-5">
+<section class="section-block section-white">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 mb-4 mb-lg-0">
                 <div class="card text-center">
                     <div class="card-body p-4">
-                        {% if team_member.photo_url %}
+                        {% if team_member.photo_src %}
                         <div class="mb-4">
-                            <img src="{{ team_member.photo_url }}" alt="{{ team_member.name }}" class="rounded-circle img-fluid" style="width: 220px; height: 220px; object-fit: cover;">
+                            <img src="{{ team_member.photo_src }}" alt="{{ team_member.name }}" class="rounded-circle img-fluid" style="width: 220px; height: 220px; object-fit: cover;">
                         </div>
                         {% else %}
                         <div class="mb-4">
@@ -164,7 +165,7 @@
 </section>
 
 <!-- Other Team Members Section -->
-<section class="py-5 bg-dark">
+<section class="cta-section">
     <div class="container">
         <div class="text-center mb-5">
             <h2>Meet More of Our Team</h2>
@@ -175,9 +176,9 @@
             <div class="col-md-6 col-lg-3 mb-4">
                 <div class="card h-100 team-card text-center">
                     <div class="card-body p-4">
-                        {% if member.photo_url %}
+                        {% if member.photo_src %}
                         <div class="mb-3">
-                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 120px; height: 120px; object-fit: cover;">
+                            <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 120px; height: 120px; object-fit: cover;">
                         </div>
                         {% else %}
                         <div class="mb-3">
@@ -186,26 +187,26 @@
                         {% endif %}
                         <h3 class="card-title h5">{{ member.name }}</h3>
                         <p class="text-muted">{{ member.position }}</p>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="btn btn-outline-primary btn-sm mt-3">View Profile</a>
+                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow mt-3 d-inline-block">View profile</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
         <div class="text-center mt-4">
-            <a href="{{ url_for('main.team') }}" class="btn btn-primary">View All Team Members</a>
+            <a href="{{ url_for('main.team') }}" class="btn btn-white">View All Team Members</a>
         </div>
     </div>
 </section>
 
 <!-- Contact CTA Section -->
-<section class="py-5">
+<section class="cta-section">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
                 <h2 class="mb-4">Work with {{ team_member.name }}</h2>
-                <p class="lead mb-5">Contact our firm today to schedule a consultation with {{ team_member.name }} and discuss how we can assist with your legal needs.</p>
-                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Schedule a Consultation</a>
+                <p class="lead mb-5 section-subtitle">Contact our firm today to schedule a consultation with {{ team_member.name }}.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Schedule a Consultation</a>
             </div>
         </div>
     </div>

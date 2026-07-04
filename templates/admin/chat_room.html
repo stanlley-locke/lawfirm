@@ -37,7 +37,7 @@
                             {% for message in messages %}
                                 <div class="message mb-3 {% if message.is_from_client %}message-client{% else %}message-staff{% endif %}">
                                     <div class="message-content p-3 rounded {% if message.is_from_client %}bg-light text-dark ms-auto{% else %}bg-primary text-white{% endif %}">
-                                        {{ message.content }}
+                                        {{ message.content|e }}
                                     </div>
                                     <div class="message-meta small text-muted mt-1 {% if message.is_from_client %}text-end{% endif %}">
                                         {% if message.is_from_client %}
@@ -101,7 +101,16 @@
                             <p><strong>Session ID:</strong> <span class="text-muted">{{ room.room_id }}</span></p>
                         </div>
                     </div>
-                    <div class="mt-3">
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <select id="assign-select" class="form-select form-select-sm d-inline-block w-auto">
+                            <option value="">Unassigned</option>
+                            {% for member in staff %}
+                            <option value="{{ member.id }}" {% if room.assigned_to_id == member.id %}selected{% endif %}>{{ member.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <button id="assign-btn" class="btn btn-sm btn-outline-primary">Assign</button>
+                        <a href="{{ url_for('chat.export_chat_pdf', room_id=room.room_id) }}" class="btn btn-sm btn-outline-secondary">Export PDF</a>
+                        <button id="email-export-btn" class="btn btn-sm btn-outline-secondary">Email Transcript</button>
                         <button id="close-chat-btn" class="btn btn-danger" data-room-id="{{ room.room_id }}">
                             <i class="fas fa-times me-1"></i> Close Chat Session
                         </button>
@@ -122,6 +131,10 @@
     const chatMessages = document.getElementById('chat-messages');
     const chatStatus = document.getElementById('chat-status');
     const closeChatBtn = document.getElementById('close-chat-btn');
+    const assignBtn = document.getElementById('assign-btn');
+    const assignSelect = document.getElementById('assign-select');
+    const emailExportBtn = document.getElementById('email-export-btn');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
     // Chat room ID
     const roomId = '{{ room.room_id }}';
@@ -154,6 +167,24 @@
     socket.on('status', (data) => {
         console.log(data.msg);
     });
+
+    socket.on('typing', (data) => {
+        if (!data.is_staff) {
+            chatStatus.textContent = data.is_typing ? 'Client typing...' : 'Connected';
+        }
+    });
+
+    socket.on('read_receipt', (data) => {
+        console.log('Messages read:', data.message_ids);
+    });
+
+    messageInput.addEventListener('input', () => {
+        socket.emit('typing', { room: roomId, is_typing: true });
+        clearTimeout(window._typingTimer);
+        window._typingTimer = setTimeout(() => {
+            socket.emit('typing', { room: roomId, is_typing: false });
+        }, 1000);
+    });
     
     // Form submission for sending messages
     messageForm.addEventListener('submit', (e) => {
@@ -179,8 +210,10 @@
             fetch(`/admin/chat/${roomId}/close`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({})
             })
             .then(response => response.json())
             .then(data => {
@@ -191,6 +224,26 @@
             })
             .catch(error => console.error('Error closing chat:', error));
         }
+    });
+
+    assignBtn.addEventListener('click', () => {
+        fetch(`/admin/chat/${roomId}/assign`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify({ assigned_to_id: assignSelect.value || null })
+        }).then(res => res.json()).then(data => {
+            if (data.success) alert('Room assigned.');
+        });
+    });
+
+    emailExportBtn.addEventListener('click', () => {
+        fetch(`/admin/chat/${roomId}/export/email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify({})
+        }).then(res => res.json()).then(data => {
+            if (data.success) alert('Transcript emailed.');
+        });
     });
     
     // Function to append a message to the chat

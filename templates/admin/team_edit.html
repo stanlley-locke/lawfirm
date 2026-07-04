@@ -21,7 +21,7 @@
                     <h2 class="h5 mb-0">Team Member Information</h2>
                 </div>
                 <div class="card-body">
-                    <form method="POST" 
+                    <form method="POST" enctype="multipart/form-data"
                           {% if team_member %}
                           action="{{ url_for('admin.edit_team_member', id=team_member.id) }}"
                           {% else %}
@@ -86,12 +86,17 @@
                                     {% endif %}
                                     <small class="form-text text-muted">Enter a URL to the profile photo (if available).</small>
                                 </div>
+                                <div class="form-group mt-3">
+                                    {{ form.photo.label(class="form-label") }}
+                                    {{ form.photo(class="form-control") }}
+                                    <small class="form-text text-muted">Or upload a photo (PNG, JPG, GIF, WebP).</small>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group mb-3">
                             {{ form.bio.label(class="form-label") }}
-                            {{ form.bio(class="form-control", rows="6", placeholder="Professional biography and credentials") }}
+                            {{ form.bio(class="form-control richtext", rows="6", placeholder="Professional biography and credentials") }}
                             {% if form.bio.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.bio.errors %}
@@ -208,9 +213,9 @@
                         <div class="col-md-6 offset-md-3">
                             <div class="card team-card text-center">
                                 <div class="card-body p-4">
-                                    {% if team_member.photo_url %}
+                                    {% if team_member.photo_src %}
                                     <div class="mb-3">
-                                        <img src="{{ team_member.photo_url }}" alt="{{ team_member.name }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+                                        <img src="{{ team_member.photo_src }}" alt="{{ team_member.name }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
                                     </div>
                                     {% else %}
                                     <div class="mb-3">
@@ -241,4 +246,14 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block head_scripts %}
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  tinymce.init({ selector: 'textarea.richtext', height: 300, menubar: false, plugins: 'lists link', toolbar: 'undo redo | bold italic | bullist numlist | link', branding: false });
+</script>
 {% endblock %}

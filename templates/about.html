@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-<!-- Page Header -->
-<div class="page-header">
+{% set header_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.jpg') %}
+<div class="page-header" style="background-image: url('{{ header_bg }}');">
     <div class="container">
-        <h1 class="display-4">About Our Firm</h1>
+        <h1>About Our Firm</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -14,128 +15,33 @@
     </div>
 </div>
 
-<!-- About Section -->
-<section class="py-5">
+<!-- Story section -->
+<section class="section-block section-white" id="our-story">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="mb-4">Forward...</h2>
-                <p>DAN OCHIENG & CO. ADVOCATES is one of the premier law firms in Kenya, with office in Kisumu, we are a medium size but highly professional full-service firm:
-                    specializing in: Land Law, Commercial Law, Company Law, Property, Conveyance, Trusts, Family and Succession Law, Insurance (Running Down), Banking and Securities Law, Employment Law, Civil Litigation, Environmental Law, Legal Research and Consultancy,
-                </p>
-                <p>The law firm combines in-depth knowledge and vast expertise to uphold the most
-excellent standards of legal practice. We focus on a wide range of intricate legal
-issues, opening new horizons and fresh perspectives for our clients. Small but highly
-professional, our law firm is configured to deliver the highest class service to our
-clients, in spite of the difficulty of the legal problem.</p>
-                <p>As a top Kenyan law firm, we are very proud of our strong working relationships with
-major law firms around the country. We also provide professional services to well-
-known corporates that rely on our competence to represent and manage their
-interests in Kenya.</p>
-                    <p>Our ongoing success and strong reputation derives from a highly regarded team of 3
-lawyers who combine intellectual capability and unique practical skills.</p>
-                        <p>The firm took over the cases from the firm of Ochieng & Associates Advocates, which
-has been in practice for over five years.</p>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="section-eyebrow">Our Story</span>
+                <h2 class="mb-4">Forward…</h2>
+                <p>DAN OCHIENG &amp; CO. ADVOCATES is one of the premier law firms in Kenya, with office in Kisumu. We are a medium size but highly professional full-service firm specializing in land law, commercial law, company law, property and conveyance, trusts, family and succession law, insurance, banking and securities law, employment law, civil litigation, environmental law, and legal research and consultancy.</p>
+                <p>The law firm combines in-depth knowledge and vast expertise to uphold the most excellent standards of legal practice. Small but highly professional, our law firm is configured to deliver the highest class service to our clients.</p>
             </div>
             <div class="col-lg-6">
-                <div class="card bg-dark border-0">
+                <div class="card feature-card border-0" id="our-values">
                     <div class="card-body p-4">
-                    
-                        <h3 class="card-title mb-4">Our Vision, Mission & Core Values</h3>
-                        <ul class="list-unstyled">
-                            <li class="mb-3 d-flex">
-                        <i class="fas  fa-eye text-primary me-3 mt-1"></i>
-                          <div><h4 class="text-primary">Vision</h4>
-                        <p>“To be the best and most sought after firm for efficient and innovative service
-delivery and dispute settlement systems."</p>
-                            </div>
-                        </li></ul>
-                        
-                        <ul class="list-unstyled">
-                            <li class="mb-3 d-flex">
-                        <i class="fas  fa-bullseye text-primary me-3 mt-1"></i>
-                          <div><h4 class="text-primary">Mission</h4>
-                        <p>“To provide a system of timely resolution of cases and controversies to our clients”</p>
-                            </div>
-                        </li></ul>
-                         <ul class="list-unstyled">
-                            <li class="mb-3 d-flex">
-                          <div><h4 class="text-primary">Core Values</h4>
-                            </div>
-                        </li></ul>
-                        <ul class="list-unstyled">
-                             <li class="mb-3 d-flex">
-                                <i class="fas fa-balance-scale text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Acountability</h5>
-                                    <p>We take individual & collective responsibility for our decisions.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-trophy text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Achievement</h5>
-                                    <p>We aspire to be at the highest level of excellence in our services</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-bolt text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Action</h5>
-                                    <p>We move quickly into action after wise planning. We beleive in moving forward for maximum results.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-smile text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Attitude</h5>
-                                    <p>We beleive that remaining positive and looking ahead are essential to achieving our goals.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-fire text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Boldness</h5>
-                                    <p>We question business as usual and beleive that taking calculated risks encourage growth and new discoveries.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-handshake text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Community</h5>
-                                    <p>We donate time, money and resources to local charitable
-organizations. We build key relationships by supporting our
-community.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-balance-scale text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Integrity</h5>
-                                    <p>We uphold the highest ethical standards in all our actions and advice.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-star text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Excellence</h5>
-                                    <p>We strive for excellence in our legal work, client service, and professional development.</p>
-                                </div>
-                            </li>
-                            <li class="mb-3 d-flex">
-                                <i class="fas fa-handshake text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Collaboration</h5>
-                                    <p>We work closely with clients and colleagues to achieve optimal results.</p>
-                                </div>
-                            </li>
-                            <li class="d-flex">
-                                <i class="fas fa-users text-primary me-3 mt-1"></i>
-                                <div>
-                                    <h5>Client Focus</h5>
-                                    <p>We place our clients' interests at the center of everything we do.</p>
-                                </div>
-                            </li>
+                        <h3 class="mb-4">Our Vision, Mission &amp; Core Values</h3>
+                        <div class="mb-4">
+                            <h4 class="h6 text-uppercase" style="color: var(--doa-cyan);">Vision</h4>
+                            <p class="mb-0">To be the best and most sought after firm for efficient and innovative service delivery and dispute settlement systems.</p>
+                        </div>
+                        <div class="mb-4">
+                            <h4 class="h6 text-uppercase" style="color: var(--doa-cyan);">Mission</h4>
+                            <p class="mb-0">To provide a system of timely resolution of cases and controversies to our clients.</p>
+                        </div>
+                        <h4 class="h6 text-uppercase mb-3" style="color: var(--doa-cyan);">Core Values</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Accountability, Achievement &amp; Action</li>
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Integrity, Excellence &amp; Boldness</li>
+                            <li><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Community, Collaboration &amp; Client Focus</li>
                         </ul>
                     </div>
                 </div>
@@ -144,187 +50,133 @@ community.</p>
     </div>
 </section>
 
-<!-- Approach Section -->
-<section class="py-5 bg-dark">
+<!-- Alternating rows — Screenshot 2026-07-03 215536.png -->
+<section class="split-row section-cream" id="why-choose-us">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2>Our Bussines Principles & Approach</h2>
-            <p>This firm’s Business Policy, binds all members of staff and demands ethical conduct
-in their daily relationships with colleagues or interactions with clients. The company
-staff must:</p>
-            <p class="lead">How we work with clients to achieve successful outcomes</p>
-           <ul class="list-unstyled">
-  <li>1. Perform duties with honesty, integrity, and to the best of their abilities.</li>
-  <li>2. Maintain impartiality and avoid compromising their professional positions.</li>
-  <li>3. Treat clients with fairness, courtesy, dignity, and sensitivity to their rights.</li>
-  <li>4. Remain accountable for actions and accept constructive criticism for improvement.</li>
-  <li>5. Comply with all company procedures and uphold its positive image at all times.</li>
-  <li>6. Use company information only for its intended purpose, within delegated authority.</li>
-  <li>7. Respect and care for the company's assets and property as their own.</li>
-  <li>8. Disclose any personal or company-related conflicts of interest to avoid compromise.</li>
-  <li>9. Decline any gifts that may be perceived as attempts to exert undue influence.</li>
-  <li>10. Report behavior that violates the code, while encouraging constructive feedback and contributions.</li>
-  <li>11. Seek guidance from supervisors or the managing partner when uncertain about policy application.</li>
-</ul>
-
-            <p>We are committed to these principles and strive to exceed our clients' expectations in every interaction.</p>
-        </div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="display-4 text-primary mb-3">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 class="card-title h5">Thorough Assessment</h3>
-                        <p class="card-text">We begin by understanding your specific situation, goals, and concerns through comprehensive consultation and case evaluation.</p>
-                    </div>
-                </div>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 order-lg-2">
+                <h2>Advocacy is a passion with proven results</h2>
+                <p>We focus on a wide range of intricate legal issues, opening new horizons and fresh perspectives for our clients. Our ongoing success and strong reputation derives from a highly regarded team of lawyers who combine intellectual capability and unique practical skills.</p>
+                <a href="{{ url_for('main.services') }}" class="btn btn-primary mt-2">Learn More</a>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="display-4 text-primary mb-3">
-                            <i class="fas fa-map"></i>
-                        </div>
-                        <h3 class="card-title h5">Strategic Planning</h3>
-                        <p class="card-text">We develop customized legal strategies that address your unique circumstances and align with your objectives.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="display-4 text-primary mb-3">
-                            <i class="fas fa-gavel"></i>
-                        </div>
-                        <h3 class="card-title h5">Decisive Action</h3>
-                        <p class="card-text">We implement your legal strategy with skill and determination, keeping you informed and involved throughout the process.</p>
-                    </div>
-                </div>
+            <div class="col-lg-6 order-lg-1">
+                <img src="{{ url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.jpg') }}" alt="Grand classical courthouse columns and coffered ceiling" class="split-image">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Team Section -->
-<section class="py-5">
+<section class="split-row section-white">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2>Our Legal Team</h2>
-            <p class="lead">Meet the professionals dedicated to serving your legal needs</p>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2>You've got ideas. We protect them.</h2>
+                <p>As a top Kenyan law firm, we are very proud of our strong working relationships with major law firms around the country. We also provide professional services to well-known corporates that rely on our competence to represent and manage their interests in Kenya.</p>
+            </div>
+            <div class="col-lg-6">
+                <img src="{{ url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.jpg') }}" alt="Legal research books and notebook on a desk" class="split-image">
+            </div>
         </div>
-        
-        {% if team_members %}
+    </div>
+</section>
+
+<!-- Principles -->
+<section class="section-block section-cream">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our Business Principles &amp; Approach</h2>
+            <p class="section-subtitle">This firm's Business Policy binds all members of staff and demands ethical conduct in their daily relationships.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <ol class="mb-0">
+                    <li class="mb-2">Perform duties with honesty, integrity, and to the best of their abilities.</li>
+                    <li class="mb-2">Maintain impartiality and avoid compromising their professional positions.</li>
+                    <li class="mb-2">Treat clients with fairness, courtesy, dignity, and sensitivity to their rights.</li>
+                    <li class="mb-2">Remain accountable for actions and accept constructive criticism for improvement.</li>
+                    <li class="mb-2">Comply with all company procedures and uphold its positive image at all times.</li>
+                    <li class="mb-2">Use company information only for its intended purpose, within delegated authority.</li>
+                    <li class="mb-2">Respect and care for the company's assets and property as their own.</li>
+                    <li class="mb-2">Disclose any personal or company-related conflicts of interest.</li>
+                    <li class="mb-2">Decline any gifts that may be perceived as attempts to exert undue influence.</li>
+                    <li class="mb-2">Report behavior that violates the code, while encouraging constructive feedback.</li>
+                    <li>Seek guidance from supervisors or the managing partner when uncertain about policy application.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team -->
+{% if team_members %}
+<section class="section-block section-white">
+    <div class="container">
+        <div class="section-header">
+            <h2>Our Legal Team</h2>
+            <p class="section-subtitle">Meet the professionals dedicated to serving your legal needs</p>
+        </div>
         <div class="row">
             {% for member in team_members %}
             <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 team-card text-center">
+                <div class="card h-100 team-card">
                     <div class="card-body p-4">
-                        {% if member.photo_url %}
-                        <div class="mb-3">
-                            <img src="{{ member.photo_url }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
-                        </div>
+                        {% if member.photo_src %}
+                        <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="team-photo">
                         {% else %}
-                        <div class="mb-3">
-                            <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
-                        </div>
+                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
                         {% endif %}
-                        <h3 class="card-title h5">{{ member.name }}</h3>
-                        <p class="text-muted">{{ member.position }}</p>
-                        <div class="team-social mt-3">
-                            {% if member.email %}
-                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
-                            {% endif %}
-                            {% if member.linkedin %}
-                            <a href="{{ member.linkedin }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                            {% endif %}
-                            {% if member.twitter %}
-                            <a href="{{ member.twitter }}" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                            {% endif %}
-                        </div>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="btn btn-outline-primary mt-3">View Profile</a>
+                        <h3 class="h5">{{ member.name }}</h3>
+                        <p class="text-muted small">{{ member.position }}</p>
+                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow">View profile</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="text-center">
-            <p>Our team information is currently being updated. Please check back soon.</p>
-        </div>
-        {% endif %}
     </div>
 </section>
+{% endif %}
 
-<!-- Testimonials Section -->
-<section class="py-5 bg-dark">
+<!-- Testimonials — what_our_clients_say.png -->
+<section class="section-block section-cream testimonial-section">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="section-header">
+            <span class="section-eyebrow" style="color: var(--doa-text-light);">Our Testimonials</span>
             <h2>What Our Clients Say</h2>
-            <p class="lead">Hear about the experiences of those we've helped</p>
         </div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <p class="card-text mb-4">The team at Dan Ochieng & Company advocates provided exceptional guidance through my complex business litigation. Their expertise and strategic approach led to a favorable outcome that exceeded my expectations.</p>
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h5 class="mb-0">Star Hospital Kisumu Annex Limited</h5>
-                                <p class="text-muted small mb-0">Client</p>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 testimonial-card p-4">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p>The team provided exceptional guidance through complex business litigation. Their expertise led to a favorable outcome.</p>
+                    <div class="testimonial-name">Star Hospital Kisumu Annex Limited</div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <p class="card-text mb-4">I was impressed by the personal attention and care I received from Dan Ochieng & Company advocates. They explained complex legal matters in simple terms and were always available to address my concerns.</p>
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h5 class="mb-0">Rusinga Humanist Of Hope Center</h5>
-                                <p class="text-muted small mb-0">Client</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-4">
+                <div class="card h-100 testimonial-card p-4">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p>I was impressed by the personal attention and care. They explained complex legal matters in simple terms.</p>
+                    <div class="testimonial-name">Rusinga Humanist Of Hope Center</div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left text-primary" style="font-size: 1.5rem;"></i>
-                        </div>
-                        <p class="card-text mb-4">Working with Dan Ochieng & Company advocates has been a game-changer for our company. Their proactive legal counsel has helped us navigate regulatory challenges and expand our operations with confidence.</p>
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h5 class="mb-0">Maxcure Insurance Agency</h5>
-                                <p class="text-muted small mb-0">Client</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-4">
+                <div class="card h-100 testimonial-card p-4">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p>Working with Dan Ochieng &amp; Company Advocates has been a game-changer for our company.</p>
+                    <div class="testimonial-name">Maxcure Insurance Agency</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Contact CTA Section -->
-<section class="py-5">
+<section class="cta-section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
+            <div class="col-lg-8">
                 <h2 class="mb-4">Ready to Work with Us?</h2>
-                <p class="lead mb-5">Contact our team today for a consultation about your legal needs. We're here to help you navigate the complexities of the law and achieve the best possible outcome.</p>
-                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Contact Us Now</a>
+                <p class="lead mb-4 section-subtitle">Contact our team today for a consultation about your legal needs.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Contact Us Now</a>
             </div>
         </div>
     </div>

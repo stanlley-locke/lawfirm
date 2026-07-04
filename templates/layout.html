@@ -1,95 +1,327 @@
 {# templates/layout.html #}
+{# Design reference: static/images/design_screens/ + static/images/logo/dan_ochieng_advocates_logo.png #}
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- CSRF token for AJAX/Fetch calls -->
-     
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{% if title %}{{ title }} – {% endif %}Dan Ochieng & Company advocates</title>
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    
-    {% block head_scripts %}{% endblock %}
-    
-    <!-- Favicon -->
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-balance-scale me-2"></i>Dan Ochieng & Company advocates</a>
-            <button class="navbar-toggler" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
-                           href="{{ url_for('main.index') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}"
-                           href="{{ url_for('main.about') }}">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint in ['main.services','main.service_detail'] %}active{% endif %}"
-                           href="{{ url_for('main.services') }}">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint in ['main.team','main.team_member'] %}active{% endif %}"
-                           href="{{ url_for('main.team') }}">Our Team</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint in ['main.case_studies','main.case_study_detail'] %}active{% endif %}"
-                           href="{{ url_for('main.case_studies') }}">Case Studies</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'contact.contact' %}active{% endif %}"
-                           href="{{ url_for('contact.contact') }}">Contact</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle me-1"></i>Admin
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.services') }}">Services</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.team') }}">Team</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.cases') }}">Case Studies</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin.messages') }}">Messages</a></li>
-                                <li>
-                                  <a class="dropdown-item" href="{{ url_for('chat.admin_chats') }}">
-                                    Live Chats
-                                    <span id="chat-nav-badge" class="badge bg-danger ms-2 d-none">0</span>
-                                  </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <title>{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}</title>
+    <meta name="description" content="{% block meta_description %}Dan Ochieng & Company Advocates — legal services in Kisumu, Kenya. Corporate, family, and property law.{% endblock %}">
+    <link rel="canonical" href="{{ base_url }}{{ request.path }}">
+    <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ base_url }}{{ request.path }}">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LegalService",
+      "name": "Dan Ochieng & Company Advocates",
+      "url": "{{ base_url }}",
+      "telephone": "+254745819632",
+      "email": "info@danochiengadvocates.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Tumaini Mall 1st Floor, Suite 103, Ring Road - Milimani",
+        "addressLocality": "Kisumu",
+        "addressCountry": "KE"
+      },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "09:00",
+        "closes": "17:00"
+      }]
+    }
+    </script>
 
-    <!-- Flash Messages -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Montserrat:wght@500;600;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+
+    {% block head_scripts %}{% endblock %}
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="doa-navbar-float" id="doaNavbarFloat">
+        <nav class="navbar navbar-expand-xl navbar-light doa-navbar" id="doaNavbar">
+            <div class="doa-navbar-inner px-3 px-lg-4">
+                <a class="navbar-brand doa-brand" href="{{ url_for('main.index') }}">
+                    <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                         alt="Dan Ochieng & Company Advocates"
+                         class="doa-brand-logo"
+                         width="46" height="46">
+                    <span class="doa-brand-name">Dan Ochieng &amp; Company Advocates</span>
+                </a>
+                <div class="doa-navbar-mobile-actions d-xl-none">
+                    <a href="tel:+254745819632" class="doa-nav-phone doa-nav-phone--header" aria-label="Call 0745 819 632">
+                        <i class="fas fa-phone" aria-hidden="true"></i>
+                    </a>
+                    <button class="navbar-toggler doa-navbar-toggler" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                            aria-controls="navbarNav" aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse doa-navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav doa-nav-menu">
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint == 'main.index' %}active{% endif %}"
+                               href="{{ url_for('main.index') }}">
+                                Home
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="Home submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid">
+                                        <a href="{{ url_for('main.index') }}#practice-areas" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Practice Areas</span>
+                                            <span class="doa-mega-link-desc">Explore our legal specializations</span>
+                                        </a>
+                                        <a href="{{ url_for('main.index') }}#testimonials" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Testimonials</span>
+                                            <span class="doa-mega-link-desc">What our clients say about us</span>
+                                        </a>
+                                        <a href="{{ url_for('main.index') }}#location" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Our Location</span>
+                                            <span class="doa-mega-link-desc">Find us in Kisumu, Kenya</span>
+                                        </a>
+                                        <a href="{{ url_for('main.index') }}#faq" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">FAQ</span>
+                                            <span class="doa-mega-link-desc">Answers to common questions</span>
+                                        </a>
+                                        <a href="{{ url_for('main.about') }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">About Us</span>
+                                            <span class="doa-mega-link-desc">Learn about our firm</span>
+                                        </a>
+                                        <a href="{{ url_for('contact.contact') }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Contact</span>
+                                            <span class="doa-mega-link-desc">Get in touch with our team</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint in ['main.services','main.service_detail'] %}active{% endif %}"
+                               href="{{ url_for('main.services') }}">
+                                Services
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="Services submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid">
+                                        {% if nav_services %}
+                                            {% for svc in nav_services %}
+                                            <a href="{{ url_for('main.service_detail', slug=svc.slug) }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">{{ svc.title }}</span>
+                                                <span class="doa-mega-link-desc">{{ svc.description|striptags|truncate(60) }}</span>
+                                            </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <a href="{{ url_for('main.services') }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">View All Services</span>
+                                                <span class="doa-mega-link-desc">Browse our practice areas</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('main.services') }}" class="doa-mega-footer-link">View all services &rarr;</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint == 'main.about' %}active{% endif %}"
+                               href="{{ url_for('main.about') }}">
+                                About Us
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="About submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid doa-mega-grid--compact">
+                                        <a href="{{ url_for('main.about') }}#our-story" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Our Story</span>
+                                            <span class="doa-mega-link-desc">Our history and mission</span>
+                                        </a>
+                                        <a href="{{ url_for('main.about') }}#our-values" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Our Values</span>
+                                            <span class="doa-mega-link-desc">Vision, mission &amp; core values</span>
+                                        </a>
+                                        <a href="{{ url_for('main.about') }}#why-choose-us" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Why Choose Us</span>
+                                            <span class="doa-mega-link-desc">What sets our firm apart</span>
+                                        </a>
+                                        <a href="{{ url_for('main.team') }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title">Meet the Team</span>
+                                            <span class="doa-mega-link-desc">Our legal professionals</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint in ['main.team','main.team_member'] %}active{% endif %}"
+                               href="{{ url_for('main.team') }}">
+                                Our Team
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="Team submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid">
+                                        {% if nav_team %}
+                                            {% for member in nav_team %}
+                                            <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">{{ member.name }}</span>
+                                                <span class="doa-mega-link-desc">{{ member.position }}</span>
+                                            </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <a href="{{ url_for('main.team') }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">View Our Team</span>
+                                                <span class="doa-mega-link-desc">Meet our legal professionals</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('main.team') }}" class="doa-mega-footer-link">View full team &rarr;</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint in ['main.case_studies','main.case_study_detail'] %}active{% endif %}"
+                               href="{{ url_for('main.case_studies') }}">
+                                Case Studies
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="Case studies submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid">
+                                        {% if nav_cases %}
+                                            {% for case in nav_cases %}
+                                            <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">{{ case.title }}</span>
+                                                <span class="doa-mega-link-desc">{{ case.summary|truncate(60) }}</span>
+                                            </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <a href="{{ url_for('main.case_studies') }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">View Case Studies</span>
+                                                <span class="doa-mega-link-desc">See our successful outcomes</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('main.case_studies') }}" class="doa-mega-footer-link">View all case studies &rarr;</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint in ['main.blog','main.blog_detail'] %}active{% endif %}"
+                               href="{{ url_for('main.blog') }}">
+                                News
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="News submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid">
+                                        {% if nav_blog %}
+                                            {% for post in nav_blog %}
+                                            <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">{{ post.title }}</span>
+                                                <span class="doa-mega-link-desc">{{ post.summary|truncate(60) }}</span>
+                                            </a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <a href="{{ url_for('main.blog') }}" class="doa-mega-link">
+                                                <span class="doa-mega-link-title">View All News</span>
+                                                <span class="doa-mega-link-desc">Legal insights and updates</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('main.blog') }}" class="doa-mega-footer-link">View all news &rarr;</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-item doa-nav-item has-mega">
+                            <a class="nav-link doa-nav-trigger {% if request.endpoint == 'contact.contact' %}active{% endif %}"
+                               href="{{ url_for('contact.contact') }}">
+                                Contact Us
+                                <i class="fas fa-chevron-down doa-mega-chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="doa-mega-panel" aria-label="Contact submenu">
+                                <div class="doa-mega-inner">
+                                    <div class="doa-mega-grid doa-mega-grid--compact">
+                                        <a href="tel:+254745819632" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-phone me-1"></i> 0745 819 632</span>
+                                            <span class="doa-mega-link-desc">Call us during business hours</span>
+                                        </a>
+                                        <a href="mailto:info@danochiengadvocates.com" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-envelope me-1"></i> Email Us</span>
+                                            <span class="doa-mega-link-desc">info@danochiengadvocates.com</span>
+                                        </a>
+                                        <a href="{{ url_for('contact.contact') }}#office-location" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-map-marker-alt me-1"></i> Our Office</span>
+                                            <span class="doa-mega-link-desc">Tumaini Mall, Kisumu</span>
+                                        </a>
+                                        {% if calendly_url %}
+                                        <a href="{{ url_for('main.appointments') }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-calendar-check me-1"></i> Book Appointment</span>
+                                            <span class="doa-mega-link-desc">Schedule a consultation online</span>
+                                        </a>
+                                        {% endif %}
+                                        <a href="{{ url_for('contact.contact') }}#contact-form" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-paper-plane me-1"></i> Contact Form</span>
+                                            <span class="doa-mega-link-desc">Send us a message</span>
+                                        </a>
+                                        <a href="{{ url_for('chat.client_chat') }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-comments me-1"></i> Live Chat</span>
+                                            <span class="doa-mega-link-desc">Chat with our team now</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="doa-nav-tools">
+                        <a href="tel:+254745819632" class="doa-nav-phone">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
+                            <span>0745 819 632</span>
+                        </a>
+                        {% if current_user.is_authenticated %}
+                            <div class="dropdown doa-nav-admin">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>Admin
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.services') }}">Services</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.team') }}">Team</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.cases') }}">Case Studies</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.messages') }}">Messages</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.blog_posts') }}">Blog</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">Users</a></li>
+                                    <li>
+                                      <a class="dropdown-item" href="{{ url_for('chat.admin_chats') }}">
+                                        Live Chats
+                                        <span id="chat-nav-badge" class="badge bg-danger ms-2 d-none">0</span>
+                                      </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="doa-navbar-spacer" id="doaNavbarSpacer" aria-hidden="true"></div>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="container mt-3">
@@ -103,78 +335,87 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
-    {% block content %}{% endblock %}
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
 
-    <!-- Footer -->
-    <footer class="footer mt-5">
+    <footer class="footer mt-auto">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-4"><i class="fas fa-balance-scale me-2"></i>Dan Ochieng & Company advocates</h5>
-                    <p>Commisioner For Oaths & Notary Public.</p>
-                    <p>Providing exceptional legal services with a commitment to excellence, integrity, and client satisfaction.</p>
+                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                             alt="Dan Ochieng & Company Advocates">
+                        <div class="footer-brand-name">Dan Ochieng &amp; Company Advocates</div>
+                    </div>
+                    <p>Commissioner For Oaths &amp; Notary Public. Providing exceptional legal services with a commitment to excellence, integrity, and client satisfaction.</p>
                     <div class="social-icons">
-                        <a href="https://www.instagram.com/stanlley_locke/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://x.com/stanley_wasonga" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.linkedin.com/in/stanley-locke-a4b430327/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/stanlley_locke/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/stanley_wasonga" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/in/stanley-locke-a4b430327/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-4">Quick Links</h5>
+                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h5>Links</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ url_for('main.index') }}">Home</a></li>
-                        <li class="mb-2"><a href="{{ url_for('main.about') }}">About Us</a></li>
-                        <li class="mb-2"><a href="{{ url_for('main.services') }}">Services</a></li>
-                        <li class="mb-2"><a href="{{ url_for('main.team') }}">Our Team</a></li>
-                        <li class="mb-2"><a href="{{ url_for('main.case_studies') }}">Case Studies</a></li>
-                        <li class="mb-2"><a href="{{ url_for('contact.contact') }}">Contact Us</a></li>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        <li><a href="{{ url_for('main.services') }}">Services</a></li>
+                        <li><a href="{{ url_for('main.about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('main.team') }}">Our Team</a></li>
+                        <li><a href="{{ url_for('main.case_studies') }}">Case Studies</a></li>
+                        <li><a href="{{ url_for('main.blog') }}">News</a></li>
+                        <li><a href="{{ url_for('contact.contact') }}">Contact Us</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4">
-                    <h5 class="mb-4">Contact Information</h5>
+                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h5>Find Us</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2">
-                          <i class="fas fa-map-marker-alt me-2"></i>
-                          Tumaini Mall 1st Floor, suite 103 Ring Road - Milimani.
-                        </li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i>0745 819 632 // 0734 090 411</li>
-                        <li class="mb-2">
-                          <i class="fas fa-envelope me-2"></i>
-                          <a href="mailto:info@lawfirmname.com">info@danochiengadvocates.com</a>
-                        </li>
-                        <li class="mb-2"><i class="fas fa-clock me-2"></i>Monday–Friday: 9 AM–5 PM</li>
+                        <li class="mb-2">Tumaini Mall 1st Floor, Suite 103<br>Ring Road – Milimani, Kisumu</li>
+                        <li class="mb-2"><a href="tel:+254745819632">0745 819 632</a></li>
+                        <li class="mb-2"><a href="tel:+254734090411">0734 090 411</a></li>
+                        <li><a href="mailto:info@danochiengadvocates.com">info@danochiengadvocates.com</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <h5>Practice Areas</h5>
+                    <ul class="list-unstyled">
+                        {% if footer_services %}
+                            {% for svc in footer_services %}
+                            <li><a href="{{ url_for('main.service_detail', slug=svc.slug) }}">{{ svc.title }}</a></li>
+                            {% endfor %}
+                        {% else %}
+                            <li><a href="{{ url_for('main.services') }}">View All Services</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
             <hr>
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <p>&copy; {{ now.year  }} Dan Ochieng & Company advocates. All rights reserved.</p>
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start footer-copyright">
+                    <p class="mb-0">&copy; {{ now.year }} Dan Ochieng &amp; Company Advocates. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+                <div class="col-md-6 text-center text-md-end footer-copyright">
+                    <p class="mb-0">
+                        <a href="{{ url_for('main.privacy') }}">Privacy Policy</a> |
+                        <a href="{{ url_for('main.terms') }}">Terms of Service</a>
+                    </p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Chat Widget Button -->
     {% if not current_user.is_authenticated %}
         <div class="chat-widget-container">
             <a href="{{ url_for('chat.client_chat') }}"
-               class="btn btn-primary chat-widget-button shadow">
+               class="btn chat-widget-button shadow">
                 <i class="fas fa-comments"></i>
                 <span class="chat-label">Chat with us</span>
             </a>
         </div>
     {% endif %}
 
-    <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
     {% block scripts %}{% endblock %}
 </body>
 </html>

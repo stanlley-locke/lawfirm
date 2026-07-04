@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
 <div class="page-header">
     <div class="container">
-        <h1 class="display-4">{{ case_study.title }}</h1>
+        <h1>{{ case_study.title }}</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -16,7 +17,7 @@
 </div>
 
 <!-- Case Study Detail Section -->
-<section class="py-5">
+<section class="section-block section-white">
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -93,7 +94,7 @@
                                     <p class="text-muted mb-3">Client: {{ case.client }}</p>
                                     {% endif %}
                                     <p class="card-text">{{ case.summary|truncate(100) }}</p>
-                                    <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="btn btn-outline-primary mt-3">Read Case Study</a>
+                                    <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="link-arrow">Read more</a>
                                 </div>
                             </div>
                         </div>
@@ -105,8 +106,8 @@
             
             <div class="col-lg-4">
                 <!-- Key Takeaways -->
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
+                <div class="card mb-4" style="border-top: 3px solid var(--doa-cyan);">
+                    <div class="card-header">
                         <h3 class="h5 mb-0">Key Takeaways</h3>
                     </div>
                     <div class="card-body">
@@ -149,13 +150,13 @@
 </section>
 
 <!-- Call to Action -->
-<section class="py-5 bg-dark">
+<section class="cta-section">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
                 <h2 class="mb-4">Let Us Help You Succeed</h2>
-                <p class="lead mb-5">Our experienced legal team can help you navigate your complex legal challenges and achieve the best possible outcome.</p>
-                <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Contact Us Today</a>
+                <p class="lead mb-5 section-subtitle">Our experienced legal team can help you navigate your complex legal challenges and achieve the best possible outcome.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Contact Us Today</a>
             </div>
         </div>
     </div>

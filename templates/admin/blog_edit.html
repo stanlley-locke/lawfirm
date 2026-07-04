@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block head_scripts %}
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-4">{{ title }}</h1>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">{{ form.title.label(class="form-label") }}{{ form.title(class="form-control slug-source") }}</div>
+    <div class="mb-3">{{ form.slug.label(class="form-label") }}{{ form.slug(class="form-control slug-target") }}</div>
+    <div class="mb-3">{{ form.summary.label(class="form-label") }}{{ form.summary(class="form-control", rows=3) }}</div>
+    <div class="mb-3">{{ form.content.label(class="form-label") }}{{ form.content(class="form-control richtext", rows=12) }}</div>
+    <div class="mb-3 form-check">{{ form.is_published(class="form-check-input") }}{{ form.is_published.label(class="form-check-label") }}</div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('admin.blog_posts') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  tinymce.init({
+    selector: 'textarea.richtext',
+    height: 400,
+    menubar: false,
+    plugins: 'lists link',
+    toolbar: 'undo redo | bold italic | bullist numlist | link',
+    branding: false
+  });
+</script>
+{% endblock %}

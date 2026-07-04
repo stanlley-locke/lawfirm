@@ -7,8 +7,8 @@
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card shadow-sm" style="border-top: 3px solid var(--doa-cyan);">
+        <div class="card-header" style="background: var(--doa-navy); color: white;">
           <h3 class="mb-0">
             <i class="fas fa-comments me-2"></i> Chat with Our Legal Team
           </h3>
@@ -58,11 +58,16 @@
               </div>
             </div>
             <div class="card-footer p-3">
-              <form id="message-form" class="d-flex">
+              <div id="typing-indicator" class="small text-muted mb-2 d-none">Someone is typing...</div>
+              <form id="message-form" class="d-flex mb-2">
                 <input type="text" class="form-control me-2" id="message-input" placeholder="Type your message...">
                 <button class="btn btn-primary" type="submit">
                   <i class="fas fa-paper-plane"></i>
                 </button>
+              </form>
+              <form id="upload-form" class="d-flex align-items-center">
+                <input type="file" class="form-control form-control-sm me-2" id="chat-file" accept=".png,.jpg,.jpeg,.gif,.webp,.pdf">
+                <button class="btn btn-sm btn-outline-secondary" type="submit">Upload (max 5MB)</button>
               </form>
             </div>
           </div>
@@ -121,8 +126,12 @@
   const statusIndicator = document.getElementById('status-indicator');
   const statusText     = document.getElementById('status-text');
   const endChatBtn     = document.getElementById('end-chat-btn');
+  const typingIndicator = document.getElementById('typing-indicator');
+  const uploadForm     = document.getElementById('upload-form');
+  const chatFileInput  = document.getElementById('chat-file');
 
   let socket, roomId, clientName, clientEmail;
+  let typingTimeout;
 
   // Validate & submit initial form
   startChatForm.addEventListener('submit', function(e) {
@@ -174,20 +183,23 @@
 
   // Load any pre-existing messages
   function loadExistingMessages(room) {
-    {% if messages %}
+    const payload = [
+      {% for message in messages %}
+      {
+        id: {{ message.id }},
+        content: {{ message.content|tojson }},
+        is_from_client: {{ 'true' if message.is_from_client else 'false' }},
+        user: {{ (message.user.username if message.user else "")|tojson }},
+        timestamp: {{ message.timestamp.isoformat()|tojson }}
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+    if (payload.length) {
       if (noMessagesDiv && noMessagesDiv.parentNode === chatMessages) {
         chatMessages.removeChild(noMessagesDiv);
       }
-      {% for message in messages %}
-        addMessage({
-          id: {{ message.id }},
-          content: '{{ message.content|safe }}',
-          is_from_client: {{ 'true' if message.is_from_client else 'false' }},
-          user: '{{ message.user.username if message.user else "" }}',
-          timestamp: '{{ message.timestamp }}'
-        });
-      {% endfor %}
-    {% endif %}
+      payload.forEach(addMessage);
+    }
   }
 
   // Set up Socket.IO and handlers
@@ -199,12 +211,45 @@
     });
     socket.on('disconnect', () => updateConnectionStatus(false));
     socket.on('message', data => addMessage(data));
+    socket.on('typing', data => {
+      if (!data.is_staff) return;
+      typingIndicator.classList.toggle('d-none', !data.is_typing);
+    });
+    socket.on('read_receipt', data => {
+      /* read receipts handled server-side */
+    });
     socket.on('status', data => {
       if (data.joined && data.user === 'staff') {
         addSystemMessage('A legal representative has joined the chat.');
       }
     });
   }
+
+  messageInput.addEventListener('input', () => {
+    if (!socket || !roomId) return;
+    socket.emit('typing', { room: roomId, is_typing: true, client_name: clientName });
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      socket.emit('typing', { room: roomId, is_typing: false, client_name: clientName });
+    }, 1000);
+  });
+
+  uploadForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!chatFileInput.files.length || !roomId) return;
+    const formData = new FormData();
+    formData.append('file', chatFileInput.files[0]);
+    fetch('/chat/upload', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': csrfToken },
+      body: formData
+    }).then(res => res.json()).then(data => {
+      if (data.success && data.message) addMessage(data.message);
+      else alert(data.error || 'Upload failed');
+      chatFileInput.value = '';
+    }).catch(() => alert('Upload failed'));
+  });
 
   // Sending a message
   messageForm.addEventListener('submit', function(e) {
@@ -249,6 +294,15 @@
       data.is_from_client ? 'bg-light text-dark ms-auto' : 'bg-primary text-white'
     }`;
     content.textContent = data.content;
+    if (data.attachment_url) {
+      const link = document.createElement('a');
+      link.href = data.attachment_url;
+      link.textContent = data.attachment_name || 'Download attachment';
+      link.target = '_blank';
+      link.rel = 'noopener';
+      content.appendChild(document.createElement('br'));
+      content.appendChild(link);
+    }
     const meta = document.createElement('div');
     meta.className = `message-meta small text-muted mt-1 ${
       data.is_from_client ? 'text-end' : ''

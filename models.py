@@ -3,13 +3,19 @@ from extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+    is_online = db.Column(db.Boolean, default=False)
+    last_seen = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    assigned_rooms = db.relationship('ChatRoom', backref='assignee', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -20,12 +26,13 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     slug = db.Column(db.String(150), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    icon = db.Column(db.String(50))  # Font awesome icon name
+    icon = db.Column(db.String(50))
     display_order = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -33,6 +40,7 @@ class Service(db.Model):
 
     def __repr__(self):
         return f'<Service {self.title}>'
+
 
 class TeamMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +51,7 @@ class TeamMember(db.Model):
     email = db.Column(db.String(120))
     phone = db.Column(db.String(30))
     photo_url = db.Column(db.String(255))
+    photo_filename = db.Column(db.String(255))
     linkedin = db.Column(db.String(255))
     twitter = db.Column(db.String(255))
     display_order = db.Column(db.Integer, default=0)
@@ -50,8 +59,15 @@ class TeamMember(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @property
+    def photo_src(self):
+        if self.photo_filename:
+            return f'/static/uploads/team/{self.photo_filename}'
+        return self.photo_url
+
     def __repr__(self):
         return f'<TeamMember {self.name}>'
+
 
 class CaseStudy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +87,24 @@ class CaseStudy(db.Model):
 
     def __repr__(self):
         return f'<CaseStudy {self.title}>'
+
+
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(220), unique=True, nullable=False)
+    summary = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    author = db.relationship('User', backref=db.backref('blog_posts', lazy=True))
+    is_published = db.Column(db.Boolean, default=False)
+    published_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<BlogPost {self.title}>'
+
 
 class ContactMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,6 +127,8 @@ class ChatMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user = db.relationship('User', backref=db.backref('messages', lazy=True))
     content = db.Column(db.Text, nullable=False)
+    attachment_filename = db.Column(db.String(255))
+    attachment_original_name = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     is_from_client = db.Column(db.Boolean, default=False)
     client_name = db.Column(db.String(100), nullable=True)
@@ -109,9 +145,10 @@ class ChatRoom(db.Model):
     room_id = db.Column(db.String(100), unique=True, nullable=False)
     client_name = db.Column(db.String(100), nullable=True)
     client_email = db.Column(db.String(120), nullable=True)
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_activity = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
-    
+
     def __repr__(self):
         return f'<ChatRoom {self.room_id}>'

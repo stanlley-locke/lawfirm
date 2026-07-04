@@ -1,0 +1,4 @@
+# PostgreSQL driver (production). Install after requirements.txt:
+#   pip install -r requirements-postgres.txt
+# Or: pip install -e ".[postgres]"
+psycopg2-binary>=2.9.10

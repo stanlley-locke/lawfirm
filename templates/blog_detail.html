@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body_class %}page-hero{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>{{ post.title }}</h1>
+        <p class="text-white-50 mb-0">{{ post.published_at.strftime('%B %d, %Y') if post.published_at }}</p>
+    </div>
+</div>
+<section class="section-block section-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5 content-body">
+                        {{ post.content|safe }}
+                    </div>
+                </div>
+                <a href="{{ url_for('main.blog') }}" class="link-arrow mt-4 d-inline-block">&larr; Back to Blog</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

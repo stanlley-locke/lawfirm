@@ -1,242 +1,181 @@
 {% extends "layout.html" %}
+{% block body_class %}{% if not thank_you %}page-hero{% endif %}{% endblock %}
 
 {% block content %}
-  <!-- Page Header -->
-  <div class="page-header">
+{% if thank_you %}
+<section class="section-block section-cream">
     <div class="container">
-      <h1 class="display-4">Contact Us</h1>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Contact</li>
-        </ol>
-      </nav>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="card p-5">
+                    <div class="display-1 text-success mb-4"><i class="fas fa-check-circle"></i></div>
+                    <h2>Thank You for Contacting Us!</h2>
+                    <p class="text-muted mb-4">Your message has been received. A member of our team will get back to you shortly.</p>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Return to Homepage</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-    <!-- this section has been hashed for later implementation-->
-  <!-- Flash Messages --
-  <div class="container mt-4">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </div -->
+</section>
+{% else %}
+{% set hero_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.jpg') %}
 
-  {% if thank_you %}
-    <!-- Thank You Section -->
-    <section class="py-5">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-8 text-center">
-            <div class="card">
-              <div class="card-body p-5">
-                <div class="display-1 text-success mb-4">
-                  <i class="fas fa-check-circle"></i>
+<!-- Page header — contact_us_page.png -->
+<section class="hero-section hero-page" style="background-image: url('{{ hero_bg }}');">
+    <div class="container hero-content text-center">
+        <h1 class="hero-page-title">Contact Us</h1>
+    </div>
+</section>
+
+<!-- Contact info + form — contact_us_page.png -->
+<section class="contact-page" id="contact-form">
+    <div class="container">
+        <div class="row contact-page__layout align-items-start g-4 g-lg-5">
+            <div class="col-lg-5 contact-page__info">
+                <header class="contact-page__header">
+                    <h2 class="contact-page__subtitle">Have Any Questions? Feel Free To Contact Us!</h2>
+                    <p class="contact-page__lead">Complete the form or reach us directly. We typically respond within 24 hours during business days.</p>
+                </header>
+
+                <div class="contact-info-grid">
+                    <article class="contact-info-card">
+                        <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-phone"></i></span>
+                        <h3 class="contact-info-card__label">Phone Numbers</h3>
+                        <div class="contact-info-card__content">
+                            <p><a href="tel:+254745819632">0745 819 632</a></p>
+                            <p><a href="tel:+254734090411">0734 090 411</a></p>
+                        </div>
+                    </article>
+
+                    <article class="contact-info-card">
+                        <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+                        <h3 class="contact-info-card__label">Physical Address</h3>
+                        <div class="contact-info-card__content">
+                            <p>Tumaini Mall 1st Floor, Suite 103<br>Ring Road – Milimani, Kisumu</p>
+                        </div>
+                    </article>
+
+                    <article class="contact-info-card">
+                        <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+                        <h3 class="contact-info-card__label">Email Address</h3>
+                        <div class="contact-info-card__content">
+                            <p><a href="mailto:info@danochiengadvocates.com">info@danochiengadvocates.com</a></p>
+                        </div>
+                    </article>
+
+                    <article class="contact-info-card">
+                        <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
+                        <h3 class="contact-info-card__label">Opening Hours</h3>
+                        <div class="contact-info-card__content">
+                            <p>Mon–Fri: 9:00 AM – 5:00 PM</p>
+                        </div>
+                    </article>
                 </div>
-                <h2>Thank You for Contacting Us!</h2>
-               <!-- <p class="lead mb-4">Your message has been received. A member of our team will get back to you shortly.</p -->
-                <a href="{{ url_for('main.index') }}" class="btn btn-primary">Return to Homepage</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  {% else %}
-    <!-- Contact Form Section -->
-    <section class="py-5">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 mb-4 mb-lg-0">
-            <div class="card">
-              <div class="card-header">
-                <h2 class="h4 mb-0">Send Us a Message</h2>
-              </div>
-              <div class="card-body">
-                <form method="POST" action="{{ url_for('contact.contact') }}" id="contactForm">
-                  {{ form.hidden_tag() }}
-
-                  <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <div class="form-group">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control", placeholder="Your name") }}
-                        {% if form.name.errors %}
-                          <div class="invalid-feedback d-block">
-                            {% for error in form.name.errors %}
-                              <span>{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control", placeholder="Your email address") }}
-                        {% if form.email.errors %}
-                          <div class="invalid-feedback d-block">
-                            {% for error in form.email.errors %}
-                              <span>{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <div class="form-group">
-                        {{ form.phone.label(class="form-label") }}
-                        {{ form.phone(class="form-control", placeholder="Your phone number (optional)") }}
-                        {% if form.phone.errors %}
-                          <div class="invalid-feedback d-block">
-                            {% for error in form.phone.errors %}
-                              <span>{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        {{ form.service.label(class="form-label") }}
-                        {{ form.service(class="form-control") }}
-                        {% if form.service.errors %}
-                          <div class="invalid-feedback d-block">
-                            {% for error in form.service.errors %}
-                              <span>{{ error }}</span>
-                            {% endfor %}
-                          </div>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group mb-3">
-                    {{ form.subject.label(class="form-label") }}
-                    {{ form.subject(class="form-control", placeholder="Subject of your inquiry") }}
-                    {% if form.subject.errors %}
-                      <div class="invalid-feedback d-block">
-                        {% for error in form.subject.errors %}
-                          <span>{{ error }}</span>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-
-                  <div class="form-group mb-4">
-                    {{ form.message.label(class="form-label") }}
-                    {{ form.message(class="form-control", rows="6", placeholder="How can we help you?") }}
-                    {% if form.message.errors %}
-                      <div class="invalid-feedback d-block">
-                        {% for error in form.message.errors %}
-                          <span>{{ error }}</span>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-
-                  <div class="text-end">
-                    <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4">
-            <!-- Contact Information -->
-            <div class="card mb-4">
-              <div class="card-header">
-                <h3 class="h5 mb-0">Contact Information</h3>
-              </div>
-              <div class="card-body">
-                <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>Tumaini Mall 1st Floor, suite 103 Ring Road - Millimani</p>
-                <p><i class="fas fa-phone me-2 text-primary"></i>0745 819 632 // 0734 090 411</p>
-                <p>
-                  <i class="fas fa-envelope me-2 text-primary"></i>
-                  <a href="mailto:info@stanlley&coadvoctes.com">info@danochiengadvocates</a>
-                </p>
-                <p><i class="fas fa-clock me-2 text-primary"></i>Monday–Friday: 9am–5pm</p>
-              </div>
             </div>
 
-            <!-- FAQs -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="h5 mb-0">Frequently Asked Questions</h3>
-              </div>
-              <div class="card-body">
-                <div class="accordion accordion-flush" id="contactFaq">
-                  <div class="accordion-item">
-                    <h4 class="accordion-header" id="faqOne">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        What information should I provide?
-                      </button>
-                    </h4>
-                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="faqOne" data-bs-parent="#contactFaq">
-                      <div class="accordion-body">
-                        Please provide a brief description of your legal matter, including relevant deadlines. The more details you provide, the better we can assist you.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h4 class="accordion-header" id="faqTwo">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        How soon will you respond?
-                      </button>
-                    </h4>
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#contactFaq">
-                      <div class="accordion-body">
-                        We typically respond to all inquiries within 24 hours during business days. Urgent matters are prioritized accordingly.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h4 class="accordion-header" id="faqThree">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        Is my information confidential?
-                      </button>
-                    </h4>
-                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#contactFaq">
-                      <div class="accordion-body">
-                        Yes, all information submitted through this form is treated as confidential and protected by attorney-client privilege.
-                      </div>
-                    </div>
-                  </div>
+            <div class="col-lg-7 contact-page__form-col">
+                <div class="contact-form-card">
+                    <form method="POST" action="{{ url_for('contact.contact') }}" id="contactForm">
+                        {{ form.hidden_tag() }}
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control", placeholder="Your name") }}
+                                {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.name.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control", placeholder="Your phone") }}
+                                {% if form.phone.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.phone.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control", placeholder="Your email") }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.service.label(class="form-label") }}
+                                {{ form.service(class="form-select", id="service") }}
+                                {% if form.service.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.service.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label") }}
+                            {{ form.subject(class="form-control", placeholder="Subject") }}
+                            {% if form.subject.errors %}
+                            <div class="invalid-feedback d-block">{% for error in form.subject.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            {{ form.message.label(class="form-label") }}
+                            {{ form.message(class="form-control", rows="5", placeholder="Message") }}
+                            {% if form.message.errors %}
+                            <div class="invalid-feedback d-block">{% for error in form.message.errors %}<span>{{ error }}</span>{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary contact-form-card__submit w-100">Request Consultation</button>
+                    </form>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Map Section (Using a placeholder) -->
-    <section class="py-5 bg-dark">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-10">
-            <div class="ratio ratio-21x9">
-              <iframe
-                src="https://maps.google.com/maps?q=Kisumu,%20Kenya&z=13&output=embed"
-                style="border:0;"
-                allowfullscreen=""
-                loading="lazy">
-              </iframe>
+<!-- Map — location_section.png -->
+<section class="map-section" id="office-location">
+    <div class="ratio ratio-21x9">
+        <iframe src="https://maps.google.com/maps?q=Tumaini+Mall+Kisumu&z=15&output=embed"
+                allowfullscreen loading="lazy" title="Office location map"></iframe>
+    </div>
+</section>
+
+<!-- FAQ — frequently _asked_qstns.png -->
+<section class="contact-faq" id="faq">
+    <div class="container">
+        <h2 class="contact-faq__title">Frequently Asked Questions</h2>
+        <div class="accordion accordion-flush contact-faq__accordion" id="contactFaq">
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true">
+                        1. What information should I provide?
+                    </button>
+                </h3>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#contactFaq">
+                    <div class="accordion-body">Please provide a brief description of your legal matter, including relevant deadlines. The more details you provide, the better we can assist you.</div>
+                </div>
             </div>
-          </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                        2. How soon will you respond?
+                    </button>
+                </h3>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                    <div class="accordion-body">We typically respond to all inquiries within 24 hours during business days. Urgent matters are prioritized accordingly.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                        3. Is my information confidential?
+                    </button>
+                </h3>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#contactFaq">
+                    <div class="accordion-body">Yes, all information submitted through this form is treated as confidential and protected by professional legal standards.</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
-  {% endif %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}
