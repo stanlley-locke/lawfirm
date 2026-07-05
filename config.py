@@ -51,11 +51,11 @@ class Config:
     # Resend email
     RESEND_API_KEY = os.getenv('RESEND_API_KEY')
     RESEND_FROM_EMAIL = os.getenv('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
-    ADMIN_NOTIFICATION_EMAIL = os.getenv('ADMIN_NOTIFICATION_EMAIL', 'admin@example.com')
+    ADMIN_NOTIFICATION_EMAIL = os.getenv('ADMIN_NOTIFICATION_EMAIL', 'danochiengadvocates@gmail.com')
 
     # App metadata
     APP_NAME = os.getenv('APP_NAME', 'Dan Ochieng & Company Advocates')
-    BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
+    BASE_URL = os.getenv('BASE_URL', 'https://www.danochiengadvocates.com')
     ALLOWED_ORIGINS = _env_list('ALLOWED_ORIGINS', 'http://localhost:5000,http://127.0.0.1:5000')
 
     # Admin bootstrap
@@ -65,7 +65,7 @@ class Config:
 
     # Business hours auto-reply
     BUSINESS_HOURS_TZ = os.getenv('BUSINESS_HOURS_TZ', 'Africa/Nairobi')
-    BUSINESS_HOURS_START = int(os.getenv('BUSINESS_HOURS_START', 9))
+    BUSINESS_HOURS_START = int(os.getenv('BUSINESS_HOURS_START', 8))
     BUSINESS_HOURS_END = int(os.getenv('BUSINESS_HOURS_END', 17))
     BUSINESS_HOURS_DAYS = [int(d) for d in _env_list('BUSINESS_HOURS_DAYS', '0,1,2,3,4')]
 

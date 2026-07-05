@@ -1,0 +1,25 @@
+{% set blog_thumbs = [
+    url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp'),
+    url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.webp'),
+    url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp'),
+    url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp')
+] %}
+{% set thumb_index = loop.index0 if loop is defined else 0 %}
+{% set thumb_src = blog_thumbs[thumb_index % blog_thumbs|length] %}
+<article class="blog-card{% if horizontal_layout|default(false) %} blog-card--horizontal{% endif %} card-lift animate-on-scroll" style="--i: {{ thumb_index }};">
+    <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="blog-card__media">
+        <img src="{{ thumb_src }}" alt="" class="blog-card__thumb" loading="lazy" width="640" height="400">
+        {% if post.published_at %}
+        <time class="blog-card__date-badge" datetime="{{ post.published_at.isoformat() }}">{{ post.published_at.strftime('%b %d, %Y') }}</time>
+        {% endif %}
+    </a>
+    <div class="blog-card__body">
+        <h3 class="blog-card__title">
+            <a href="{{ url_for('main.blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+        </h3>
+        {% if post.summary %}
+        <p class="blog-card__excerpt">{{ post.summary|striptags|truncate(120) }}</p>
+        {% endif %}
+        <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="link-arrow">Read more</a>
+    </div>
+</article>

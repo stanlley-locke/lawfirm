@@ -2,11 +2,13 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-{% set header_bg = url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.jpg') %}
-<div class="page-header" style="background-image: url('{{ header_bg }}');">
+{% set header_bg = url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp') %}
+
+<!-- Page hero -->
+<div class="page-header team-hero" style="background-image: url('{{ header_bg }}');">
     <div class="container">
-        <h1>Our Legal Team</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">Our Team</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Our Team</li>
@@ -15,81 +17,103 @@
     </div>
 </div>
 
-<section class="section-block section-white">
+<!-- Intro -->
+<section class="section-block section-cream team-intro" aria-labelledby="team-intro-heading">
     <div class="container">
-        <div class="section-header">
-            <p class="section-subtitle">Our team of experienced legal professionals is dedicated to providing exceptional service and achieving the best possible outcomes for our clients.</p>
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Our People</span>
+            <h2 id="team-intro-heading">Meet Our Legal Team</h2>
+            <p class="section-subtitle">Our success derives from a highly regarded team of seasoned Advocates and competent support staff combining intellectual capability and practical skills.</p>
         </div>
-        {% if team_members %}
-        <div class="row">
-            {% for member in team_members %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 team-card">
-                    <div class="card-body text-center p-4">
-                        {% if member.photo_src %}
-                        <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="team-photo" style="width:180px;height:180px;">
-                        {% else %}
-                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
-                        {% endif %}
-                        <h2 class="h4">{{ member.name }}</h2>
-                        <p class="text-muted mb-3">{{ member.position }}</p>
-                        <p class="small">{{ member.bio|truncate(120) }}</p>
-                        <div class="team-social mb-3">
-                            {% if member.email %}
-                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
-                            {% endif %}
-                            {% if member.linkedin %}
-                            <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                            {% endif %}
-                        </div>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow">View full profile</a>
-                    </div>
-                </div>
+    </div>
+</section>
+
+<!-- Advocates -->
+<section class="section-block section-navy-light team-grid-section" aria-labelledby="team-advocates-heading">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <h2 id="team-advocates-heading">Advocates</h2>
+            <p class="section-subtitle">Experienced legal professionals leading our practice across Kisumu and Kwale County</p>
+        </div>
+        {% if advocates %}
+        <div class="row g-4">
+            {% for member in advocates %}
+            <div class="col-sm-6 col-lg-4">
+                {% set show_bio = true %}
+                {% set show_social = true %}
+                {% include 'partials/team_card.html' %}
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center">
-            <p class="text-muted">Our team information is currently being updated.</p>
-            <a href="{{ url_for('contact.contact') }}" class="btn btn-primary mt-3">Contact Us</a>
+        <div class="text-center animate-on-scroll">
+            <p class="text-muted mb-0">Our team information is currently being updated.</p>
+            <a href="{{ url_for('contact.contact') }}" class="btn btn-primary mt-4">Contact Us</a>
         </div>
         {% endif %}
     </div>
 </section>
 
-<section class="section-block section-cream">
+<!-- Support staff -->
+{% if support_staff %}
+<section class="section-block section-cream team-grid-section" aria-labelledby="team-support-heading">
     <div class="container">
-        <div class="section-header"><h2>Our Team Values</h2></div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card text-center p-4">
-                    <i class="fas fa-balance-scale fa-2x mb-3" style="color: var(--doa-navy);"></i>
-                    <h3 class="h5">Excellence</h3>
-                    <p class="mb-0 small">We are committed to excellence in all aspects of our legal practice.</p>
-                </div>
+        <div class="section-header animate-on-scroll">
+            <h2 id="team-support-heading">Support Staff</h2>
+            <p class="section-subtitle">Dedicated professionals who keep our firm running efficiently for every client</p>
+        </div>
+        <div class="row g-4">
+            {% for member in support_staff %}
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                {% set show_bio = true %}
+                {% set show_social = false %}
+                {% include 'partials/team_card.html' %}
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card text-center p-4">
-                    <i class="fas fa-handshake fa-2x mb-3" style="color: var(--doa-navy);"></i>
-                    <h3 class="h5">Integrity</h3>
-                    <p class="mb-0 small">We uphold the highest ethical standards in all our interactions.</p>
-                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Team values -->
+<section class="section-block section-blue team-values-section" aria-labelledby="team-values-heading">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">What Drives Us</span>
+            <h2 id="team-values-heading">Our Core Values</h2>
+            <p class="section-subtitle">Accountability, Achievement, Action, Attitude, Balance, Boldness, Challenge, Commitment, and Community</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <article class="team-value-card card-lift animate-on-scroll" style="--i: 0;">
+                    <span class="team-value-card__icon" aria-hidden="true"><i class="fas fa-balance-scale"></i></span>
+                    <h3 class="team-value-card__title">Accountability</h3>
+                    <p>We take ownership of our work and remain answerable to clients and the legal profession.</p>
+                </article>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card text-center p-4">
-                    <i class="fas fa-users fa-2x mb-3" style="color: var(--doa-navy);"></i>
-                    <h3 class="h5">Collaboration</h3>
-                    <p class="mb-0 small">We work collaboratively with our clients and within our team.</p>
-                </div>
+            <div class="col-md-4">
+                <article class="team-value-card card-lift animate-on-scroll" style="--i: 1;">
+                    <span class="team-value-card__icon" aria-hidden="true"><i class="fas fa-trophy"></i></span>
+                    <h3 class="team-value-card__title">Achievement</h3>
+                    <p>We strive for measurable success in every matter we handle for our clients.</p>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="team-value-card card-lift animate-on-scroll" style="--i: 2;">
+                    <span class="team-value-card__icon" aria-hidden="true"><i class="fas fa-bolt"></i></span>
+                    <h3 class="team-value-card__title">Commitment</h3>
+                    <p>We are dedicated to timely resolution of cases and controversies with unwavering focus.</p>
+                </article>
             </div>
         </div>
     </div>
 </section>
 
+<!-- CTA -->
 <section class="cta-section">
     <div class="container text-center">
         <h2 class="mb-4">Work with Our Team</h2>
-        <p class="lead mb-4 section-subtitle">Contact us today to discuss how our experienced legal team can help.</p>
+        <p class="lead mb-4 section-subtitle">Contact us today to discuss how our experienced legal team can help with your matter.</p>
         <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Schedule a Consultation</a>
     </div>
 </section>

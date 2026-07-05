@@ -35,6 +35,7 @@ class TeamMemberForm(FlaskForm):
     bio = TextAreaField('Biography', validators=[DataRequired()])
     email = StringField('Email', validators=[Optional(), Email(), Length(max=120)])
     phone = StringField('Phone', validators=[Optional(), Length(max=30)])
+    practice_number = StringField('Practice Number', validators=[Optional(), Length(max=50)])
     photo_url = StringField('Photo URL', validators=[Optional(), URL(), Length(max=255)])
     photo = FileField('Upload Photo')
     linkedin = StringField('LinkedIn URL', validators=[Optional(), URL(), Length(max=255)])

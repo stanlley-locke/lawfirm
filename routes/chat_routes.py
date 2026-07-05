@@ -175,7 +175,7 @@ def handle_message(data):
     if is_from_client and not is_within_business_hours(current_app):
         auto_reply = (
             'Thank you for contacting us. Our office is currently closed. '
-            'We will respond during business hours (Mon–Fri, 9 AM–5 PM EAT).'
+            'We will respond during business hours (Mon–Fri 8:00 am–5:30 pm, Sat 9:30 am–1:00 pm EAT).'
         )
         auto_msg = ChatMessage(
             content=auto_reply,

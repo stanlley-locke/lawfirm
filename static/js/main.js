@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initFloatingNavbar();
     initMegaMenus();
     initMobileNav();
+    initScrollReveal();
+    initTestimonialCarousel();
 
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -28,18 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceFilter.addEventListener('change', function() {
             const serviceId = this.value;
             const caseStudies = document.querySelectorAll('.case-study-item');
-            
-            if (serviceId === 'all') {
-                // Show all case studies
-                caseStudies.forEach(study => {
-                    study.style.display = 'block';
-                });
-            } else {
-                // Filter case studies by service
-                caseStudies.forEach(study => {
+            const noResults = document.getElementById('caseStudiesNoResults');
+            let visibleCount = 0;
+
+            caseStudies.forEach(study => {
+                let show = false;
+                if (serviceId === 'all') {
+                    show = true;
+                } else {
                     const studyServiceId = study.getAttribute('data-service-id');
-                    study.style.display = (studyServiceId === serviceId || (!studyServiceId && serviceId === 'none')) ? 'block' : 'none';
-                });
+                    show = studyServiceId === serviceId || (!studyServiceId && serviceId === 'none');
+                }
+                study.style.display = show ? '' : 'none';
+                if (show) visibleCount += 1;
+            });
+
+            if (noResults) {
+                noResults.classList.toggle('d-none', visibleCount > 0 || serviceId === 'all');
             }
         });
     }
@@ -276,6 +283,102 @@ function initMobileNav() {
     desktopQuery.addEventListener('change', function() {
         setMobileNavOpen(false);
         hideMobileMenu();
+    });
+}
+
+function initTestimonialCarousel() {
+    var carousel = document.getElementById('testimonialCarousel');
+    if (!carousel) return;
+
+    var slides = carousel.querySelectorAll('.testimonial-slide');
+    var dots = carousel.querySelectorAll('.testimonial-dot');
+    if (!slides.length) return;
+
+    var currentIndex = 0;
+    var intervalMs = 6000;
+    var timer = null;
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function showSlide(index) {
+        currentIndex = (index + slides.length) % slides.length;
+
+        slides.forEach(function(slide, i) {
+            slide.classList.toggle('is-active', i === currentIndex);
+        });
+
+        dots.forEach(function(dot, i) {
+            var isActive = i === currentIndex;
+            dot.classList.toggle('is-active', isActive);
+            dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+    }
+
+    function nextSlide() {
+        showSlide(currentIndex + 1);
+    }
+
+    function startAutoRotate() {
+        if (prefersReducedMotion || slides.length < 2) return;
+        stopAutoRotate();
+        timer = setInterval(nextSlide, intervalMs);
+    }
+
+    function stopAutoRotate() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            var index = parseInt(dot.getAttribute('data-index'), 10);
+            if (Number.isNaN(index)) return;
+            showSlide(index);
+            startAutoRotate();
+        });
+    });
+
+    carousel.addEventListener('mouseenter', stopAutoRotate);
+    carousel.addEventListener('mouseleave', startAutoRotate);
+    carousel.addEventListener('focusin', stopAutoRotate);
+    carousel.addEventListener('focusout', function(e) {
+        if (!carousel.contains(e.relatedTarget)) {
+            startAutoRotate();
+        }
+    });
+
+    showSlide(0);
+    startAutoRotate();
+}
+
+function initScrollReveal() {
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var elements = document.querySelectorAll('.animate-on-scroll');
+
+    if (!elements.length) return;
+
+    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+        elements.forEach(function(el) {
+            el.classList.add('is-visible');
+        });
+        return;
+    }
+
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    elements.forEach(function(el) {
+        observer.observe(el);
     });
 }
 

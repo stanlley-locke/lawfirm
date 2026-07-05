@@ -76,7 +76,7 @@ These pages use the shared design system (page header hero, cream/white sections
 
 - Light Bootstrap 5 theme (`data-bs-theme="light"`)
 - Logo in navbar, footer, and favicon
-- Phone number in navbar (`0745 819 632`)
+- Phone number in navbar (`0729 116 086`)
 - Four-column footer: Brand, Links, Find Us, Practice Areas
 - Floating cyan chat widget (preserved)
 

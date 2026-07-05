@@ -2,11 +2,16 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-{% set header_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.jpg') %}
-<div class="page-header" style="background-image: url('{{ header_bg }}');">
+{% set header_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp') %}
+{% set story_image = url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.webp') %}
+{% set why_image = url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp') %}
+{% set partnership_image = url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp') %}
+
+<!-- Page hero -->
+<div class="page-header about-hero" style="background-image: url('{{ header_bg }}');">
     <div class="container">
-        <h1>About Our Firm</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">About Us</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">About</li>
@@ -15,91 +20,198 @@
     </div>
 </div>
 
-<!-- Story section -->
-<section class="section-block section-white" id="our-story">
+<!-- Our Story -->
+<section class="section-block section-cream about-story" id="our-story" aria-labelledby="about-story-heading">
     <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <span class="section-eyebrow">Our Story</span>
-                <h2 class="mb-4">Forward…</h2>
-                <p>DAN OCHIENG &amp; CO. ADVOCATES is one of the premier law firms in Kenya, with office in Kisumu. We are a medium size but highly professional full-service firm specializing in land law, commercial law, company law, property and conveyance, trusts, family and succession law, insurance, banking and securities law, employment law, civil litigation, environmental law, and legal research and consultancy.</p>
-                <p>The law firm combines in-depth knowledge and vast expertise to uphold the most excellent standards of legal practice. Small but highly professional, our law firm is configured to deliver the highest class service to our clients.</p>
+        <div class="row align-items-center g-4 g-lg-5">
+            <div class="col-lg-6 order-lg-1">
+                <div class="about-split__media animate-on-scroll">
+                    <img src="{{ story_image }}"
+                         alt="Legal research books and notebook on a professional desk"
+                         class="about-split__image"
+                         width="640"
+                         height="640"
+                         loading="lazy">
+                </div>
             </div>
-            <div class="col-lg-6">
-                <div class="card feature-card border-0" id="our-values">
-                    <div class="card-body p-4">
-                        <h3 class="mb-4">Our Vision, Mission &amp; Core Values</h3>
-                        <div class="mb-4">
-                            <h4 class="h6 text-uppercase" style="color: var(--doa-cyan);">Vision</h4>
-                            <p class="mb-0">To be the best and most sought after firm for efficient and innovative service delivery and dispute settlement systems.</p>
-                        </div>
-                        <div class="mb-4">
-                            <h4 class="h6 text-uppercase" style="color: var(--doa-cyan);">Mission</h4>
-                            <p class="mb-0">To provide a system of timely resolution of cases and controversies to our clients.</p>
-                        </div>
-                        <h4 class="h6 text-uppercase mb-3" style="color: var(--doa-cyan);">Core Values</h4>
-                        <ul class="list-unstyled mb-0">
-                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Accountability, Achievement &amp; Action</li>
-                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Integrity, Excellence &amp; Boldness</li>
-                            <li><i class="fas fa-check me-2" style="color: var(--doa-navy);"></i>Community, Collaboration &amp; Client Focus</li>
-                        </ul>
-                    </div>
+            <div class="col-lg-6 order-lg-2">
+                <span class="section-eyebrow animate-on-scroll">Our Story</span>
+                <h2 id="about-story-heading" class="about-split__title animate-on-scroll">Premier Advocacy in Kisumu &amp; Kwale County</h2>
+                <div class="about-split__body animate-on-scroll">
+                    <p>DAN OCHIENG &amp; COMPANY ADVOCATES is one of the premier law firms in Kenya, with offices in Kisumu and Kwale County. We are a medium-size but highly professional full-service firm specializing in Commercial Law, Civil Litigation, Research and Consultancy.</p>
+                    <p>The firm combines in-depth knowledge and vast expertise to uphold the most excellent standards of legal practice. We focus on intricate legal issues, opening new horizons and fresh perspectives for our clients. Small but highly professional, we are configured to deliver the highest-class service regardless of difficulty.</p>
+                    <p>Established in <strong>December 2023</strong>, the firm took over cases from M/s Ochieng &amp; Associates Advocates (since closed), continuing a legacy of trusted legal service in Western Kenya and beyond.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Alternating rows — Screenshot 2026-07-03 215536.png -->
-<section class="split-row section-cream" id="why-choose-us">
+<!-- Our Values -->
+<section class="section-block section-blue about-values" id="our-values" aria-labelledby="about-values-heading">
     <div class="container">
-        <div class="row align-items-center g-5">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Our Values</span>
+            <h2 id="about-values-heading">Vision, Mission &amp; Core Values</h2>
+            <p class="section-subtitle">The principles that guide every client relationship and case we undertake</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 0;">
+                    <span class="about-value-card__label">Vision</span>
+                    <p class="mb-0">"To be the best and most sought-after firm for efficient and innovative service delivery and dispute settlement systems."</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 1;">
+                    <span class="about-value-card__label">Mission</span>
+                    <p class="mb-0">"To provide a system of timely resolution of cases and controversies to our clients."</p>
+                </article>
+            </div>
+            <div class="col-lg-4">
+                <article class="about-value-card about-value-card--list card-lift animate-on-scroll" style="--i: 2;">
+                    <span class="about-value-card__label">Consultancy Clients</span>
+                    <ul class="about-value-list mb-0">
+                        <li><i class="fas fa-check" aria-hidden="true"></i>Christian Legal Education and Research (CLEAR – Kenya)</li>
+                        <li><i class="fas fa-check" aria-hidden="true"></i>Impact Research and Development (IRDO)</li>
+                        <li><i class="fas fa-check" aria-hidden="true"></i>Salina Youth Initiative</li>
+                        <li><i class="fas fa-check" aria-hidden="true"></i>Star Hospital Kisumu Annex Ltd</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+        <div class="row g-4 mt-2">
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 3;">
+                    <span class="about-value-card__label">Accountability</span>
+                    <p class="mb-0">We take ownership of our work and remain answerable to our clients, the courts, and the legal profession.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 4;">
+                    <span class="about-value-card__label">Achievement</span>
+                    <p class="mb-0">We strive for measurable success in every matter, delivering outcomes that meet and exceed client expectations.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 5;">
+                    <span class="about-value-card__label">Action</span>
+                    <p class="mb-0">We move decisively to protect client interests, resolving cases and controversies without unnecessary delay.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 6;">
+                    <span class="about-value-card__label">Attitude</span>
+                    <p class="mb-0">We approach every challenge with professionalism, respect, and a positive commitment to service excellence.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 7;">
+                    <span class="about-value-card__label">Balance</span>
+                    <p class="mb-0">We maintain equilibrium between client needs, ethical obligations, and the wellbeing of our team.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 8;">
+                    <span class="about-value-card__label">Boldness</span>
+                    <p class="mb-0">We advance creative legal strategies with confidence and courage in complex and high-stakes matters.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 9;">
+                    <span class="about-value-card__label">Challenge</span>
+                    <p class="mb-0">We embrace difficult legal problems as opportunities to excel and to deliver innovative solutions.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 10;">
+                    <span class="about-value-card__label">Commitment</span>
+                    <p class="mb-0">We are dedicated to seeing every client matter through to the best possible outcome with unwavering focus.</p>
+                </article>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <article class="about-value-card card-lift animate-on-scroll" style="--i: 11;">
+                    <span class="about-value-card__label">Community</span>
+                    <p class="mb-0">We contribute to the communities we serve in Kisumu, Kwale County, and across Kenya through trusted legal service.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section-block section-white about-split about-why" id="why-choose-us" aria-labelledby="about-why-heading">
+    <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
             <div class="col-lg-6 order-lg-2">
-                <h2>Advocacy is a passion with proven results</h2>
-                <p>We focus on a wide range of intricate legal issues, opening new horizons and fresh perspectives for our clients. Our ongoing success and strong reputation derives from a highly regarded team of lawyers who combine intellectual capability and unique practical skills.</p>
-                <a href="{{ url_for('main.services') }}" class="btn btn-primary mt-2">Learn More</a>
+                <span class="section-eyebrow animate-on-scroll">Why Choose Us</span>
+                <h2 id="about-why-heading" class="about-split__title animate-on-scroll">Advocacy Is a Passion with Proven Results</h2>
+                <div class="about-split__body animate-on-scroll">
+                    <p>We focus on a wide range of intricate legal issues, opening new horizons and fresh perspectives for our clients. Our ongoing success and strong reputation derives from a highly regarded team of seasoned Advocates and competent support staff who combine intellectual capability and unique practical skills.</p>
+                    <a href="{{ url_for('main.services') }}" class="btn btn-primary about-split__cta">Explore Our Services</a>
+                </div>
             </div>
             <div class="col-lg-6 order-lg-1">
-                <img src="{{ url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.jpg') }}" alt="Grand classical courthouse columns and coffered ceiling" class="split-image">
+                <div class="about-split__media animate-on-scroll">
+                    <img src="{{ why_image }}"
+                         alt="Grand classical courthouse columns and coffered ceiling"
+                         class="about-split__image"
+                         width="640"
+                         height="640"
+                         loading="lazy">
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="split-row section-white">
+<!-- Partnerships -->
+<section class="section-block section-cream about-split about-partnerships" aria-labelledby="about-partnerships-heading">
     <div class="container">
-        <div class="row align-items-center g-5">
+        <div class="row align-items-center g-4 g-lg-5">
             <div class="col-lg-6">
-                <h2>You've got ideas. We protect them.</h2>
-                <p>As a top Kenyan law firm, we are very proud of our strong working relationships with major law firms around the country. We also provide professional services to well-known corporates that rely on our competence to represent and manage their interests in Kenya.</p>
+                <div class="about-split__media animate-on-scroll">
+                    <img src="{{ partnership_image }}"
+                         alt="Bronze Lady Justice statue holding balanced scales"
+                         class="about-split__image"
+                         width="640"
+                         height="640"
+                         loading="lazy">
+                </div>
             </div>
             <div class="col-lg-6">
-                <img src="{{ url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.jpg') }}" alt="Legal research books and notebook on a desk" class="split-image">
+                <span class="section-eyebrow animate-on-scroll">Client Partnerships</span>
+                <h2 id="about-partnerships-heading" class="about-split__title animate-on-scroll">You've Got Ideas. We Protect Them.</h2>
+                <div class="about-split__body animate-on-scroll">
+                    <p>As a top Kenyan law firm, we are very proud of our strong working relationships with major law firms around the country. We also provide professional services to well-known corporates that rely on our competence to represent and manage their interests in Kenya.</p>
+                    <a href="{{ url_for('contact.contact') }}" class="btn btn-outline-primary about-split__cta">Schedule a Consultation</a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Principles -->
-<section class="section-block section-cream">
+<!-- Business Principles -->
+<section class="section-block section-blue about-principles" aria-labelledby="about-principles-heading">
     <div class="container">
-        <div class="section-header">
-            <h2>Our Business Principles &amp; Approach</h2>
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">How We Operate</span>
+            <h2 id="about-principles-heading">Our Business Principles &amp; Approach</h2>
             <p class="section-subtitle">This firm's Business Policy binds all members of staff and demands ethical conduct in their daily relationships.</p>
         </div>
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <ol class="mb-0">
-                    <li class="mb-2">Perform duties with honesty, integrity, and to the best of their abilities.</li>
-                    <li class="mb-2">Maintain impartiality and avoid compromising their professional positions.</li>
-                    <li class="mb-2">Treat clients with fairness, courtesy, dignity, and sensitivity to their rights.</li>
-                    <li class="mb-2">Remain accountable for actions and accept constructive criticism for improvement.</li>
-                    <li class="mb-2">Comply with all company procedures and uphold its positive image at all times.</li>
-                    <li class="mb-2">Use company information only for its intended purpose, within delegated authority.</li>
-                    <li class="mb-2">Respect and care for the company's assets and property as their own.</li>
-                    <li class="mb-2">Disclose any personal or company-related conflicts of interest.</li>
-                    <li class="mb-2">Decline any gifts that may be perceived as attempts to exert undue influence.</li>
-                    <li class="mb-2">Report behavior that violates the code, while encouraging constructive feedback.</li>
+            <div class="col-lg-10">
+                <ol class="about-principles__list animate-on-scroll">
+                    <li>Perform duties with honesty, integrity, and to the best of their abilities.</li>
+                    <li>Maintain impartiality and avoid compromising their professional positions.</li>
+                    <li>Treat clients with fairness, courtesy, dignity, and sensitivity to their rights.</li>
+                    <li>Remain accountable for actions and accept constructive criticism for improvement.</li>
+                    <li>Comply with all company procedures and uphold its positive image at all times.</li>
+                    <li>Use company information only for its intended purpose, within delegated authority.</li>
+                    <li>Respect and care for the company's assets and property as their own.</li>
+                    <li>Disclose any personal or company-related conflicts of interest.</li>
+                    <li>Decline any gifts that may be perceived as attempts to exert undue influence.</li>
+                    <li>Report behavior that violates the code, while encouraging constructive feedback.</li>
                     <li>Seek guidance from supervisors or the managing partner when uncertain about policy application.</li>
                 </ol>
             </div>
@@ -107,76 +219,100 @@
     </div>
 </section>
 
-<!-- Team -->
+<!-- Team preview -->
 {% if team_members %}
-<section class="section-block section-white">
+<section class="section-block section-navy-light about-team">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Our People</span>
             <h2>Our Legal Team</h2>
             <p class="section-subtitle">Meet the professionals dedicated to serving your legal needs</p>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for member in team_members %}
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 team-card">
-                    <div class="card-body p-4">
-                        {% if member.photo_src %}
-                        <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="team-photo">
-                        {% else %}
-                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
-                        {% endif %}
-                        <h3 class="h5">{{ member.name }}</h3>
-                        <p class="text-muted small">{{ member.position }}</p>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow">View profile</a>
-                    </div>
-                </div>
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                {% set show_bio = false %}
+                {% set show_social = false %}
+                {% include 'partials/team_card.html' %}
             </div>
             {% endfor %}
+        </div>
+        <div class="text-center mt-4 animate-on-scroll">
+            <a href="{{ url_for('main.team') }}" class="btn btn-outline-primary">View Full Team</a>
         </div>
     </div>
 </section>
 {% endif %}
 
-<!-- Testimonials — what_our_clients_say.png -->
-<section class="section-block section-cream testimonial-section">
+<!-- Testimonials -->
+<section class="section-block section-cream testimonial-section about-testimonials">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
             <span class="section-eyebrow" style="color: var(--doa-text-light);">Our Testimonials</span>
             <h2>What Our Clients Say</h2>
         </div>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 testimonial-card p-4">
-                    <i class="fas fa-quote-left quote-icon"></i>
-                    <p>The team provided exceptional guidance through complex business litigation. Their expertise led to a favorable outcome.</p>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 0;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>The team provided exceptional guidance through complex business litigation. Their expertise and strategic approach led to a favorable outcome that exceeded our expectations.</p>
                     <div class="testimonial-name">Star Hospital Kisumu Annex Limited</div>
+                    <div class="testimonial-role">Commercial Litigation Client</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 testimonial-card p-4">
-                    <i class="fas fa-quote-left quote-icon"></i>
-                    <p>I was impressed by the personal attention and care. They explained complex legal matters in simple terms.</p>
-                    <div class="testimonial-name">Rusinga Humanist Of Hope Center</div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 1;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>When our organisation faced sensitive civil matters, the firm responded with compassion and clarity, explaining our options in plain language throughout the process.</p>
+                    <div class="testimonial-name">Rusinga Humanist Of Hope Centre</div>
+                    <div class="testimonial-role">Civil &amp; Community Legal Support</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 testimonial-card p-4">
-                    <i class="fas fa-quote-left quote-icon"></i>
-                    <p>Working with Dan Ochieng &amp; Company Advocates has been a game-changer for our company.</p>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 2;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>Their handling of our insurance and running-down claims was thorough and results-driven, with deep knowledge of insurance law at every stage.</p>
                     <div class="testimonial-name">Maxcure Insurance Agency</div>
+                    <div class="testimonial-role">Insurance &amp; Running Down Matters</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 3;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>As a research and legal education partner, we rely on the firm for rigorous legal analysis and policy-oriented consultancy grounded in Kenyan law.</p>
+                    <div class="testimonial-name">Christian Legal Education and Research (CLEAR &ndash; Kenya)</div>
+                    <div class="testimonial-role">Legal Research &amp; Consultancy Partner</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 4;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>The firm advised us on land acquisition and title documentation with exceptional attention to detail, ensuring our property transactions were secure and compliant.</p>
+                    <div class="testimonial-name">Impact Research and Development (IRDO)</div>
+                    <div class="testimonial-role">Land &amp; Conveyancing Advisory</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 testimonial-card card-lift animate-on-scroll p-4" style="--i: 5;">
+                    <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                    <p>They guided us through employment contracts, workplace policies, and a staff dispute with professionalism, strengthening governance for our youth programmes.</p>
+                    <div class="testimonial-name">Salina Youth Initiative</div>
+                    <div class="testimonial-role">Employment &amp; Organizational Law</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="cta-section">
+<!-- CTA -->
+<section class="cta-section about-cta">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <h2 class="mb-4">Ready to Work with Us?</h2>
-                <p class="lead mb-4 section-subtitle">Contact our team today for a consultation about your legal needs.</p>
-                <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Contact Us Now</a>
+                <span class="section-eyebrow animate-on-scroll">Get Started</span>
+                <h2 class="mb-4 animate-on-scroll">Ready to Work with Us?</h2>
+                <p class="lead mb-4 section-subtitle animate-on-scroll">Contact our team today for a consultation about your legal needs.</p>
+                <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg animate-on-scroll">Contact Us Now</a>
             </div>
         </div>
     </div>

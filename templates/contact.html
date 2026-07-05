@@ -18,17 +18,23 @@
     </div>
 </section>
 {% else %}
-{% set hero_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.jpg') %}
+{% set hero_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp') %}
 
 <!-- Page header — contact_us_page.png -->
-<section class="hero-section hero-page" style="background-image: url('{{ hero_bg }}');">
-    <div class="container hero-content text-center">
-        <h1 class="hero-page-title">Contact Us</h1>
+<div class="page-header" style="background-image: url('{{ hero_bg }}');">
+    <div class="container">
+        <h1 class="page-hero-title">Contact Us</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Contact</li>
+            </ol>
+        </nav>
     </div>
-</section>
+</div>
 
 <!-- Contact info + form — contact_us_page.png -->
-<section class="contact-page" id="contact-form">
+<section class="contact-page contact-section-bg" id="contact-form">
     <div class="container">
         <div class="row contact-page__layout align-items-start g-4 g-lg-5">
             <div class="col-lg-5 contact-page__info">
@@ -42,7 +48,7 @@
                         <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-phone"></i></span>
                         <h3 class="contact-info-card__label">Phone Numbers</h3>
                         <div class="contact-info-card__content">
-                            <p><a href="tel:+254745819632">0745 819 632</a></p>
+                            <p><a href="tel:+254729116086">0729 116 086</a></p>
                             <p><a href="tel:+254734090411">0734 090 411</a></p>
                         </div>
                     </article>
@@ -51,7 +57,7 @@
                         <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
                         <h3 class="contact-info-card__label">Physical Address</h3>
                         <div class="contact-info-card__content">
-                            <p>Tumaini Mall 1st Floor, Suite 103<br>Ring Road – Milimani, Kisumu</p>
+                            <p>Tumaini Mall, 1st Floor, Suite 108<br>Ring Road – Milimani, Kisumu City<br><span class="text-muted">Also: office in Kwale County</span></p>
                         </div>
                     </article>
 
@@ -59,7 +65,7 @@
                         <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
                         <h3 class="contact-info-card__label">Email Address</h3>
                         <div class="contact-info-card__content">
-                            <p><a href="mailto:info@danochiengadvocates.com">info@danochiengadvocates.com</a></p>
+                            <p><a href="mailto:danochiengadvocates@gmail.com">danochiengadvocates@gmail.com</a></p>
                         </div>
                     </article>
 
@@ -67,7 +73,9 @@
                         <span class="contact-info-card__icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
                         <h3 class="contact-info-card__label">Opening Hours</h3>
                         <div class="contact-info-card__content">
-                            <p>Mon–Fri: 9:00 AM – 5:00 PM</p>
+                            <p>Mon–Fri: 8:00 am – 5:30 pm</p>
+                            <p>Sat: 9:30 am – 1:00 pm</p>
+                            <p class="text-muted mb-0">Closed on public holidays</p>
                         </div>
                     </article>
                 </div>
@@ -132,18 +140,20 @@
 </section>
 
 <!-- Map — location_section.png -->
-<section class="map-section" id="office-location">
-    <div class="ratio ratio-21x9">
-        <iframe src="https://maps.google.com/maps?q=Tumaini+Mall+Kisumu&z=15&output=embed"
-                allowfullscreen loading="lazy" title="Office location map"></iframe>
-    </div>
-</section>
+{% with map_section_id='office-location', show_kisumu_po_box=true %}
+{% include 'partials/office_maps.html' %}
+{% endwith %}
 
 <!-- FAQ — frequently _asked_qstns.png -->
-<section class="contact-faq" id="faq">
+<section class="faq-section section-block" id="faq">
     <div class="container">
-        <h2 class="contact-faq__title">Frequently Asked Questions</h2>
-        <div class="accordion accordion-flush contact-faq__accordion" id="contactFaq">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Support</span>
+            <h2>Frequently Asked Questions</h2>
+            <p class="section-subtitle">Helpful information before you reach out</p>
+        </div>
+        <div class="faq-section__accordion animate-on-scroll">
+        <div class="accordion accordion-flush" id="contactFaq">
             <div class="accordion-item">
                 <h3 class="accordion-header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true">
@@ -174,6 +184,7 @@
                     <div class="accordion-body">Yes, all information submitted through this form is treated as confidential and protected by professional legal standards.</div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </section>

@@ -12,11 +12,11 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     services = Service.query.filter_by(is_active=True).order_by(Service.display_order).limit(6).all()
-    featured_case_studies = CaseStudy.query.filter_by(is_active=True, featured=True).limit(3).all()
+    featured_case_studies = CaseStudy.query.filter_by(is_active=True, featured=True).limit(4).all()
     team_members = TeamMember.query.filter_by(is_active=True).order_by(TeamMember.display_order).limit(4).all()
     recent_posts = BlogPost.query.filter_by(is_published=True).order_by(
         BlogPost.published_at.desc()
-    ).limit(3).all()
+    ).limit(4).all()
     return render_template(
         'index.html',
         title='Home',
@@ -51,16 +51,36 @@ def service_detail(slug):
     )
 
 
+SUPPORT_STAFF_POSITIONS = frozenset({
+    'Office Secretary',
+    'Legal Assistant',
+    'Office Clerk',
+    'Student (pupillage)',
+})
+
+
 @main_bp.route('/team')
 def team():
     team_members = TeamMember.query.filter_by(is_active=True).order_by(TeamMember.display_order).all()
-    return render_template('team.html', title='Our Team', team_members=team_members)
+    advocates = [m for m in team_members if m.position not in SUPPORT_STAFF_POSITIONS]
+    support_staff = [m for m in team_members if m.position in SUPPORT_STAFF_POSITIONS]
+    return render_template(
+        'team.html',
+        title='Our Team',
+        team_members=team_members,
+        advocates=advocates,
+        support_staff=support_staff,
+    )
 
 
 @main_bp.route('/team/<slug>')
 def team_member(slug):
     member = TeamMember.query.filter_by(slug=slug, is_active=True).first_or_404()
-    return render_template('team_member.html', title=member.name, team_member=member)
+    other_members = TeamMember.query.filter(
+        TeamMember.is_active == True,  # noqa: E712
+        TeamMember.id != member.id,
+    ).order_by(TeamMember.display_order).all()
+    return render_template('team_member.html', title=member.name, team_member=member, team_members=other_members)
 
 
 @main_bp.route('/case-studies')
@@ -95,14 +115,32 @@ def case_study_detail(slug):
 
 @main_bp.route('/blog')
 def blog():
-    posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.published_at.desc()).all()
-    return render_template('blog.html', title='News & Insights', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    per_page = 9
+    pagination = BlogPost.query.filter_by(is_published=True).order_by(
+        BlogPost.published_at.desc()
+    ).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template(
+        'blog.html',
+        title='News & Insights',
+        posts=pagination.items,
+        pagination=pagination,
+    )
 
 
 @main_bp.route('/blog/<slug>')
 def blog_detail(slug):
     post = BlogPost.query.filter_by(slug=slug, is_published=True).first_or_404()
-    return render_template('blog_detail.html', title=post.title, post=post)
+    related_posts = BlogPost.query.filter(
+        BlogPost.is_published == True,  # noqa: E712
+        BlogPost.id != post.id,
+    ).order_by(BlogPost.published_at.desc()).limit(3).all()
+    return render_template(
+        'blog_detail.html',
+        title=post.title,
+        post=post,
+        related_posts=related_posts,
+    )
 
 
 @main_bp.route('/privacy')

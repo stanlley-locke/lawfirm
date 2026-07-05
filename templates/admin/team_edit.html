@@ -125,7 +125,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     {{ form.phone.label(class="form-label") }}
-                                    {{ form.phone(class="form-control", placeholder="(555) 123-4567") }}
+                                    {{ form.phone(class="form-control", placeholder="0729 116 086") }}
                                     {% if form.phone.errors %}
                                     <div class="invalid-feedback d-block">
                                         {% for error in form.phone.errors %}
@@ -133,6 +133,20 @@
                                         {% endfor %}
                                     </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.practice_number.label(class="form-label") }}
+                                    {{ form.practice_number(class="form-control", placeholder="P.105/16021/19") }}
+                                    {% if form.practice_number.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.practice_number.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Advocate practice number (if applicable).</small>
                                 </div>
                             </div>
                         </div>

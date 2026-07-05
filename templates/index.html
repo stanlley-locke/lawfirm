@@ -2,14 +2,14 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-{% set hero_bg = url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.jpg') %}
+{% set hero_bg = url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp') %}
 <!-- Hero — homepage_hero_section.png -->
 <section class="hero-section text-white" style="background-image: url('{{ hero_bg }}');">
     <div class="container hero-content">
         <div class="row justify-content-center">
             <div class="col-lg-9">
-                <h1>Legal Solutions for Business and Individual Needs</h1>
-                <p class="lead mb-4">Commissioner For Oaths &amp; Notary Public. Expert legal counsel in Kisumu, Kenya with a commitment to excellence and client satisfaction.</p>
+                <h1 class="page-hero-title page-hero-title--home">Premier Full-Service Law Firm</h1>
+                <p class="lead page-hero-lead mb-4">Commercial, Civil Litigation, Research &amp; Consultancy. Expert legal counsel in Kisumu and Kwale County, Kenya — committed to efficient service delivery and dispute resolution.</p>
                 <a href="{{ url_for('contact.contact') }}" class="btn btn-primary btn-lg">Make Enquiry</a>
             </div>
         </div>
@@ -23,22 +23,22 @@
             <div class="row g-0 align-items-stretch">
                 <div class="col-lg-6 intro-float-card__body">
                     <div class="intro-float-card__logo-wrap">
-                        <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                        <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}"
                              alt="Dan Ochieng &amp; Company Advocates"
                              class="intro-float-card__logo"
                              width="320"
                              height="320">
                     </div>
                     <h2 id="intro-card-heading">Trusted Legal Partnerships</h2>
-                    <p>At Dan Ochieng &amp; Company Advocates, we combine extensive legal knowledge with a client-centered approach to deliver exceptional results across land law, commercial law, family law, and civil litigation.</p>
-                    <p>Whether you're facing a complex business challenge or personal legal matter, our team crafts solutions that protect your interests every step of the way.</p>
+                    <p>DAN OCHIENG &amp; COMPANY ADVOCATES is one of the premier law firms in Kenya, with offices in Kisumu and Kwale County. We combine in-depth knowledge and vast expertise to uphold excellent standards across commercial law, civil litigation, land matters, and legal research and consultancy.</p>
+                    <p>Small but highly professional, our firm is configured to deliver the highest-class service regardless of difficulty — opening new horizons and fresh perspectives for every client we serve.</p>
                     <a href="{{ url_for('main.about') }}" class="btn btn-outline-primary intro-float-card__cta">Learn more</a>
                     <p class="intro-float-card__attribution">Dan Ochieng &amp; Company Advocates</p>
                 </div>
                 <div class="col-lg-6 intro-float-card__media">
                     <div class="intro-image-wrap">
-                        <img src="{{ url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.jpg') }}" alt="Legal books and open notebook on a professional desk">
-                        <span class="intro-image-caption">Dan Ochieng</span>
+                        <img src="{{ url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.webp') }}" alt="Legal books and open notebook on a professional desk">
+                        <span class="intro-image-caption">Established December 2023</span>
                     </div>
                 </div>
             </div>
@@ -47,9 +47,9 @@
 </section>
 
 <!-- Practice areas grid — practice_areas.png / homepage_after_hero_section.png -->
-<section class="section-block section-cream" id="practice-areas">
+<section class="section-block section-cream practice-areas-section" id="practice-areas">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
             <h2>Practice Areas</h2>
             <p class="section-subtitle">Comprehensive legal solutions for your personal and business needs</p>
         </div>
@@ -57,7 +57,7 @@
             {% if services %}
                 {% for service in services %}
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="practice-card">
+                    <div class="practice-card card-lift animate-on-scroll" data-slug="{{ service.slug }}" style="--i: {{ loop.index0 }};">
                         <div class="practice-icon">
                             <i class="{{ service.icon or 'fas fa-balance-scale' }}"></i>
                         </div>
@@ -79,35 +79,16 @@
     </div>
 </section>
 
-<!-- CTA banner — practice_areas.png / location_section.png -->
-<section class="cta-banner">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-md-3 text-center text-md-start">
-                <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
-                     alt="" class="cta-banner-img" aria-hidden="true">
-            </div>
-            <div class="col-md-6">
-                <h3>Have Legal Questions? Ask Our Experts!</h3>
-                <p>Our experienced team is ready to provide guidance on your legal matters. Reach out today for a consultation.</p>
-            </div>
-            <div class="col-md-3 text-center text-md-end">
-                <a href="{{ url_for('chat.client_chat') }}" class="btn btn-white">Ask an Expert</a>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Excellence section — what_our_clients_say.png / Screenshot alternating rows -->
-<section class="section-block section-white">
+<section class="section-block section-blue">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <img src="{{ url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.jpg') }}" alt="Historic law library with leather-bound books and marble busts" class="split-image">
+                <img src="{{ url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp') }}" alt="Historic law library with leather-bound books and marble busts" class="split-image">
             </div>
             <div class="col-lg-6">
                 <h2>Legal Excellence, Personalized Care</h2>
-                <p>We focus on a wide range of intricate legal issues, opening new horizons and fresh perspectives for our clients. Small but highly professional, our firm is configured to deliver the highest class service.</p>
+                <p>We focus on intricate legal issues across our practice areas, opening new horizons for clients. Our success derives from a highly regarded team of seasoned Advocates and competent support staff combining intellectual capability and practical skills.</p>
                 <a href="{{ url_for('main.about') }}" class="btn btn-primary mt-2">Learn More</a>
             </div>
         </div>
@@ -117,21 +98,75 @@
 <!-- Testimonials — what_our_clients_say.png -->
 <section class="section-block section-cream testimonial-section" id="testimonials">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
             <span class="section-eyebrow" style="color: var(--doa-text-light);">Our Testimonials</span>
             <h2>What Our Clients Say</h2>
         </div>
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="testimonial-quote">
-                    <i class="fas fa-quote-left quote-icon"></i>
-                    <p class="lead mb-4">The team at Dan Ochieng &amp; Company Advocates provided exceptional guidance through complex business litigation. Their expertise and strategic approach led to a favorable outcome that exceeded our expectations.</p>
-                    <div class="testimonial-name">Star Hospital Kisumu Annex Limited</div>
-                    <div class="testimonial-role">Client</div>
+                <div class="testimonial-carousel" id="testimonialCarousel" aria-live="polite">
+                    <div class="testimonial-slides">
+                        <div class="testimonial-slide is-active" data-index="0">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">The team at Dan Ochieng &amp; Company Advocates provided exceptional guidance through complex business litigation. Their expertise and strategic approach led to a favorable outcome that exceeded our expectations.</p>
+                                <div class="testimonial-name">Star Hospital Kisumu Annex Limited</div>
+                                <div class="testimonial-role">Commercial Litigation Client</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" data-index="1">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">When our organisation faced sensitive civil matters, Dan Ochieng &amp; Company Advocates responded with compassion and clarity. They explained our options in plain language and stood firmly by our community throughout the process.</p>
+                                <div class="testimonial-name">Rusinga Humanist Of Hope Centre</div>
+                                <div class="testimonial-role">Civil &amp; Community Legal Support</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" data-index="2">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">Their handling of our insurance and running-down claims was thorough and results-driven. From initial assessment to settlement, the firm demonstrated deep knowledge of insurance law and kept us informed at every stage.</p>
+                                <div class="testimonial-name">Maxcure Insurance Agency</div>
+                                <div class="testimonial-role">Insurance &amp; Running Down Matters</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" data-index="3">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">As a research and legal education partner, CLEAR-Kenya relies on Dan Ochieng &amp; Company Advocates for rigorous legal analysis and policy-oriented consultancy. Their work is precise, timely, and grounded in Kenyan law.</p>
+                                <div class="testimonial-name">Christian Legal Education and Research (CLEAR &ndash; Kenya)</div>
+                                <div class="testimonial-role">Legal Research &amp; Consultancy Partner</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" data-index="4">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">The firm advised us on land acquisition and title documentation with exceptional attention to detail. Their conveyancing team ensured our property transactions were compliant, secure, and completed without unnecessary delay.</p>
+                                <div class="testimonial-name">Impact Research and Development (IRDO)</div>
+                                <div class="testimonial-role">Land &amp; Conveyancing Advisory</div>
+                            </div>
+                        </div>
+                        <div class="testimonial-slide" data-index="5">
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon" aria-hidden="true"></i>
+                                <p class="lead mb-4">Dan Ochieng &amp; Company Advocates guided us through employment contracts, workplace policies, and a staff dispute with professionalism and practical advice. We now have stronger governance structures for our youth programmes.</p>
+                                <div class="testimonial-name">Salina Youth Initiative</div>
+                                <div class="testimonial-role">Employment &amp; Organizational Law</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-dots" role="tablist" aria-label="Testimonial navigation">
+                        <button type="button" class="testimonial-dot is-active" role="tab" aria-selected="true" aria-label="Testimonial 1 of 6" data-index="0"></button>
+                        <button type="button" class="testimonial-dot" role="tab" aria-selected="false" aria-label="Testimonial 2 of 6" data-index="1"></button>
+                        <button type="button" class="testimonial-dot" role="tab" aria-selected="false" aria-label="Testimonial 3 of 6" data-index="2"></button>
+                        <button type="button" class="testimonial-dot" role="tab" aria-selected="false" aria-label="Testimonial 4 of 6" data-index="3"></button>
+                        <button type="button" class="testimonial-dot" role="tab" aria-selected="false" aria-label="Testimonial 5 of 6" data-index="4"></button>
+                        <button type="button" class="testimonial-dot" role="tab" aria-selected="false" aria-label="Testimonial 6 of 6" data-index="5"></button>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <img src="{{ url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.jpg') }}" alt="Bronze Lady Justice statue holding balanced scales" class="testimonial-image">
+                <img src="{{ url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp') }}" alt="Bronze Lady Justice statue holding balanced scales" class="testimonial-image">
             </div>
         </div>
     </div>
@@ -139,29 +174,21 @@
 
 <!-- Case Studies -->
 {% if case_studies %}
-<section class="section-block section-white">
+<section class="section-block section-blue case-studies-section">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Success Stories</span>
             <h2>Featured Case Studies</h2>
             <p class="section-subtitle">See how we've helped clients achieve successful outcomes</p>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for case in case_studies %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 case-study-card">
-                    <div class="card-body p-4">
-                        <h3 class="h5">{{ case.title }}</h3>
-                        {% if case.client %}
-                        <p class="text-muted small mb-2">Client: {{ case.client }}</p>
-                        {% endif %}
-                        <p>{{ case.summary|truncate(150) }}</p>
-                        <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="link-arrow">Read more</a>
-                    </div>
-                </div>
+            <div class="col-md-6 col-lg-4">
+                {% include 'partials/case_study_card.html' %}
             </div>
             {% endfor %}
         </div>
-        <div class="text-center mt-2">
+        <div class="text-center mt-4">
             <a href="{{ url_for('main.case_studies') }}" class="btn btn-outline-primary">View All Case Studies</a>
         </div>
     </div>
@@ -170,25 +197,21 @@
 
 <!-- Blog — our_blog.png -->
 {% if recent_posts %}
-<section class="section-block section-cream">
+<section class="section-block section-cream blog-section">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Insights</span>
             <h2>Our Blog</h2>
             <p class="section-subtitle">Legal news, insights, and updates from our team</p>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for post in recent_posts %}
-            <div class="col-md-4 mb-4">
-                <article class="blog-card">
-                    <div class="blog-thumb mb-3"></div>
-                    <div class="blog-date">{{ post.published_at.strftime('%B %d, %Y') if post.published_at }}</div>
-                    <h3><a href="{{ url_for('main.blog_detail', slug=post.slug) }}">{{ post.title }}</a></h3>
-                    <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="link-arrow">Read more</a>
-                </article>
+            <div class="col-md-6 col-lg-4">
+                {% include 'partials/blog_card.html' %}
             </div>
             {% endfor %}
         </div>
-        <div class="text-center mt-2">
+        <div class="text-center mt-4">
             <a href="{{ url_for('main.blog') }}" class="btn btn-outline-primary">View All Posts</a>
         </div>
     </div>
@@ -197,54 +220,41 @@
 
 <!-- Team -->
 {% if team_members %}
-<section class="section-block section-white">
+<section class="section-block section-navy-light team-section">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Our People</span>
             <h2>Meet Our Legal Team</h2>
             <p class="section-subtitle">Dedicated professionals committed to your success</p>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for member in team_members %}
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 team-card">
-                    <div class="card-body p-4">
-                        {% if member.photo_src %}
-                        <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="team-photo">
-                        {% else %}
-                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
-                        {% endif %}
-                        <h3 class="h5">{{ member.name }}</h3>
-                        <p class="text-muted small">{{ member.position }}</p>
-                        <div class="team-social mb-3">
-                            {% if member.email %}
-                            <a href="mailto:{{ member.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
-                            {% endif %}
-                            {% if member.linkedin %}
-                            <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                            {% endif %}
-                        </div>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow">View profile</a>
-                    </div>
-                </div>
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                {% set show_bio = false %}
+                {% set show_social = false %}
+                {% include 'partials/team_card.html' %}
             </div>
             {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.team') }}" class="btn btn-outline-primary">View Full Team</a>
         </div>
     </div>
 </section>
 {% endif %}
 
 <!-- Map — location_section.png -->
-<section class="map-section" id="location">
-    <div class="ratio ratio-21x9">
-        <iframe src="https://maps.google.com/maps?q=Tumaini+Mall+Kisumu&z=15&output=embed"
-                allowfullscreen loading="lazy" title="Office location map"></iframe>
-    </div>
-</section>
+{% include 'partials/office_maps.html' %}
 
 <!-- FAQ — frequently _asked_qstns.png -->
-<section class="faq-dark" id="faq">
+<section class="faq-section section-block" id="faq">
     <div class="container">
-        <h2>Frequently Asked Questions</h2>
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Support</span>
+            <h2>Frequently Asked Questions</h2>
+            <p class="section-subtitle">Quick answers to common questions about our services</p>
+        </div>
+        <div class="faq-section__accordion animate-on-scroll">
         <div class="accordion accordion-flush" id="homeFaq">
             <div class="accordion-item">
                 <h3 class="accordion-header">
@@ -253,7 +263,7 @@
                     </button>
                 </h3>
                 <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">We specialize in land law, commercial law, company law, property and conveyance, family and succession law, employment law, civil litigation, and more.</div>
+                    <div class="accordion-body">We specialize in land matters, general civil litigation, conveyances and property, arbitration and ADR, employment law, mergers and acquisitions, bank securities, company law, family law and estates, and insurance law (running down).</div>
                 </div>
             </div>
             <div class="accordion-item">
@@ -263,7 +273,7 @@
                     </button>
                 </h3>
                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">You can contact us via our contact form, call us at 0745 819 632, or book an appointment through our online scheduling page.</div>
+                    <div class="accordion-body">You can contact us via our contact form, call us at 0729 116 086 or 0734 090 411, or email danochiengadvocates@gmail.com.</div>
                 </div>
             </div>
             <div class="accordion-item">
@@ -273,7 +283,7 @@
                     </button>
                 </h3>
                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">We are open Monday through Friday, 9:00 AM to 5:00 PM. Contact us for urgent matters outside business hours.</div>
+                    <div class="accordion-body">Our Customer Care Desk is open Monday through Friday, 8:00 am to 5:30 pm, and Saturday 9:30 am to 1:00 pm. We are closed on public holidays.</div>
                 </div>
             </div>
             <div class="accordion-item">
@@ -289,13 +299,14 @@
             <div class="accordion-item">
                 <h3 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                        5. Do you offer notary and commissioner for oaths services?
+                        5. Do you serve clients outside Kisumu?
                     </button>
                 </h3>
                 <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
-                    <div class="accordion-body">Yes. We are Commissioner For Oaths &amp; Notary Public, offering document certification and notarization services.</div>
+                    <div class="accordion-body">Yes. In addition to our Kisumu office at Tumaini Mall, we maintain an office in Kwale County and work with major law firms across Kenya to serve corporates and individuals nationwide.</div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </section>

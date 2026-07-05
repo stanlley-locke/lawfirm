@@ -4,8 +4,14 @@
 {% block content %}
 <div class="page-header">
     <div class="container">
-        <h1>Case & Matter Tracker</h1>
-        <p class="lead">Enter your reference code below to check the real-time status of your legal case, property transaction, or company filing.</p>
+        <h1 class="page-hero-title">Case &amp; Matter Tracker</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Case Tracker</li>
+            </ol>
+        </nav>
+        <p class="page-hero-lead mt-3 mb-0">Enter your reference code below to check the real-time status of your legal case, property transaction, or company filing.</p>
     </div>
 </div>
 

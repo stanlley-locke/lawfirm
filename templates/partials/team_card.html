@@ -1,0 +1,37 @@
+{% set role_text = (member.position or '')|trim %}
+{% set role_lower = role_text|lower %}
+{% set name_lower = (member.name or '')|trim|lower %}
+{% set bio_text = (member.bio or '')|striptags|trim %}
+{% set bio_lower = bio_text|lower %}
+{% set show_role = role_text and role_lower != name_lower %}
+{% set show_bio_block = show_bio|default(false) and bio_text and bio_lower != role_lower and not (role_lower and bio_lower.startswith(role_lower)) %}
+{% set team_photo_fallback = url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp') %}
+<article class="team-card card-lift animate-on-scroll" style="--i: {{ loop.index0 if loop is defined else 0 }};">
+    <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="team-card__photo-link" tabindex="-1" aria-hidden="true">
+        <div class="team-card__photo-wrap">
+            <img src="{{ member.photo_src or team_photo_fallback }}" alt="" class="team-card__photo" loading="lazy" width="300" height="400" onerror="this.onerror=null;this.src='{{ team_photo_fallback }}';">
+        </div>
+    </a>
+    <div class="team-card__body">
+        <h3 class="team-card__name">
+            <a href="{{ url_for('main.team_member', slug=member.slug) }}">{{ member.name }}</a>
+        </h3>
+        {% if show_role %}
+        <p class="team-card__role">{{ role_text }}</p>
+        {% endif %}
+        {% if show_bio_block %}
+        <p class="team-card__bio">{{ bio_text|truncate(100) }}</p>
+        {% endif %}
+        {% if show_social|default(false) %}
+        <div class="team-social">
+            {% if member.email %}
+            <a href="mailto:{{ member.email }}" aria-label="Email {{ member.name }}"><i class="fas fa-envelope"></i></a>
+            {% endif %}
+            {% if member.linkedin %}
+            <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile for {{ member.name }}"><i class="fab fa-linkedin-in"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="team-card__link link-arrow">View profile</a>
+    </div>
+</article>

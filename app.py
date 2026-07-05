@@ -94,6 +94,7 @@ def create_app(config_name=None):
         nav_blog = BlogPost.query.filter_by(is_published=True).order_by(
             BlogPost.published_at.desc()
         ).limit(4).all()
+        from utils import firm_contact
         return {
             'now': datetime.utcnow(),
             'app_name': current_app.config.get('APP_NAME'),
@@ -104,7 +105,24 @@ def create_app(config_name=None):
             'nav_team': nav_team,
             'nav_cases': nav_cases,
             'nav_blog': nav_blog,
+            'firm_email': firm_contact.FIRM_EMAIL,
+            'firm_phone_primary': firm_contact.FIRM_PHONE_PRIMARY,
+            'firm_phone_primary_tel': firm_contact.FIRM_PHONE_PRIMARY_TEL,
+            'firm_phone_secondary': firm_contact.FIRM_PHONE_SECONDARY,
+            'firm_phone_secondary_tel': firm_contact.FIRM_PHONE_SECONDARY_TEL,
+            'firm_mailto_url': firm_contact.mailto_url(),
+            'firm_whatsapp_url': firm_contact.whatsapp_url(),
         }
+
+    @app.template_filter('phone_links')
+    def phone_links_filter(phone_str):
+        from utils.firm_contact import split_phone_parts
+        return split_phone_parts(phone_str)
+
+    @app.template_filter('consultation_mailto')
+    def consultation_mailto_filter(member_name):
+        from utils.firm_contact import consultation_mailto
+        return consultation_mailto(member_name)
 
     @app.after_request
     def set_security_headers(response):

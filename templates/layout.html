@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}</title>
-    <meta name="description" content="{% block meta_description %}Dan Ochieng & Company Advocates — legal services in Kisumu, Kenya. Corporate, family, and property law.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Dan Ochieng & Company Advocates — premier full-service law firm in Kisumu and Kwale County, Kenya. Commercial law, civil litigation, land matters, and legal consultancy.{% endblock %}">
     <link rel="canonical" href="{{ base_url }}{{ request.path }}">
     <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name }}">
     <meta property="og:type" content="website">
@@ -18,21 +18,61 @@
       "@context": "https://schema.org",
       "@type": "LegalService",
       "name": "Dan Ochieng & Company Advocates",
-      "url": "{{ base_url }}",
-      "telephone": "+254745819632",
-      "email": "info@danochiengadvocates.com",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Tumaini Mall 1st Floor, Suite 103, Ring Road - Milimani",
-        "addressLocality": "Kisumu",
-        "addressCountry": "KE"
-      },
-      "openingHoursSpecification": [{
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "opens": "09:00",
-        "closes": "17:00"
-      }]
+      "url": "https://www.danochiengadvocates.com",
+      "telephone": ["+254729116086", "+254734090411"],
+      "email": "danochiengadvocates@gmail.com",
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "streetAddress": "Tumaini Mall, 1st Floor, Suite 108, Ring Road - Milimani",
+          "addressLocality": "Kisumu",
+          "postalCode": "40100",
+          "addressCountry": "KE"
+        },
+        {
+          "@type": "PostalAddress",
+          "addressLocality": "Kwale Town",
+          "addressRegion": "Kwale County",
+          "addressCountry": "KE"
+        }
+      ],
+      "location": [
+        {
+          "@type": "Place",
+          "name": "Kisumu Office",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Tumaini Mall, 1st Floor, Suite 108, Ring Road - Milimani",
+            "addressLocality": "Kisumu",
+            "postalCode": "40100",
+            "addressCountry": "KE"
+          }
+        },
+        {
+          "@type": "Place",
+          "name": "Kwale County Office",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Kwale Town",
+            "addressRegion": "Kwale County",
+            "addressCountry": "KE"
+          }
+        }
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+          "opens": "08:00",
+          "closes": "17:30"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "09:30",
+          "closes": "13:00"
+        }
+      ]
     }
     </script>
 
@@ -45,7 +85,7 @@
 
     {% block head_scripts %}{% endblock %}
 
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
+    <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
     {% block navbar %}
@@ -53,14 +93,14 @@
         <nav class="navbar navbar-expand-xl navbar-light doa-navbar" id="doaNavbar">
             <div class="doa-navbar-inner px-3 px-lg-4">
                 <a class="navbar-brand doa-brand" href="{{ url_for('main.index') }}">
-                    <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                    <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}"
                          alt="Dan Ochieng & Company Advocates"
                          class="doa-brand-logo"
                          width="46" height="46">
                     <span class="doa-brand-name">Dan Ochieng &amp; Company Advocates</span>
                 </a>
                 <div class="doa-navbar-mobile-actions d-xl-none">
-                    <a href="tel:+254745819632" class="doa-nav-phone doa-nav-phone--header" aria-label="Call 0745 819 632">
+                    <a href="tel:{{ firm_phone_primary_tel }}" class="doa-nav-phone doa-nav-phone--header" aria-label="Call {{ firm_phone_primary }}">
                         <i class="fas fa-phone" aria-hidden="true"></i>
                     </a>
                     <button class="navbar-toggler doa-navbar-toggler" type="button"
@@ -255,17 +295,25 @@
                             <div class="doa-mega-panel" aria-label="Contact submenu">
                                 <div class="doa-mega-inner">
                                     <div class="doa-mega-grid doa-mega-grid--compact">
-                                        <a href="tel:+254745819632" class="doa-mega-link">
-                                            <span class="doa-mega-link-title"><i class="fas fa-phone me-1"></i> 0745 819 632</span>
-                                            <span class="doa-mega-link-desc">Call us during business hours</span>
+                                        <a href="tel:{{ firm_phone_primary_tel }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-phone me-1"></i> {{ firm_phone_primary }}</span>
+                                            <span class="doa-mega-link-desc">Main line — call during office hours</span>
                                         </a>
-                                        <a href="mailto:info@danochiengadvocates.com" class="doa-mega-link">
+                                        <a href="tel:{{ firm_phone_secondary_tel }}" class="doa-mega-link">
+                                            <span class="doa-mega-link-title"><i class="fas fa-phone me-1"></i> {{ firm_phone_secondary }}</span>
+                                            <span class="doa-mega-link-desc">Alternative office line</span>
+                                        </a>
+                                        <a href="{{ firm_mailto_url }}" class="doa-mega-link">
                                             <span class="doa-mega-link-title"><i class="fas fa-envelope me-1"></i> Email Us</span>
-                                            <span class="doa-mega-link-desc">info@danochiengadvocates.com</span>
+                                            <span class="doa-mega-link-desc">{{ firm_email }}</span>
+                                        </a>
+                                        <a href="{{ firm_whatsapp_url }}" class="doa-mega-link" target="_blank" rel="noopener noreferrer">
+                                            <span class="doa-mega-link-title"><i class="fab fa-whatsapp me-1"></i> WhatsApp</span>
+                                            <span class="doa-mega-link-desc">Message us on WhatsApp</span>
                                         </a>
                                         <a href="{{ url_for('contact.contact') }}#office-location" class="doa-mega-link">
                                             <span class="doa-mega-link-title"><i class="fas fa-map-marker-alt me-1"></i> Our Office</span>
-                                            <span class="doa-mega-link-desc">Tumaini Mall, Kisumu</span>
+                                            <span class="doa-mega-link-desc">Tumaini Mall, Milimani, Kisumu</span>
                                         </a>
                                         {% if calendly_url %}
                                         <a href="{{ url_for('main.appointments') }}" class="doa-mega-link">
@@ -286,10 +334,57 @@
                             </div>
                         </li>
                     </ul>
+                    <div class="doa-mobile-contact d-xl-none">
+                        <button class="doa-mobile-contact__toggle collapsed" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#doaMobileContact"
+                                aria-expanded="false" aria-controls="doaMobileContact">
+                            <span class="doa-mobile-contact__toggle-label">
+                                <i class="fas fa-headset" aria-hidden="true"></i>
+                                Contact Us
+                            </span>
+                            <i class="fas fa-chevron-down doa-mobile-contact__chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="collapse doa-mobile-contact__panel" id="doaMobileContact">
+                            <div class="doa-mobile-contact__body">
+                                <ul class="doa-mobile-contact__list list-unstyled mb-0">
+                                    <li>
+                                        <a href="tel:{{ firm_phone_primary_tel }}">
+                                            <i class="fas fa-phone" aria-hidden="true"></i>
+                                            <span>{{ firm_phone_primary }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="tel:{{ firm_phone_secondary_tel }}">
+                                            <i class="fas fa-phone" aria-hidden="true"></i>
+                                            <span>{{ firm_phone_secondary }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ firm_mailto_url }}">
+                                            <i class="fas fa-envelope" aria-hidden="true"></i>
+                                            <span>{{ firm_email }}</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="doa-mobile-contact__quick">
+                                    <a href="tel:{{ firm_phone_primary_tel }}" class="doa-mobile-contact__action doa-mobile-contact__action--call">
+                                        <i class="fas fa-phone" aria-hidden="true"></i> Call
+                                    </a>
+                                    <a href="{{ firm_mailto_url }}" class="doa-mobile-contact__action doa-mobile-contact__action--email">
+                                        <i class="fas fa-envelope" aria-hidden="true"></i> Email
+                                    </a>
+                                    <a href="{{ firm_whatsapp_url }}" class="doa-mobile-contact__action doa-mobile-contact__action--whatsapp"
+                                       target="_blank" rel="noopener noreferrer">
+                                        <i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="doa-nav-tools">
-                        <a href="tel:+254745819632" class="doa-nav-phone">
+                        <a href="tel:{{ firm_phone_primary_tel }}" class="doa-nav-phone doa-nav-phone--desktop">
                             <i class="fas fa-phone" aria-hidden="true"></i>
-                            <span>0745 819 632</span>
+                            <span>{{ firm_phone_primary }}</span>
                         </a>
                         {% if current_user.is_authenticated %}
                             {% if current_user.is_admin %}
@@ -374,23 +469,19 @@
     {% block footer %}
     <footer class="footer mt-auto">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+            <div class="row footer__grid g-4 g-lg-5">
+                <div class="col-12 col-lg-3 footer__brand-col">
                     <div class="footer-brand">
-                        <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
+                        <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}"
                              alt="Dan Ochieng & Company Advocates">
                         <div class="footer-brand-name">Dan Ochieng &amp; Company Advocates</div>
+                        <p class="footer-tagline">Commercial, Civil Litigation &amp; Legal Consultancy</p>
                     </div>
-                    <p>Commissioner For Oaths &amp; Notary Public. Providing exceptional legal services with a commitment to excellence, integrity, and client satisfaction.</p>
-                    <div class="social-icons">
-                        <a href="https://www.instagram.com/stanlley_locke/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://x.com/stanley_wasonga" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.linkedin.com/in/stanley-locke-a4b430327/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+                    <p class="footer-brand-desc">Premier full-service law firm in Kisumu and Kwale County, delivering efficient and innovative legal solutions with integrity and excellence.</p>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
-                    <h5>Links</h5>
-                    <ul class="list-unstyled">
+                <div class="col-12 col-lg-3 footer__col">
+                    <h5 class="footer__heading">Links</h5>
+                    <ul class="list-unstyled footer__list">
                         <li><a href="{{ url_for('main.index') }}">Home</a></li>
                         <li><a href="{{ url_for('main.services') }}">Services</a></li>
                         <li><a href="{{ url_for('main.about') }}">About Us</a></li>
@@ -400,18 +491,40 @@
                         <li><a href="{{ url_for('contact.contact') }}">Contact Us</a></li>
                     </ul>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
-                    <h5>Find Us</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">Tumaini Mall 1st Floor, Suite 103<br>Ring Road – Milimani, Kisumu</li>
-                        <li class="mb-2"><a href="tel:+254745819632">0745 819 632</a></li>
-                        <li class="mb-2"><a href="tel:+254734090411">0734 090 411</a></li>
-                        <li><a href="mailto:info@danochiengadvocates.com">info@danochiengadvocates.com</a></li>
+                <div class="col-12 col-lg-3 footer__col">
+                    <h5 class="footer__heading">Find Us</h5>
+                    <ul class="list-unstyled footer__list footer__list--contact">
+                        <li class="footer__address">Tumaini Mall, 1st Floor, Suite 108<br>Ring Road – Milimani, Kisumu City<br>P.O. Box 7275 – 40100, Kisumu</li>
+                        <li class="footer__contact-item">
+                            <a href="tel:{{ firm_phone_primary_tel }}">
+                                <i class="fas fa-phone footer__contact-icon" aria-hidden="true"></i>
+                                <span>{{ firm_phone_primary }}</span>
+                            </a>
+                        </li>
+                        <li class="footer__contact-item">
+                            <a href="tel:{{ firm_phone_secondary_tel }}">
+                                <i class="fas fa-phone footer__contact-icon" aria-hidden="true"></i>
+                                <span>{{ firm_phone_secondary }}</span>
+                            </a>
+                        </li>
+                        <li class="footer__contact-item">
+                            <a href="{{ firm_mailto_url }}">
+                                <i class="fas fa-envelope footer__contact-icon" aria-hidden="true"></i>
+                                <span>{{ firm_email }}</span>
+                            </a>
+                        </li>
+                        <li class="footer__contact-item">
+                            <a href="{{ firm_whatsapp_url }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-whatsapp footer__contact-icon footer__contact-icon--whatsapp" aria-hidden="true"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </li>
+                        <li class="footer__hours">Mon–Fri: 8:00 am – 5:30 pm<br>Sat: 9:30 am – 1:00 pm</li>
                     </ul>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <h5>Practice Areas</h5>
-                    <ul class="list-unstyled">
+                <div class="col-12 col-lg-3 footer__col">
+                    <h5 class="footer__heading">Practice Areas</h5>
+                    <ul class="list-unstyled footer__list">
                         {% if footer_services %}
                             {% for svc in footer_services %}
                             <li><a href="{{ url_for('main.service_detail', slug=svc.slug) }}">{{ svc.title }}</a></li>
@@ -422,16 +535,18 @@
                     </ul>
                 </div>
             </div>
-            <hr>
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start footer-copyright">
-                    <p class="mb-0">&copy; {{ now.year }} Dan Ochieng &amp; Company Advocates. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end footer-copyright">
-                    <p class="mb-0">
-                        <a href="{{ url_for('main.privacy') }}">Privacy Policy</a> |
-                        <a href="{{ url_for('main.terms') }}">Terms of Service</a>
-                    </p>
+            <div class="footer__bottom">
+                <div class="row align-items-center gy-2">
+                    <div class="col-12 col-md-6 footer-copyright">
+                        <p class="mb-0">&copy; {{ now.year }} Dan Ochieng &amp; Company Advocates. All rights reserved.</p>
+                    </div>
+                    <div class="col-12 col-md-6 footer-copyright footer__legal">
+                        <p class="mb-0">
+                            <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>
+                            <span class="footer__legal-sep" aria-hidden="true">|</span>
+                            <a href="{{ url_for('main.terms') }}">Terms of Service</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -440,11 +555,26 @@
 
     {% block chat_widget %}
     {% if not current_user.is_authenticated %}
-        <div class="chat-widget-container">
+        <div class="doa-float-actions" id="doaFloatActions">
+            <a href="{{ firm_mailto_url }}"
+               class="doa-float-btn doa-float-btn--email shadow"
+               aria-label="Email {{ firm_email }}"
+               title="Email us">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <span class="doa-float-label">Email us</span>
+            </a>
+            <a href="{{ firm_whatsapp_url }}"
+               class="doa-float-btn doa-float-btn--whatsapp shadow"
+               target="_blank" rel="noopener noreferrer"
+               aria-label="WhatsApp {{ firm_phone_primary }}"
+               title="WhatsApp us">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                <span class="doa-float-label">WhatsApp</span>
+            </a>
             <a href="{{ url_for('chat.client_chat') }}"
-               class="btn chat-widget-button shadow">
-                <i class="fas fa-comments"></i>
-                <span class="chat-label">Chat with us</span>
+               class="doa-float-btn doa-float-btn--chat chat-widget-button shadow">
+                <i class="fas fa-comments" aria-hidden="true"></i>
+                <span class="doa-float-label chat-label">Chat with us</span>
             </a>
         </div>
     {% endif %}

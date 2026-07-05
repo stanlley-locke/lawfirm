@@ -1,0 +1,52 @@
+{# Dual office map section — Kisumu (primary) + Kwale County #}
+<section class="map-section section-block section-cream" id="{{ map_section_id | default('location') }}">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Find Us</span>
+            <h2>Our Office Location</h2>
+            <p class="section-subtitle">Visit our Kisumu office at Tumaini Mall, Milimani — we also serve clients from our Kwale County office</p>
+        </div>
+        <div class="map-grid animate-on-scroll">
+            <article class="map-card">
+                <div class="map-card__header">
+                    <h3 class="map-card__title">Kisumu Office</h3>
+                    <address class="map-card__address">
+                        Tumaini Mall, 1st Floor, Suite 108<br>
+                        Ring Road – Milimani, Kisumu City
+                        {% if show_kisumu_po_box %}
+                        <br>P.O. Box 7275 – 40100, Kisumu
+                        {% endif %}
+                    </address>
+                </div>
+                <div class="map-card__frame">
+                    <iframe src="https://maps.google.com/maps?q=Tumaini+Mall+Milimani+Kisumu+Suite+108&amp;z=15&amp;output=embed"
+                            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            title="Kisumu office map — Tumaini Mall, Milimani"></iframe>
+                </div>
+                <div class="map-card__footer">
+                    <a href="https://maps.google.com/?q=Tumaini+Mall+Milimani+Kisumu+Suite+108"
+                       class="map-card__directions link-arrow" target="_blank" rel="noopener noreferrer">Get directions</a>
+                </div>
+            </article>
+
+            <article class="map-card">
+                <div class="map-card__header">
+                    <h3 class="map-card__title">Kwale County Office</h3>
+                    <address class="map-card__address">
+                        Kwale Town<br>
+                        Kwale County, Kenya
+                    </address>
+                </div>
+                <div class="map-card__frame">
+                    <iframe src="https://maps.google.com/maps?q=Kwale+Town+Kwale+County+Kenya&amp;z=14&amp;output=embed"
+                            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            title="Kwale County office map — Kwale Town"></iframe>
+                </div>
+                <div class="map-card__footer">
+                    <a href="https://maps.google.com/?q=Kwale+Town+Kwale+County+Kenya"
+                       class="map-card__directions link-arrow" target="_blank" rel="noopener noreferrer">Get directions</a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>

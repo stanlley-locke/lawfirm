@@ -144,6 +144,7 @@ def new_team_member():
             bio=form.bio.data,
             email=form.email.data,
             phone=form.phone.data,
+            practice_number=form.practice_number.data,
             photo_url=form.photo_url.data,
             linkedin=form.linkedin.data,
             twitter=form.twitter.data,
@@ -174,6 +175,7 @@ def edit_team_member(id):
         team_member.bio = form.bio.data
         team_member.email = form.email.data
         team_member.phone = form.phone.data
+        team_member.practice_number = form.practice_number.data
         team_member.photo_url = form.photo_url.data
         team_member.linkedin = form.linkedin.data
         team_member.twitter = form.twitter.data
@@ -831,7 +833,7 @@ def generate_document():
             amount = request.form.get('amount', '0.00')
             reason = request.form.get('reason', 'unpaid services')
             deadline = request.form.get('deadline_date', '7 days from date hereof')
-            advocate = request.form.get('advocate_name', 'Dan Ochieng, Advocate')
+            advocate = request.form.get('advocate_name', 'Ochieng Erick Daniel, Advocate')
             
             story.append(Paragraph("FORMAL LETTER OF DEMAND", title_style))
             story.append(Spacer(1, 15))

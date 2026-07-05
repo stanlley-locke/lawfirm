@@ -2,24 +2,147 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-<div class="page-header">
+{% set blog_hero_images = [
+    url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp'),
+    url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.webp'),
+    url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp'),
+    url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp')
+] %}
+{% set hero_image = blog_hero_images[post.id % blog_hero_images|length] %}
+
+<div class="page-header blog-article-hero" style="background-image: url('{{ hero_image }}');">
     <div class="container">
-        <h1>{{ post.title }}</h1>
-        <p class="text-white-50 mb-0">{{ post.published_at.strftime('%B %d, %Y') if post.published_at }}</p>
+        <h1 class="page-hero-title">{{ post.title }}</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.blog') }}">News</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ post.title|truncate(40) }}</li>
+            </ol>
+        </nav>
     </div>
 </div>
-<section class="section-block section-white">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4 p-lg-5 content-body">
-                        {{ post.content|safe }}
+
+<article class="blog-article">
+    <section class="section-block section-cream blog-article__intro">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    <div class="blog-article__meta animate-on-scroll">
+                        {% if post.published_at %}
+                        <time class="blog-article__date-badge" datetime="{{ post.published_at.isoformat() }}">{{ post.published_at.strftime('%B %d, %Y') }}</time>
+                        {% endif %}
+                        {% if post.author %}
+                        <span class="blog-article__author">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+                            {{ post.author.username }}
+                        </span>
+                        {% endif %}
                     </div>
+                    {% if post.summary %}
+                    <p class="blog-article__lead animate-on-scroll">{{ post.summary|striptags }}</p>
+                    {% endif %}
                 </div>
-                <a href="{{ url_for('main.blog') }}" class="link-arrow mt-4 d-inline-block">&larr; Back to Blog</a>
             </div>
         </div>
+    </section>
+
+    <section class="section-block section-white blog-article__body">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    <figure class="blog-article__featured animate-on-scroll">
+                        <img src="{{ hero_image }}"
+                             alt=""
+                             class="blog-article__featured-img"
+                             width="960"
+                             height="540"
+                             loading="eager">
+                    </figure>
+
+                    <div class="blog-article__content content-body animate-on-scroll">
+                        {{ post.content|safe }}
+                    </div>
+
+                    <div class="blog-article__actions animate-on-scroll">
+                        <a href="{{ url_for('main.blog') }}" class="blog-article__back">&larr; Back to News</a>
+                        <div class="blog-article__share">
+                            <span class="blog-article__share-label">Share</span>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}"
+                               class="blog-article__share-link"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="Share on LinkedIn">
+                                <i class="bi bi-linkedin" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.url|urlencode }}&text={{ post.title|urlencode }}"
+                               class="blog-article__share-link"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="Share on X">
+                                <i class="bi bi-twitter-x" aria-hidden="true"></i>
+                            </a>
+                            <button type="button"
+                                    class="blog-article__share-link blog-article__share-copy"
+                                    data-share-url="{{ request.url }}"
+                                    aria-label="Copy link">
+                                <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if related_posts %}
+    <section class="section-block section-blue blog-article__related" aria-labelledby="blog-related-heading">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-eyebrow">Keep Reading</span>
+                <h2 id="blog-related-heading">Related Articles</h2>
+                <p class="section-subtitle">More insights from our legal team</p>
+            </div>
+            <div class="row g-4">
+                {% for post in related_posts %}
+                <div class="col-md-6 col-lg-4">
+                    {% include 'partials/blog_card.html' %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</article>
+
+<section class="cta-section blog-article-cta">
+    <div class="container text-center">
+        <span class="section-eyebrow">Get in Touch</span>
+        <h2 class="mb-4">Need Legal Guidance?</h2>
+        <p class="lead mb-4 section-subtitle">Speak with an advocate about how this topic applies to your situation.</p>
+        <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Schedule a Consultation</a>
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+(function () {
+    var copyBtn = document.querySelector('.blog-article__share-copy');
+    if (!copyBtn) return;
+    copyBtn.addEventListener('click', function () {
+        var url = copyBtn.getAttribute('data-share-url');
+        if (!url || !navigator.clipboard) return;
+        navigator.clipboard.writeText(url).then(function () {
+            copyBtn.classList.add('is-copied');
+            copyBtn.setAttribute('aria-label', 'Link copied');
+            setTimeout(function () {
+                copyBtn.classList.remove('is-copied');
+                copyBtn.setAttribute('aria-label', 'Copy link');
+            }, 2000);
+        });
+    });
+})();
+</script>
 {% endblock %}

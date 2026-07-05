@@ -2,42 +2,53 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-{% set hero_bg = url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.jpg') %}
-<!-- Hero — our_services_page.png -->
-<section class="hero-section hero-page" style="background-image: url('{{ hero_bg }}');">
-    <div class="container hero-content">
-        <h1 class="hero-page-title">Services</h1>
-    </div>
-</section>
+{% set hero_bg = url_for('static', filename='images/assets/tingey-injury-law-firm-yCdPU73kGSc-unsplash.webp') %}
 
-<!-- Intro — our_services_page.png -->
-<section class="section-block section-white">
+<!-- Hero -->
+<div class="page-header" style="background-image: url('{{ hero_bg }}');">
     <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-5">
-                <h2>Tailored Legal Solutions, Exceptional Results</h2>
+        <h1 class="page-hero-title">Services</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Services</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Intro -->
+<section class="section-block section-cream services-intro" aria-labelledby="services-intro-heading">
+    <div class="container">
+        <div class="row g-4 g-lg-5 align-items-start services-intro__grid">
+            <div class="col-lg-5 services-intro__heading-col">
+                <span class="section-eyebrow animate-on-scroll">Legal Services</span>
+                <h2 id="services-intro-heading" class="services-intro__title animate-on-scroll">Tailored Legal Solutions, Exceptional Results</h2>
             </div>
-            <div class="col-lg-7">
-                <p>We offer a wide range of legal services to meet the needs of individuals, businesses, and organizations. Our attorneys bring expertise and experience to every case, ensuring that you receive the highest quality legal representation.</p>
-                <p>From land law and commercial transactions to family matters and civil litigation, we develop customized strategies aligned with your objectives.</p>
-                <a href="{{ url_for('contact.contact') }}" class="link-arrow mt-2 d-inline-block">Learn more</a>
+            <div class="col-lg-7 services-intro__body-col">
+                <div class="services-intro__body animate-on-scroll">
+                    <p>We offer a wide range of legal services to meet the needs of individuals, businesses, and organizations. Our attorneys bring expertise and experience to every case, ensuring that you receive the highest quality legal representation.</p>
+                    <p>From land matters and civil litigation to conveyancing, employment law, mergers and acquisitions, and insurance running-down claims, we develop customized strategies aligned with your objectives.</p>
+                    <a href="{{ url_for('main.about') }}" class="btn btn-outline-primary services-intro__cta">Learn more</a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Services grid — practice_areas.png -->
-<section class="section-block section-cream">
+<!-- Practice Areas -->
+<section class="section-block section-white practice-areas-section" id="practice-areas">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">What We Do</span>
             <h2>Practice Areas</h2>
             <p class="section-subtitle">Expert counsel across a broad range of legal disciplines</p>
         </div>
         {% if services %}
-        <div class="row">
+        <div class="row g-4">
             {% for service in services %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="practice-card">
+            <div class="col-md-6 col-lg-4">
+                <div class="practice-card card-lift animate-on-scroll" data-slug="{{ service.slug }}" style="--i: {{ loop.index0 }};">
                     <div class="practice-icon">
                         <i class="{{ service.icon or 'fas fa-balance-scale' }}"></i>
                     </div>
@@ -49,7 +60,7 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center">
+        <div class="text-center animate-on-scroll">
             <p class="text-muted">Our services are currently being updated. Please check back soon.</p>
             <a href="{{ url_for('contact.contact') }}" class="btn btn-primary mt-3">Contact Us</a>
         </div>
@@ -57,76 +68,54 @@
     </div>
 </section>
 
-<!-- Process steps — our_services_page.png -->
-<section class="section-block section-white">
+<!-- Our Legal Approach -->
+<section class="section-block section-blue legal-approach" aria-labelledby="legal-approach-heading">
     <div class="container">
-        <div class="section-header">
-            <h2>Our Legal Approach</h2>
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">How We Work</span>
+            <h2 id="legal-approach-heading">Our Legal Approach</h2>
             <p class="section-subtitle">How we work with you to achieve successful outcomes</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="process-card">
-                        <div>
-                            <h3>1. Schedule a Time</h3>
-                            <p>We begin by understanding your specific situation and objectives through comprehensive consultation.</p>
-                        </div>
-                        <div class="process-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="row g-4 legal-approach__grid">
+            <div class="col-md-6 col-lg-3">
+                <article class="process-step card-lift animate-on-scroll" style="--i: 0;">
+                    <span class="process-step__badge" aria-hidden="true">1</span>
+                    <div class="process-step__icon" aria-hidden="true">
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
-                </div>
+                    <h3>Schedule a Time</h3>
+                    <p>We begin by understanding your specific situation and objectives through a comprehensive initial consultation.</p>
+                </article>
             </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="process-card">
-                        <div>
-                            <h3>2. Meet a Consultant</h3>
-                            <p>We thoroughly evaluate your case, identifying strengths, challenges, and optimal legal strategies.</p>
-                        </div>
-                        <div class="process-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="col-md-6 col-lg-3">
+                <article class="process-step card-lift animate-on-scroll" style="--i: 1;">
+                    <span class="process-step__badge" aria-hidden="true">2</span>
+                    <div class="process-step__icon" aria-hidden="true">
+                        <i class="fas fa-user-tie"></i>
                     </div>
-                </div>
+                    <h3>Meet a Consultant</h3>
+                    <p>We thoroughly evaluate your case, identifying strengths, challenges, and the optimal legal strategies available.</p>
+                </article>
             </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="process-card">
-                        <div>
-                            <h3>3. Plan Your Case</h3>
-                            <p>We create a customized legal plan that addresses your unique circumstances and goals.</p>
-                        </div>
-                        <div class="process-icon"><i class="fas fa-handshake"></i></div>
+            <div class="col-md-6 col-lg-3">
+                <article class="process-step card-lift animate-on-scroll" style="--i: 2;">
+                    <span class="process-step__badge" aria-hidden="true">3</span>
+                    <div class="process-step__icon" aria-hidden="true">
+                        <i class="fas fa-handshake"></i>
                     </div>
-                </div>
+                    <h3>Plan Your Case</h3>
+                    <p>We create a customized legal plan that addresses your unique circumstances, timeline, and goals.</p>
+                </article>
             </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="process-card">
-                        <div>
-                            <h3>4. Execute with Excellence</h3>
-                            <p>We implement your legal strategy with skill and determination while keeping you informed.</p>
-                        </div>
-                        <div class="process-icon"><i class="fas fa-gavel"></i></div>
+            <div class="col-md-6 col-lg-3">
+                <article class="process-step card-lift animate-on-scroll" style="--i: 3;">
+                    <span class="process-step__badge" aria-hidden="true">4</span>
+                    <div class="process-step__icon" aria-hidden="true">
+                        <i class="fas fa-gavel"></i>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA banner -->
-<section class="cta-banner">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-md-3 text-center text-md-start">
-                <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}"
-                     alt="" class="cta-banner-img" aria-hidden="true">
-            </div>
-            <div class="col-md-6">
-                <h3>Have Legal Questions? Ask Our Experts!</h3>
-                <p>Contact our team today to discuss your legal needs and how we can help.</p>
-            </div>
-            <div class="col-md-3 text-center text-md-end">
-                <a href="{{ url_for('contact.contact') }}" class="btn btn-white">Ask an Expert</a>
+                    <h3>Execute with Excellence</h3>
+                    <p>We implement your legal strategy with skill and determination while keeping you informed at every stage.</p>
+                </article>
             </div>
         </div>
     </div>

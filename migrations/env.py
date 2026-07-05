@@ -4,6 +4,16 @@ from logging.config import fileConfig
 from flask import current_app
 
 from alembic import context
+from alembic.ddl.sqlite import SQLiteImpl
+
+try:
+    import sqlalchemy_sqlitecloud  # noqa: F401 — registers SQLAlchemy dialect
+except ImportError:
+    pass
+
+
+class SQLiteCloudImpl(SQLiteImpl):
+    __dialect__ = 'sqlitecloud'
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

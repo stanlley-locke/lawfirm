@@ -5,8 +5,8 @@
 <!-- Page Header -->
 <div class="page-header">
     <div class="container">
-        <h1>{{ case_study.title }}</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">{{ case_study.title }}</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item"><a href="{{ url_for('main.case_studies') }}">Case Studies</a></li>
@@ -83,20 +83,14 @@
                 <!-- Related Case Studies -->
                 {% if related_cases %}
                 <div class="mt-5">
-                    <h3 class="mb-4">Related Case Studies</h3>
-                    <div class="row">
+                    <div class="section-header text-start mb-4">
+                        <span class="section-eyebrow">Related</span>
+                        <h3 class="h4 mb-0">Related Case Studies</h3>
+                    </div>
+                    <div class="row g-4">
                         {% for case in related_cases %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 case-study-card">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title h5">{{ case.title }}</h4>
-                                    {% if case.client %}
-                                    <p class="text-muted mb-3">Client: {{ case.client }}</p>
-                                    {% endif %}
-                                    <p class="card-text">{{ case.summary|truncate(100) }}</p>
-                                    <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="link-arrow">Read more</a>
-                                </div>
-                            </div>
+                        <div class="col-md-6">
+                            {% include 'partials/case_study_card.html' %}
                         </div>
                         {% endfor %}
                     </div>

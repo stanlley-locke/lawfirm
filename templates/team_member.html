@@ -5,8 +5,8 @@
 <!-- Page Header -->
 <div class="page-header">
     <div class="container">
-        <h1>{{ team_member.name }}</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">{{ team_member.name }}</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item"><a href="{{ url_for('main.team') }}">Our Team</a></li>
@@ -17,51 +17,62 @@
 </div>
 
 <!-- Team Member Profile Section -->
-<section class="section-block section-white">
+<section class="section-block section-navy-light">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-4 mb-4 mb-lg-0">
-                <div class="card text-center">
-                    <div class="card-body p-4">
-                        {% if team_member.photo_src %}
-                        <div class="mb-4">
-                            <img src="{{ team_member.photo_src }}" alt="{{ team_member.name }}" class="rounded-circle img-fluid" style="width: 220px; height: 220px; object-fit: cover;">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <aside class="team-profile-card">
+                    <div class="team-card team-card--profile">
+                        <div class="team-card__photo-wrap">
+                            {% if team_member.photo_src %}
+                            <img src="{{ team_member.photo_src }}" alt="" class="team-card__photo" width="400" height="533" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp') }}';">
+                            {% else %}
+                            <div class="team-card__photo-placeholder" aria-hidden="true">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% else %}
-                        <div class="mb-4">
-                            <i class="fas fa-user-circle" style="font-size: 8rem;"></i>
-                        </div>
-                        {% endif %}
-                        <h2 class="card-title h3">{{ team_member.name }}</h2>
-                        <p class="text-muted mb-3">{{ team_member.position }}</p>
-                        
-                        <div class="team-contact mt-4">
-                            {% if team_member.email %}
-                            <p class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:{{ team_member.email }}">{{ team_member.email }}</a></p>
+                        <div class="team-card__body">
+                            <h2 class="team-card__name">{{ team_member.name }}</h2>
+                            {% if team_member.position and team_member.position|trim|lower != team_member.name|trim|lower %}
+                            <p class="team-card__role">{{ team_member.position }}</p>
+                            {% endif %}
+                            <div class="team-contact">
+                                {% if team_member.email %}
+                                <p class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:{{ team_member.email }}">{{ team_member.email }}</a></p>
+                                {% endif %}
+                            {% if team_member.practice_number %}
+                            <p class="mb-2"><i class="fas fa-id-card me-2"></i>{{ team_member.practice_number }}</p>
                             {% endif %}
                             {% if team_member.phone %}
-                            <p class="mb-2"><i class="fas fa-phone me-2"></i>{{ team_member.phone }}</p>
+                            <p class="mb-2 team-contact-phone">
+                                <i class="fas fa-phone me-2" aria-hidden="true"></i>
+                                {% for part in team_member.phone|phone_links %}
+                                <a href="tel:{{ part.href }}">{{ part.display }}</a>{% if not loop.last %}<span class="team-contact-phone__sep"> / </span>{% endif %}
+                                {% endfor %}
+                            </p>
                             {% endif %}
-                        </div>
-                        
-                        <div class="team-social mt-4">
-                            {% if team_member.linkedin %}
-                            <a href="{{ team_member.linkedin }}" target="_blank" class="btn btn-outline-primary me-2" aria-label="LinkedIn"><i class="fab fa-linkedin-in me-2"></i>LinkedIn</a>
-                            {% endif %}
-                            {% if team_member.twitter %}
-                            <a href="{{ team_member.twitter }}" target="_blank" class="btn btn-outline-info" aria-label="Twitter"><i class="fab fa-twitter me-2"></i>Twitter</a>
-                            {% endif %}
+                            </div>
+                            <div class="team-social">
+                                {% if team_member.linkedin %}
+                                <a href="{{ team_member.linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                {% endif %}
+                                {% if team_member.twitter %}
+                                <a href="{{ team_member.twitter }}" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </aside>
                 
-                <div class="card mt-4">
+                <div class="card mt-4 team-profile-cta">
                     <div class="card-header">
                         <h3 class="h5 mb-0">Schedule a Consultation</h3>
                     </div>
                     <div class="card-body">
                         <p>Interested in working with {{ team_member.name }}? Contact us to schedule a consultation.</p>
-                        <a href="{{ url_for('contact.contact') }}" class="btn btn-primary w-100">Contact Now</a>
+                        <a href="{{ team_member.name|consultation_mailto }}" class="btn btn-primary w-100 mb-2">Email {{ team_member.name.split()[0] }}</a>
+                        <a href="{{ url_for('contact.contact') }}" class="btn btn-outline-primary w-100">Contact Form</a>
                     </div>
                 </div>
             </div>
@@ -78,84 +89,43 @@
                     </div>
                 </div>
                 
-                <!-- Expertise Section -->
+                {% if team_member.practice_number %}
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h3 class="h5 mb-0">Areas of Expertise</h3>
+                        <h3 class="h5 mb-0">Credentials</h3>
                     </div>
                     <div class="card-body">
+                        <p class="mb-2"><i class="fas fa-id-card me-2 text-primary"></i><strong>Advocate Practice Number:</strong> {{ team_member.practice_number }}</p>
+                        <p class="mb-0 text-muted">Admitted to practice before courts in Kenya.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Firm Practice Areas</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Dan Ochieng &amp; Company Advocates provides full-service legal counsel including:</p>
                         <div class="row">
                             <div class="col-md-6">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Corporate Law</li>
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Contract Negotiation</li>
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Business Litigation</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Land Matters</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>General Civil Litigation</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Conveyances &amp; Property</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Arbitration &amp; ADR</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Employment Law</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Mergers & Acquisitions</li>
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Intellectual Property</li>
-                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Regulatory Compliance</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Mergers, Acquisitions &amp; Joint Ventures</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Bank Securities</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Company Law &amp; Business Registration</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Family Law, Wills &amp; Estates</li>
+                                    <li class="list-group-item"><i class="fas fa-check text-primary me-2"></i>Insurance Law (Running Down)</li>
                                 </ul>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Education and Credentials -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h3 class="h5 mb-0">Education & Credentials</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h4 class="h6">Education</h4>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-graduation-cap me-2 text-primary"></i>J.D., Harvard Law School</li>
-                                <li class="mb-2"><i class="fas fa-graduation-cap me-2 text-primary"></i>B.A., Political Science, Yale University</li>
-                            </ul>
-                        </div>
-                        <div class="mb-4">
-                            <h4 class="h6">Bar Admissions</h4>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-gavel me-2 text-primary"></i>State Bar of California</li>
-                                <li class="mb-2"><i class="fas fa-gavel me-2 text-primary"></i>U.S. District Court, Northern District of California</li>
-                                <li class="mb-2"><i class="fas fa-gavel me-2 text-primary"></i>U.S. Court of Appeals, Ninth Circuit</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="h6">Professional Associations</h4>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-users me-2 text-primary"></i>American Bar Association</li>
-                                <li class="mb-2"><i class="fas fa-users me-2 text-primary"></i>State Bar Association</li>
-                                <li class="mb-2"><i class="fas fa-users me-2 text-primary"></i>Local County Bar Association</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Publications & Speaking -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="h5 mb-0">Publications & Speaking Engagements</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h4 class="h6">Publications</h4>
-                            <ul>
-                                <li class="mb-2">"Navigating the Complexities of Corporate Law," Legal Journal, 2022</li>
-                                <li class="mb-2">"The Future of Contract Law in a Digital Age," Business Law Review, 2021</li>
-                                <li class="mb-2">"Understanding Intellectual Property Rights," Corporate Counsel Magazine, 2020</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="h6">Speaking Engagements</h4>
-                            <ul>
-                                <li class="mb-2">"Corporate Compliance in a Changing Regulatory Environment," Annual Business Law Conference, 2022</li>
-                                <li class="mb-2">"Best Practices in Contract Negotiation," Legal Tech Summit, 2021</li>
-                                <li class="mb-2">"Protecting Your Business Through Effective Legal Strategies," Business Owner's Workshop, 2020</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -165,36 +135,24 @@
 </section>
 
 <!-- Other Team Members Section -->
-<section class="cta-section">
+<section class="section-block section-blue team-section">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Our People</span>
             <h2>Meet More of Our Team</h2>
-            <p class="lead">Our diverse team of attorneys brings expertise across multiple practice areas</p>
+            <p class="section-subtitle">Our team of advocates and support staff brings expertise across multiple practice areas</p>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for member in team_members if member.id != team_member.id %}
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 team-card text-center">
-                    <div class="card-body p-4">
-                        {% if member.photo_src %}
-                        <div class="mb-3">
-                            <img src="{{ member.photo_src }}" alt="{{ member.name }}" class="rounded-circle img-fluid" style="width: 120px; height: 120px; object-fit: cover;">
-                        </div>
-                        {% else %}
-                        <div class="mb-3">
-                            <i class="fas fa-user-circle" style="font-size: 4rem;"></i>
-                        </div>
-                        {% endif %}
-                        <h3 class="card-title h5">{{ member.name }}</h3>
-                        <p class="text-muted">{{ member.position }}</p>
-                        <a href="{{ url_for('main.team_member', slug=member.slug) }}" class="link-arrow mt-3 d-inline-block">View profile</a>
-                    </div>
-                </div>
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                {% set show_bio = false %}
+                {% set show_social = false %}
+                {% include 'partials/team_card.html' %}
             </div>
             {% endfor %}
         </div>
         <div class="text-center mt-4">
-            <a href="{{ url_for('main.team') }}" class="btn btn-white">View All Team Members</a>
+            <a href="{{ url_for('main.team') }}" class="btn btn-primary">View All Team Members</a>
         </div>
     </div>
 </section>

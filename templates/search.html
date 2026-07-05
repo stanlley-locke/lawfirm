@@ -4,7 +4,13 @@
 {% block content %}
 <div class="page-header">
     <div class="container">
-        <h1>Search</h1>
+        <h1 class="page-hero-title">Search</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Search</li>
+            </ol>
+        </nav>
         <form action="{{ url_for('main.search') }}" method="get" class="mt-4 mx-auto" style="max-width: 520px;">
             <div class="input-group">
                 <input type="search" name="q" class="form-control" value="{{ query }}" placeholder="Search services, cases, blog...">

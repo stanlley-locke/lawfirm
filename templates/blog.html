@@ -2,40 +2,91 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-<div class="page-header">
+{% set header_bg = url_for('static', filename='images/assets/mikhail-pavstyuk-EKy2OTRPXdw-unsplash.webp') %}
+
+<div class="page-header blog-page-hero" style="background-image: url('{{ header_bg }}');">
     <div class="container">
-        <h1>Our Blog</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">News &amp; Insights</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">News</li>
             </ol>
         </nav>
+        <p class="page-hero-lead">Legal news, insights, and updates from our advocates in Kisumu and Kwale County.</p>
     </div>
 </div>
 
-<section class="section-block section-cream">
+<section class="section-block section-cream blog-page-intro" aria-labelledby="blog-intro-heading">
     <div class="container">
-        <div class="section-header">
-            <p class="section-subtitle">Legal news, insights, and updates from our team</p>
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Insights</span>
+            <h2 id="blog-intro-heading">Legal News &amp; Updates</h2>
+            <p class="section-subtitle">Stay informed with commentary on Kenyan law, firm announcements, and practical guidance from Dan Ochieng &amp; Company Advocates.</p>
         </div>
+    </div>
+</section>
+
+<section class="section-block section-navy-light blog-page blog-listing" aria-labelledby="blog-listing-heading">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Latest</span>
+            <h2 id="blog-listing-heading">All Articles</h2>
+            {% if pagination and pagination.total %}
+            <p class="section-subtitle">{{ pagination.total }} published article{{ 's' if pagination.total != 1 else '' }}</p>
+            {% endif %}
+        </div>
+
         {% if posts %}
-        <div class="row">
+        <div class="row g-4 blog-listing__grid">
             {% for post in posts %}
-            <div class="col-md-4 mb-4">
-                <article class="blog-card">
-                    <div class="blog-thumb mb-3"></div>
-                    <div class="blog-date">{{ post.published_at.strftime('%B %d, %Y') if post.published_at }}</div>
-                    <h2 class="h5"><a href="{{ url_for('main.blog_detail', slug=post.slug) }}">{{ post.title }}</a></h2>
-                    <p class="text-muted small">{{ post.summary|striptags|truncate(100) }}</p>
-                    <a href="{{ url_for('main.blog_detail', slug=post.slug) }}" class="link-arrow">Read more</a>
-                </article>
+            <div class="col-md-6 col-lg-4">
+                {% include 'partials/blog_card.html' %}
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <p class="text-center text-muted">No blog posts published yet.</p>
+
+        {% if pagination and pagination.pages > 1 %}
+        <nav class="blog-pagination animate-on-scroll" aria-label="Blog pagination">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item{% if not pagination.has_prev %} disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.blog', page=pagination.prev_num) if pagination.has_prev else '#' }}"{% if not pagination.has_prev %} tabindex="-1" aria-disabled="true"{% endif %}>&larr; Previous</a>
+                </li>
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                <li class="page-item{% if page_num == pagination.page %} active{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.blog', page=page_num) }}"{% if page_num == pagination.page %} aria-current="page"{% endif %}>{{ page_num }}</a>
+                </li>
+                    {% else %}
+                <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item{% if not pagination.has_next %} disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.blog', page=pagination.next_num) if pagination.has_next else '#' }}"{% if not pagination.has_next %} tabindex="-1" aria-disabled="true"{% endif %}>Next &rarr;</a>
+                </li>
+            </ul>
+        </nav>
         {% endif %}
+
+        {% else %}
+        <div class="blog-empty animate-on-scroll">
+            <div class="blog-empty__icon" aria-hidden="true">
+                <i class="bi bi-journal-text"></i>
+            </div>
+            <h3 class="blog-empty__title">No articles yet</h3>
+            <p class="blog-empty__text">We are preparing legal insights and firm updates. Check back soon, or contact us for immediate assistance.</p>
+            <a href="{{ url_for('contact.contact') }}" class="btn btn-primary">Contact Us</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="cta-section blog-page-cta">
+    <div class="container text-center">
+        <span class="section-eyebrow">Get in Touch</span>
+        <h2 class="mb-4">Have a Legal Question?</h2>
+        <p class="lead mb-4 section-subtitle">Our advocates are ready to discuss your matter and outline a clear path forward.</p>
+        <a href="{{ url_for('contact.contact') }}" class="btn btn-white btn-lg">Schedule a Consultation</a>
     </div>
 </section>
 {% endblock %}

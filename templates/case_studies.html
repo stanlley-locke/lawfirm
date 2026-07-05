@@ -2,10 +2,14 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-<div class="page-header">
+{% set header_bg = url_for('static', filename='images/assets/giammarco-boscaro-zeH-ljawHtg-unsplash.webp') %}
+{% set featured_cases = case_studies|selectattr('featured')|list %}
+
+<!-- Page hero -->
+<div class="page-header case-studies-hero" style="background-image: url('{{ header_bg }}');">
     <div class="container">
-        <h1>Case Studies</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">Case Studies</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Case Studies</li>
@@ -14,48 +18,75 @@
     </div>
 </div>
 
-<section class="section-block section-cream">
+<!-- Intro -->
+<section class="section-block section-cream case-studies-intro" aria-labelledby="case-studies-intro-heading">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Success Stories</span>
+            <h2 id="case-studies-intro-heading">Real Results for Real Clients</h2>
             <p class="section-subtitle">Explore how we've helped our clients achieve successful legal outcomes through strategic representation and expert counsel.</p>
         </div>
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-6">
-                <label for="serviceFilter" class="form-label fw-semibold">Filter by Practice Area:</label>
-                <select id="serviceFilter" class="form-select">
-                    <option value="all">All Practice Areas</option>
-                    <option value="none">No Specific Practice Area</option>
-                    {% for service in services %}
-                    <option value="{{ service.id }}">{{ service.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    </div>
+</section>
+
+{% if featured_cases %}
+<!-- Featured cases -->
+<section class="section-block section-navy-light case-studies-featured" aria-labelledby="case-studies-featured-heading">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Highlighted</span>
+            <h2 id="case-studies-featured-heading">Featured Case Studies</h2>
+            <p class="section-subtitle">Selected matters that demonstrate our approach and the outcomes we deliver</p>
         </div>
-        {% if case_studies %}
-        <div class="row">
-            {% for case in case_studies %}
-            <div class="col-md-6 col-lg-4 mb-4 case-study-item" data-service-id="{{ case.service_id|default('none') }}">
-                <div class="card h-100 case-study-card">
-                    <div class="card-body p-4">
-                        <h2 class="h5">{{ case.title }}</h2>
-                        {% if case.client %}<p class="text-muted small">Client: {{ case.client }}</p>{% endif %}
-                        {% if case.service %}
-                        <span class="badge bg-secondary mb-2">{{ case.service.title }}</span>
-                        {% endif %}
-                        {% if case.featured %}<span class="badge badge-featured mb-2">Featured</span>{% endif %}
-                        <p>{{ case.summary|truncate(150) }}</p>
-                        <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="link-arrow">Read more</a>
-                    </div>
-                </div>
+        <div class="row g-4">
+            {% for case in featured_cases %}
+            <div class="col-md-6 col-lg-4">
+                {% set show_badges = true %}
+                {% include 'partials/case_study_card.html' %}
             </div>
             {% endfor %}
         </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- All case studies -->
+<section class="section-block section-blue case-studies-all" aria-labelledby="case-studies-all-heading">
+    <div class="container">
+        <div class="section-header animate-on-scroll">
+            <span class="section-eyebrow">Browse</span>
+            <h2 id="case-studies-all-heading">All Case Studies</h2>
+            <p class="section-subtitle">Filter by practice area to find matters relevant to your situation</p>
+        </div>
+
+        <div class="case-studies-filter animate-on-scroll">
+            <label for="serviceFilter" class="form-label">Filter by Practice Area</label>
+            <select id="serviceFilter" class="form-select">
+                <option value="all">All Practice Areas</option>
+                <option value="none">No Specific Practice Area</option>
+                {% for service in services %}
+                <option value="{{ service.id }}">{{ service.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if case_studies %}
+        <div class="row g-4">
+            {% for case in case_studies %}
+            <div class="col-md-6 col-lg-4 case-study-item" data-service-id="{{ case.service_id|default('none') }}" style="--i: {{ loop.index0 }};">
+                {% set show_badges = true %}
+                {% include 'partials/case_study_card.html' %}
+            </div>
+            {% endfor %}
+        </div>
+        <p id="caseStudiesNoResults" class="case-studies-empty d-none">No case studies match the selected practice area.</p>
         {% else %}
-        <p class="text-center text-muted">No case studies available at the moment.</p>
+        <p class="case-studies-empty">No case studies available at the moment.</p>
         {% endif %}
     </div>
 </section>
 
+<!-- CTA -->
 <section class="cta-section">
     <div class="container text-center">
         <h2 class="mb-4">Need Legal Assistance?</h2>

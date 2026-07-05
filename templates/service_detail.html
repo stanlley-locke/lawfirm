@@ -4,8 +4,8 @@
 {% block content %}
 <div class="page-header">
     <div class="container">
-        <h1>{{ service.title }}</h1>
-        <nav aria-label="breadcrumb">
+        <h1 class="page-hero-title">{{ service.title }}</h1>
+        <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
                 <li class="breadcrumb-item"><a href="{{ url_for('main.services') }}">Services</a></li>
@@ -39,16 +39,10 @@
 
                 {% if related_cases %}
                 <h2 class="h4 mb-4">Related Case Studies</h2>
-                <div class="row">
+                <div class="row g-4">
                     {% for case in related_cases %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 case-study-card">
-                            <div class="card-body p-4">
-                                <h3 class="h6">{{ case.title }}</h3>
-                                <p class="small">{{ case.summary|truncate(100) }}</p>
-                                <a href="{{ url_for('main.case_study_detail', slug=case.slug) }}" class="link-arrow">Read more</a>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        {% include 'partials/case_study_card.html' %}
                     </div>
                     {% endfor %}
                 </div>
@@ -60,8 +54,8 @@
                         <h2 class="h5 mb-3">Contact Us</h2>
                         <p class="small">Need assistance with {{ service.title }}? Contact our team for a consultation.</p>
                         <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-primary w-100 mb-3">Request a Consultation</a>
-                        <p class="small mb-1"><i class="fas fa-phone me-2"></i>0745 819 632</p>
-                        <p class="small mb-0"><i class="fas fa-envelope me-2"></i><a href="mailto:info@danochiengadvocates.com">info@danochiengadvocates.com</a></p>
+                        <p class="small mb-1"><i class="fas fa-phone me-2"></i><a href="tel:+254729116086">0729 116 086</a> / <a href="tel:+254734090411">0734 090 411</a></p>
+                        <p class="small mb-0"><i class="fas fa-envelope me-2"></i><a href="mailto:danochiengadvocates@gmail.com">danochiengadvocates@gmail.com</a></p>
                     </div>
                 </div>
                 <div class="card">
