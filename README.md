@@ -177,7 +177,7 @@ export SQLITECLOUD_CONNECTION_STRING="sqlitecloud://host:8860/lawfirm.db?apikey=
 # ... other production secrets (SESSION_SECRET, ADMIN_PASSWORD, RESEND_API_KEY)
 
 flask db upgrade
-gunicorn -c gunicorn.conf.py "app:app"
+gunicorn -c gunicorn.conf.py wsgi:app
 ```
 
 ### Flask-Migrate notes
@@ -204,10 +204,36 @@ export SQLITECLOUD_CONNECTION_STRING="sqlitecloud://host:8860/lawfirm.db?apikey=
 
 pip install -r requirements-postgres.txt   # or: pip install -e ".[postgres]"
 flask db upgrade
-gunicorn -c gunicorn.conf.py "app:app"
+gunicorn -c gunicorn.conf.py wsgi:app
 ```
 
-Uses **gunicorn + eventlet** for SocketIO support. Set `SESSION_COOKIE_SECURE=True` (default in production config) when serving over HTTPS.
+Uses **gunicorn + eventlet** via `wsgi.py` (monkey-patch runs before Flask imports). Set `SESSION_COOKIE_SECURE=True` (default in production config) when serving over HTTPS.
+
+### Deploy on Render
+
+1. Connect the repo and use **Python 3.12** (`runtime.txt` pins `python-3.12.8`).
+2. **Build command:** `pip install -r requirements.txt`
+3. **Start command:** `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT wsgi:app`
+   - Alternative: `gunicorn -c gunicorn.conf.py wsgi:app`
+4. Set environment variables (see checklist below).
+5. Optional: use the included `render.yaml` Blueprint for one-click setup.
+
+**Render environment variables (required in production):**
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `FLASK_ENV` | Yes | Set to `production` |
+| `SESSION_SECRET` | Yes | Long random secret for session signing |
+| `ADMIN_PASSWORD` | Yes | Bootstrap password for first admin user |
+| `RESEND_API_KEY` | Yes | Resend transactional email API key |
+| `BASE_URL` | Yes | Public site URL, e.g. `https://your-app.onrender.com` |
+| `ALLOWED_ORIGINS` | Yes | Comma-separated CORS/SocketIO origins, e.g. `https://your-app.onrender.com` |
+| `USE_SQLITECLOUD` | If using cloud DB | Set to `true` |
+| `SQLITECLOUD_CONNECTION_STRING` | If using cloud DB | Full `sqlitecloud://...` connection string from dashboard |
+
+**Optional:** `ADMIN_USERNAME`, `ADMIN_EMAIL`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`, `CALENDLY_URL`, `DATABASE_URL` (local SQLite fallback when cloud is disabled).
+
+Do **not** use `gunicorn app:app` — that imports `app.py` before the eventlet monkey patch and breaks SocketIO/SQLAlchemy under eventlet workers.
 
 ## Migrations
 
@@ -230,6 +256,7 @@ CI runs automatically via GitHub Actions (`.github/workflows/ci.yml`).
 ```
 lawfirm/
 ├── app.py              # Application factory & dev entry point
+├── wsgi.py             # Production WSGI entry (eventlet monkey_patch)
 ├── config.py           # Central configuration
 ├── models.py           # SQLAlchemy models
 ├── routes/             # Blueprints (auth, admin, main, contact, chat)

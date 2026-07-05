@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: lawfirm
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT wsgi:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: SESSION_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: USE_SQLITECLOUD
+        sync: false
+      - key: SQLITECLOUD_CONNECTION_STRING
+        sync: false
+      - key: BASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false

@@ -57,7 +57,7 @@ def create_app(config_name=None):
     csrf.init_app(app)
 
     cors_origins = app.config.get('ALLOWED_ORIGINS') or ['http://localhost:5000']
-    async_mode = 'eventlet' if os.environ.get('FLASK_ENV') == 'production' else 'threading'
+    async_mode = 'eventlet' if config_name == 'production' else 'threading'
     socketio.init_app(
         app,
         cors_allowed_origins=cors_origins,
@@ -162,9 +162,13 @@ def create_app(config_name=None):
 
     validate_production_config(app)
     return app
-app = create_app()
 
 
 if __name__ == '__main__':
+    import eventlet
+
+    eventlet.monkey_patch()
+
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=app.debug)
+    dev_app = create_app()
+    socketio.run(dev_app, host='0.0.0.0', port=port, debug=dev_app.debug)

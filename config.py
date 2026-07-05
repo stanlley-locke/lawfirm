@@ -1,5 +1,7 @@
 import os
 
+from sqlalchemy.pool import NullPool
+
 
 def _env_bool(name, default='False'):
     return os.getenv(name, default).lower() in ('true', '1', 't', 'yes')
@@ -89,6 +91,8 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     SESSION_COOKIE_SECURE = True
+    # Eventlet workers + SQLAlchemy: disable pooling to avoid lock errors
+    SQLALCHEMY_ENGINE_OPTIONS = {'poolclass': NullPool}
 
 
 class TestingConfig(Config):
