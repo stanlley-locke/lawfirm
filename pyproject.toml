@@ -17,9 +17,15 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "reportlab>=4.2.5",
     "resend>=2.6.0",
+    "sqlalchemy-sqlitecloud>=0.1.2",
+    "sqlitecloud>=0.0.83",
 ]
 
 [project.optional-dependencies]
+sqlitecloud = [
+    "sqlalchemy-sqlitecloud>=0.1.2",
+    "sqlitecloud>=0.0.83",
+]
 postgres = [
     "psycopg2-binary>=2.9.10",
 ]

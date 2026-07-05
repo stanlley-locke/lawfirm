@@ -41,6 +41,16 @@ def create_app(config_name=None):
     app.config.from_object(config_by_name.get(config_name, config_by_name['development']))
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
+    if app.config.get('USE_SQLITECLOUD'):
+        try:
+            import sqlalchemy_sqlitecloud  # noqa: F401 - registers SQLAlchemy dialect
+        except ModuleNotFoundError as exc:
+            raise RuntimeError(
+                'SQLite Cloud is enabled (USE_SQLITECLOUD or SQLITECLOUD_CONNECTION_STRING) '
+                'but the cloud SQLAlchemy driver is not installed. '
+                'Run: pip install sqlalchemy-sqlitecloud sqlitecloud'
+            ) from exc
+
     db.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
@@ -110,8 +120,8 @@ def create_app(config_name=None):
             "https://cdn.replit.com https://cdn.tiny.cloud https://assets.calendly.com "
             "https://fonts.googleapis.com; "
             "img-src 'self' data: https:; "
-            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
-            "connect-src 'self' ws: wss: https://cdn.tiny.cloud; "
+            "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+            "connect-src 'self' ws: wss: https://cdn.tiny.cloud https://cdn.jsdelivr.net; "
             "frame-src https://www.google.com https://maps.google.com https://calendly.com; "
             "object-src 'none'; "
             "base-uri 'self'; "

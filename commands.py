@@ -1,3 +1,4 @@
+import os
 import click
 from datetime import datetime
 
@@ -94,3 +95,54 @@ def register_commands(app):
                 db.session.commit()
 
             click.echo('Demo content seeded successfully.')
+
+    @app.cli.command('test-sqlitecloud')
+    def test_sqlitecloud():
+        """Test SQLite Cloud native driver, Weblite REST, SQLAlchemy, and Flask-SQLAlchemy."""
+        import sqlitecloud
+        from sqlalchemy import create_engine, text
+        from models import User
+        from utils.sqlitecloud import (
+            WebliteClient,
+            get_sqlitecloud_connection_string,
+            redact_connection_string,
+        )
+
+        if not app.config.get('USE_SQLITECLOUD'):
+            click.echo(
+                'SQLite Cloud is not enabled. Set USE_SQLITECLOUD=true in .env first.'
+            )
+            raise SystemExit(1)
+
+        conn_str = get_sqlitecloud_connection_string()
+        click.echo(f'Connection: {redact_connection_string(conn_str)}')
+
+        if os.getenv('SQLITECLOUD_GATEWAY_URL'):
+            click.echo('Testing Weblite REST API...')
+            try:
+                client = WebliteClient()
+                databases = client.list_databases()
+                db_names = [item.get('name') for item in databases.get('data', [])]
+                click.echo(f'  Databases: {", ".join(db_names) or "(none)"}')
+            except RuntimeError as exc:
+                click.echo(f'  REST API: {exc}')
+                click.echo('  (Native driver is used for the app; REST is optional.)')
+
+        click.echo('Testing native sqlitecloud driver...')
+        conn = sqlitecloud.connect(conn_str)
+        cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [row[0] for row in cursor.fetchall()]
+        click.echo(f'  Tables: {", ".join(tables) or "(none)"}')
+        conn.close()
+
+        click.echo('Testing SQLAlchemy engine...')
+        import sqlalchemy_sqlitecloud  # noqa: F401 — registers dialect
+        engine = create_engine(conn_str)
+        with engine.connect() as connection:
+            result = connection.execute(text('SELECT COUNT(*) FROM user')).scalar()
+        click.echo(f'  User count (SQLAlchemy): {result}')
+
+        click.echo('Testing Flask-SQLAlchemy...')
+        user_count = User.query.count()
+        click.echo(f'  User count (Flask db): {user_count}')
+        click.echo('SQLite Cloud connection OK.')

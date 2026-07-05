@@ -5,7 +5,7 @@ Flask-based website and admin CMS for a Kisumu, Kenya law firm. Includes contact
 ## Requirements
 
 - **Python 3.12** recommended (best prebuilt wheel support; 3.13+ may lack wheels for some packages)
-- SQLite for local development (default) or PostgreSQL for production
+- SQLite for local development (default), [SQLite Cloud](https://sqlitecloud.io) for production, or PostgreSQL
 - [Resend](https://resend.com) account for transactional email
 
 ## Quick Start
@@ -73,6 +73,8 @@ Edit `.env` with your values. **Required in production:**
 
 Optional: `DATABASE_URL`, `CALENDLY_URL`, business hours settings — see `.env.example`.
 
+For SQLite Cloud production, set `USE_SQLITECLOUD=true` and `SQLITECLOUD_CONNECTION_STRING` (see [SQLite Cloud setup](#sqlite-cloud) below).
+
 ### 4. Initialize database
 
 ```bash
@@ -103,6 +105,90 @@ Visit http://localhost:5000 — admin login at `/auth/login`.
 
 Emails are sent asynchronously via the `resend` Python package (contact notifications, admin replies, chat alerts, transcript export).
 
+## SQLite Cloud
+
+The app can use [SQLite Cloud](https://sqlitecloud.io) as a managed SQLite backend in production. Flask-SQLAlchemy connects via the native [`sqlitecloud`](https://pypi.org/project/sqlitecloud/) driver and the [`sqlalchemy-sqlitecloud`](https://pypi.org/project/sqlalchemy-sqlitecloud/) SQLAlchemy dialect (port 8860).
+
+### 1. Create a SQLite Cloud project
+
+1. Sign up at [sqlitecloud.io](https://sqlitecloud.io) and open your project dashboard.
+2. Upload or create your database (e.g. `lawfirm.db`).
+3. Copy the **connection string** from the dashboard (format: `sqlitecloud://host:8860/lawfirm.db?apikey=...`).
+
+### 2. Configure environment
+
+Add to `.env` (see `.env.example` for placeholders — **never commit real API keys**):
+
+| Variable | Description |
+|----------|-------------|
+| `USE_SQLITECLOUD` | Set to `true` to use cloud DB instead of local `DATABASE_URL` |
+| `SQLITECLOUD_API_KEY` | API key (`orgkey_...` or project key from dashboard) |
+| `SQLITECLOUD_GATEWAY_URL` | Weblite gateway URL (e.g. `https://your-id.g1.gateway.sqlite.cloud`) |
+| `SQLITECLOUD_DATABASE` | Database filename on the node (default: `lawfirm.db`) |
+| `SQLITECLOUD_CONNECTION_STRING` | **Preferred:** full native connection string from the dashboard |
+| `SQLITECLOUD_HOST` | Alternative: native hostname (`your-id.g1.sqlite.cloud`) with `SQLITECLOUD_APIKEY` |
+| `SQLITECLOUD_APIKEY` | Alternative API key alias (same as `SQLITECLOUD_API_KEY`) |
+
+Cloud mode activates when `USE_SQLITECLOUD=true` or a connection string is set. The app derives the native host from `SQLITECLOUD_GATEWAY_URL` by replacing `.gateway.` with `.` (e.g. `caxawolbdz.g1.gateway.sqlite.cloud` → `caxawolbdz.g1.sqlite.cloud`). Leave cloud vars unset for local SQLite development.
+
+**Security:** If an API key is ever exposed in git, chat, or logs, rotate it immediately in the [SQLite Cloud dashboard](https://dashboard.sqlitecloud.io).
+
+### 3. Install cloud dependencies
+
+Both packages are included in `requirements.txt`:
+
+```bash
+pip install sqlitecloud sqlalchemy-sqlitecloud
+# or install everything:
+pip install -r requirements.txt
+```
+
+Or install the optional extra:
+
+```bash
+pip install -e ".[sqlitecloud]"
+```
+
+### 4. Test the connection
+
+```bash
+# Enable cloud mode in .env first: USE_SQLITECLOUD=true
+flask test-sqlitecloud
+```
+
+This verifies the Weblite REST API (optional), native `sqlitecloud` driver, SQLAlchemy engine, and Flask-SQLAlchemy models.
+
+If Weblite REST returns `401`, use the **project connection string** from the dashboard (`SQLITECLOUD_CONNECTION_STRING`) — the native driver on port 8860 is what Flask-SQLAlchemy uses.
+
+You can also test directly in Python:
+
+```python
+import sqlitecloud
+conn = sqlitecloud.connect("sqlitecloud://host:8860/lawfirm.db?apikey=YOUR_KEY")
+print(conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall())
+```
+
+### 5. Run in production
+
+```bash
+export FLASK_ENV=production
+export USE_SQLITECLOUD=true
+export SQLITECLOUD_CONNECTION_STRING="sqlitecloud://host:8860/lawfirm.db?apikey=..."
+# ... other production secrets (SESSION_SECRET, ADMIN_PASSWORD, RESEND_API_KEY)
+
+flask db upgrade
+gunicorn -c gunicorn.conf.py "app:app"
+```
+
+### Flask-Migrate notes
+
+Flask-Migrate/Alembic works with SQLite Cloud because the `sqlalchemy-sqlitecloud` dialect extends the standard SQLite dialect. Keep in mind:
+
+- The `sqlalchemy-sqlitecloud` integration is still marked **beta** upstream.
+- SQLite Cloud is SQLite-compatible, but remote latency makes large migrations slower than local SQLite.
+- Avoid concurrent `flask db upgrade` runs against the same cloud database.
+- Some SQLite-specific DDL edge cases may behave differently over the network driver.
+
 ## Production
 
 ```bash
@@ -110,7 +196,11 @@ export FLASK_ENV=production
 export SESSION_SECRET=...
 export ADMIN_PASSWORD=...
 export RESEND_API_KEY=...
-export DATABASE_URL=postgresql://user:pass@host:5432/lawfirm
+# Option A: SQLite Cloud
+export USE_SQLITECLOUD=true
+export SQLITECLOUD_CONNECTION_STRING="sqlitecloud://host:8860/lawfirm.db?apikey=..."
+# Option B: PostgreSQL
+# export DATABASE_URL=postgresql://user:pass@host:5432/lawfirm
 
 pip install -r requirements-postgres.txt   # or: pip install -e ".[postgres]"
 flask db upgrade

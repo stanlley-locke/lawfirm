@@ -10,11 +10,34 @@ def _env_list(name, default=''):
     return [item.strip() for item in raw.split(',') if item.strip()]
 
 
+def _sqlitecloud_active():
+    """Cloud mode when explicitly enabled or a connection string is configured."""
+    return _env_bool('USE_SQLITECLOUD') or bool(os.getenv('SQLITECLOUD_CONNECTION_STRING', '').strip())
+
+
+def _resolve_database_uri():
+    """Use SQLite Cloud when enabled; otherwise fall back to local DATABASE_URL."""
+    if _sqlitecloud_active():
+        from utils.sqlitecloud import get_sqlitecloud_connection_string
+        return get_sqlitecloud_connection_string()
+    return os.getenv('DATABASE_URL', 'sqlite:///lawfirm.db')
+
+
 class Config:
     """Central application configuration."""
 
     SECRET_KEY = os.getenv('SESSION_SECRET', 'dev-secret-key-change-in-production')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///lawfirm.db')
+
+    # Database: local SQLite by default, SQLite Cloud when enabled
+    USE_SQLITECLOUD = _sqlitecloud_active()
+    SQLITECLOUD_CONNECTION_STRING = os.getenv('SQLITECLOUD_CONNECTION_STRING', '')
+    SQLITECLOUD_CONNECTION_URI = os.getenv('SQLITECLOUD_CONNECTION_URI', '')
+    SQLITECLOUD_GATEWAY_URL = os.getenv('SQLITECLOUD_GATEWAY_URL', '')
+    SQLITECLOUD_API_KEY = os.getenv('SQLITECLOUD_API_KEY', '')
+    SQLITECLOUD_HOST = os.getenv('SQLITECLOUD_HOST', '')
+    SQLITECLOUD_DATABASE = os.getenv('SQLITECLOUD_DATABASE', 'lawfirm.db')
+    SQLITECLOUD_APIKEY = os.getenv('SQLITECLOUD_APIKEY', '')
+    SQLALCHEMY_DATABASE_URI = _resolve_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Session security
@@ -99,6 +122,20 @@ def validate_production_config(app):
         'ADMIN_PASSWORD': app.config.get('ADMIN_PASSWORD'),
         'RESEND_API_KEY': app.config.get('RESEND_API_KEY'),
     }
+    if app.config.get('USE_SQLITECLOUD'):
+        has_conn_str = bool(
+            app.config.get('SQLITECLOUD_CONNECTION_STRING')
+            or app.config.get('SQLITECLOUD_CONNECTION_URI')
+        )
+        has_gateway = (
+            (app.config.get('SQLITECLOUD_API_KEY') or app.config.get('SQLITECLOUD_APIKEY'))
+            and app.config.get('SQLITECLOUD_GATEWAY_URL')
+        )
+        has_split = app.config.get('SQLITECLOUD_HOST') and (
+            app.config.get('SQLITECLOUD_APIKEY') or app.config.get('SQLITECLOUD_API_KEY')
+        )
+        if not has_conn_str and not has_gateway and not has_split:
+            required['SQLITECLOUD_CONNECTION_STRING'] = ''
     missing = [name for name, value in required.items() if not value or value.startswith('dev-')]
     if missing:
         raise RuntimeError(
