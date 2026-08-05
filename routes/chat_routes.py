@@ -535,9 +535,7 @@ def admin_chat_room_messages(room_id):
     chat_room = ChatRoom.query.filter_by(room_id=room_id).first_or_404()
     
     # Mark messages as read
-    unread_messages = ChatMessage.query.filter_by(room=room_id, is_read=False).all()
-    for message in unread_messages:
-        message.is_read = True
+    ChatMessage.query.filter_by(room=room_id, is_read=False).update({"is_read": True})
     db.session.commit()
     
     messages = ChatMessage.query.filter_by(room=room_id).order_by(ChatMessage.timestamp).all()
