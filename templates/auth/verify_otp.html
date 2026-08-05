@@ -79,13 +79,32 @@
     }
     tick();
 
-    // Auto-submit once 6 digits are entered for a smoother experience.
+    // Auto-submit once 6 digits are entered for a smoother experience, and prevent double submissions.
     var codeInput = document.querySelector('.otp-input');
     var form = codeInput ? codeInput.closest('form') : null;
     if (codeInput && form) {
+        var isSubmitting = false;
+        
+        form.addEventListener('submit', function (e) {
+            if (isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+            isSubmitting = true;
+            // Optionally disable the button to provide visual feedback
+            var btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            }
+        });
+
         codeInput.addEventListener('input', function () {
             codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
-            if (codeInput.value.length === 6) {
+            if (codeInput.value.length === 6 && !isSubmitting) {
+                // We dispatch a submit event instead of just calling form.submit()
+                // so that the form's event listener above catches it and sets isSubmitting.
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                 form.submit();
             }
         });
