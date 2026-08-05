@@ -173,7 +173,10 @@ def create_app(config_name=None):
 
     if not app.config.get('TESTING'):
         with app.app_context():
-            bootstrap_initial_admin()
+            try:
+                bootstrap_initial_admin()
+            except Exception as e:
+                app.logger.warning(f"Skipping initial admin bootstrap (likely pending migrations): {e}")
 
     from commands import register_commands
     register_commands(app)
