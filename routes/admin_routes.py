@@ -14,7 +14,7 @@ from forms import (
     AdminUserForm, ReplyForm,
 )
 from utils.sanitize import sanitize_html
-from utils.email_utils import send_email, escape_html
+from utils.email_utils import send_template_email
 from utils.uploads import save_upload
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -57,6 +57,24 @@ def dashboard():
         analytics_service_labels=['Land Law', 'Commercial Law', 'Company Law', 'Property & Conveyance', 'Family Law', 'Civil Litigation'],
         analytics_service_views=[450, 320, 210, 580, 290, 180]
     )
+
+
+@admin_bp.route('/dashboard/stats')
+@admin_required
+def dashboard_stats():
+    """JSON snapshot of dashboard metrics, polled by dashboard-refresh.js."""
+    recent_messages = ContactMessage.query.order_by(desc(ContactMessage.created_at)).limit(5).all()
+    return jsonify({
+        'services_count': Service.query.count(),
+        'team_members_count': TeamMember.query.count(),
+        'case_studies_count': CaseStudy.query.count(),
+        'blog_posts_count': BlogPost.query.count(),
+        'unread_messages_count': ContactMessage.query.filter_by(is_read=False).count(),
+        'recent_messages': [
+            {'id': m.id, 'is_read': m.is_read}
+            for m in recent_messages
+        ],
+    })
 
 
 
@@ -381,11 +399,15 @@ def reply_message(id):
     if not form.subject.data:
         form.subject.data = f"Re: {message.subject}"
     if form.validate_on_submit():
-        send_email(
+        send_template_email(
             subject=form.subject.data,
             recipients=[message.email],
+            template_name='emails/notification.html',
             text_body=form.body.data,
-            html_body=f"<p>{escape_html(form.body.data).replace(chr(10), '<br>')}</p>",
+            context={
+                'heading': form.subject.data,
+                'body': form.body.data,
+            },
             reply_to=current_app.config.get('RESEND_FROM_EMAIL'),
         )
         if not message.is_read:
@@ -418,11 +440,15 @@ def quick_reply_message(id):
                     'filename': file.filename
                 })
                 
-    send_email(
+    send_template_email(
         subject=f"Re: {message.subject}",
         recipients=[message.email],
+        template_name='emails/notification.html',
         text_body=reply_body,
-        html_body=f"<p>{escape_html(reply_body).replace(chr(10), '<br>')}</p>",
+        context={
+            'heading': f"Re: {message.subject}",
+            'body': reply_body,
+        },
         reply_to=current_app.config.get('RESEND_FROM_EMAIL'),
         attachments=attachments if attachments else None
     )
@@ -469,13 +495,11 @@ def new_user():
         db.session.commit()
 
         # Send welcome email asynchronously
-        from utils.email_utils import send_email
         from flask import request
-        
+
         login_url = request.url_root.rstrip('/') + (url_for('auth.login') if user.is_admin else url_for('client.login'))
         role_name = "Administrator" if user.is_admin else "Client"
-        
-        subject = f"Welcome to DOA Advocates - Your Account Details"
+
         text_body = (
             f"Hello {user.username},\n\n"
             f"An account has been created for you on the Dan Ochieng & Company Advocates portal.\n\n"
@@ -485,31 +509,23 @@ def new_user():
             f"Password: {form.password.data}\n\n"
             f"You can log in to your dashboard here:\n"
             f"{login_url}\n\n"
-            f"Please change your password after logging in for security reasons.\n\n"
+            f"For security, sign-in also requires a one-time verification code emailed to you.\n"
+            f"Please change your password after logging in.\n\n"
             f"Best regards,\n"
             f"DOA Advocates Team"
         )
-        html_body = (
-            f"<div style='font-family: sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto;'>"
-            f"<h2 style='color: #082068;'>Welcome to DOA Advocates</h2>"
-            f"<p>Hello <strong>{user.username}</strong>,</p>"
-            f"<p>An account has been created for you on the Dan Ochieng & Company Advocates portal as an <strong>{role_name}</strong>.</p>"
-            f"<div style='background-color: #f8fafc; padding: 15px; border-left: 4px solid #082068; margin: 20px 0;'>"
-            f"<p style='margin: 0 0 8px 0;'><strong>Username:</strong> {user.username}</p>"
-            f"<p style='margin: 0 0 8px 0;'><strong>Password:</strong> <code style='background: #e2e8f0; padding: 2px 4px;'>{form.password.data}</code></p>"
-            f"<p style='margin: 0;'><strong>Login Link:</strong> <a href='{login_url}' style='color: #00c8f8; text-decoration: none; font-weight: bold;'>Go to Portal</a></p>"
-            f"</div>"
-            f"<p style='font-size: 0.9em; color: #64748b;'>For security, please change your password after logging in.</p>"
-            f"<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;'>"
-            f"<p style='font-size: 0.8em; color: #94a3b8;'>This is an automated message from Dan Ochieng & Company Advocates.</p>"
-            f"</div>"
-        )
         try:
-            send_email(
-                subject=subject,
+            send_template_email(
+                subject="Welcome to DOA Advocates - Your Account Details",
                 recipients=[user.email],
+                template_name='emails/account_welcome.html',
                 text_body=text_body,
-                html_body=html_body
+                context={
+                    'user': user,
+                    'role_name': role_name,
+                    'temp_password': form.password.data,
+                    'login_url': login_url,
+                },
             )
         except Exception as e:
             current_app.logger.error("Failed to send welcome email: %s", str(e))

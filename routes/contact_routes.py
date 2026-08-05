@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, current_
 from extensions import db
 from models import Service, ContactMessage
 from forms import ContactForm
-from utils.email_utils import send_email, escape_html
+from utils.email_utils import send_template_email
 
 contact_bp = Blueprint('contact', __name__)
 
@@ -31,30 +31,26 @@ def contact():
             admin_email = current_app.config.get('ADMIN_NOTIFICATION_EMAIL')
             if admin_email:
                 service_label = dict(form.service.choices).get(form.service.data, 'None')
-                text_body = f"""New contact form submission from {form.name.data} ({form.email.data}):
-
-Subject: {form.subject.data}
-Service: {service_label}
-Phone: {form.phone.data or 'Not provided'}
-
-Message:
-{form.message.data}
-"""
-                html_body = f"""
-<h3>New Contact Inquiry Submission</h3>
-<p><strong>From:</strong> {escape_html(form.name.data)} &lt;{escape_html(form.email.data)}&gt;</p>
-<p><strong>Subject:</strong> {escape_html(form.subject.data)}</p>
-<p><strong>Service:</strong> {escape_html(service_label)}</p>
-<p><strong>Phone:</strong> {escape_html(form.phone.data or 'Not provided')}</p>
-<hr>
-<p><strong>Message:</strong></p>
-<p>{escape_html(form.message.data).replace(chr(10), '<br>')}</p>
-"""
-                send_email(
+                text_body = (
+                    f"New contact form submission from {form.name.data} ({form.email.data}):\n\n"
+                    f"Subject: {form.subject.data}\n"
+                    f"Service: {service_label}\n"
+                    f"Phone: {form.phone.data or 'Not provided'}\n\n"
+                    f"Message:\n{form.message.data}\n"
+                )
+                send_template_email(
                     subject=f"New Contact Inquiry: {form.subject.data}",
                     recipients=[admin_email],
+                    template_name='emails/contact_notification.html',
                     text_body=text_body,
-                    html_body=html_body,
+                    context={
+                        'name': form.name.data,
+                        'email': form.email.data,
+                        'phone': form.phone.data,
+                        'subject': form.subject.data,
+                        'service_label': service_label,
+                        'message': form.message.data,
+                    },
                     reply_to=form.email.data,
                 )
         except Exception as e:

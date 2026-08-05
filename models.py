@@ -1,7 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+
+# --- OTP (two-factor login) settings ---
+OTP_EXPIRY_MINUTES = 10
+OTP_MAX_ATTEMPTS = 5
+OTP_RESEND_COOLDOWN_SECONDS = 60
 
 
 class User(UserMixin, db.Model):
@@ -15,6 +20,12 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Two-factor (OTP) login fields
+    otp_code_hash = db.Column(db.String(255), nullable=True)
+    otp_expires_at = db.Column(db.DateTime, nullable=True)
+    otp_attempts = db.Column(db.Integer, default=0)
+    otp_last_sent_at = db.Column(db.DateTime, nullable=True)
+
     assigned_rooms = db.relationship('ChatRoom', backref='assignee', lazy=True)
 
     def set_password(self, password):
@@ -22,6 +33,41 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def set_otp(self, code):
+        """Hash and store a freshly generated OTP code with a fresh expiry."""
+        self.otp_code_hash = generate_password_hash(code)
+        self.otp_expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
+        self.otp_last_sent_at = datetime.utcnow()
+        self.otp_attempts = 0
+
+    def check_otp(self, code):
+        """Validate a submitted OTP code against the stored hash and expiry."""
+        if not self.otp_code_hash or not self.otp_expires_at:
+            return False
+        if datetime.utcnow() > self.otp_expires_at:
+            return False
+        return check_password_hash(self.otp_code_hash, code)
+
+    def clear_otp(self):
+        self.otp_code_hash = None
+        self.otp_expires_at = None
+        self.otp_attempts = 0
+        self.otp_last_sent_at = None
+
+    def otp_is_expired(self):
+        return not self.otp_expires_at or datetime.utcnow() > self.otp_expires_at
+
+    def otp_resend_allowed(self):
+        if not self.otp_last_sent_at:
+            return True
+        return (datetime.utcnow() - self.otp_last_sent_at).total_seconds() >= OTP_RESEND_COOLDOWN_SECONDS
+
+    def otp_seconds_until_resend(self):
+        if not self.otp_last_sent_at:
+            return 0
+        remaining = OTP_RESEND_COOLDOWN_SECONDS - (datetime.utcnow() - self.otp_last_sent_at).total_seconds()
+        return max(0, int(remaining))
 
     def __repr__(self):
         return f'<User {self.username}>'

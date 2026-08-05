@@ -1,12 +1,16 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, abort, send_from_directory
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, abort, send_from_directory, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 
 from extensions import db
-from models import LegalCase, CaseMilestone, CaseDocument, CaseInvoice, User
-from forms import LoginForm
+from models import LegalCase, CaseMilestone, CaseDocument, CaseInvoice, User, OTP_MAX_ATTEMPTS
+from forms import LoginForm, OTPForm
+from utils.otp import (
+    generate_otp_code, send_otp_email, mask_email,
+    start_otp_challenge, get_pending_otp_user, clear_otp_session,
+)
 
 client_bp = Blueprint('client', __name__, url_prefix='/client')
 
@@ -27,14 +31,72 @@ def login():
             flash('Invalid credentials.', 'danger')
             return redirect(url_for('client.login'))
 
-        login_user(user, remember=form.remember.data)
-        flash('Successfully logged in to your Client Portal!', 'success')
-        
-        if user.is_admin:
-            return redirect(url_for('admin.dashboard'))
-        return redirect(url_for('client.dashboard'))
+        start_otp_challenge(user, role='client', remember=form.remember.data)
+        flash('We emailed you a 6-digit verification code. Enter it below to finish signing in.', 'info')
+        return redirect(url_for('client.verify_otp'))
 
     return render_template('client/login.html', title='Client Portal Login', form=form)
+
+
+@client_bp.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    user = get_pending_otp_user('client')
+    if not user:
+        flash('Your verification session has expired. Please log in again.', 'warning')
+        return redirect(url_for('client.login'))
+
+    form = OTPForm()
+    if form.validate_on_submit():
+        if user.otp_attempts >= OTP_MAX_ATTEMPTS:
+            user.clear_otp()
+            db.session.commit()
+            clear_otp_session()
+            flash('Too many incorrect attempts. Please log in again.', 'danger')
+            return redirect(url_for('client.login'))
+
+        if user.otp_is_expired():
+            flash('That code has expired. Please request a new one.', 'danger')
+        elif user.check_otp(form.code.data):
+            user.clear_otp()
+            db.session.commit()
+            remember = session.pop('otp_remember', False)
+            clear_otp_session()
+            login_user(user, remember=remember)
+            flash('Successfully logged in to your Client Portal!', 'success')
+            if user.is_admin:
+                return redirect(url_for('admin.dashboard'))
+            return redirect(url_for('client.dashboard'))
+        else:
+            user.otp_attempts += 1
+            db.session.commit()
+            flash('Incorrect verification code. Please try again.', 'danger')
+
+    return render_template(
+        'client/verify_otp.html',
+        title='Verify Code',
+        form=form,
+        email=mask_email(user.email),
+        resend_wait_seconds=user.otp_seconds_until_resend(),
+    )
+
+
+@client_bp.route('/resend-otp', methods=['POST'])
+def resend_otp():
+    user = get_pending_otp_user('client')
+    if not user:
+        flash('Your verification session has expired. Please log in again.', 'warning')
+        return redirect(url_for('client.login'))
+
+    if not user.otp_resend_allowed():
+        flash('Please wait a moment before requesting another code.', 'warning')
+        return redirect(url_for('client.verify_otp'))
+
+    code = generate_otp_code()
+    user.set_otp(code)
+    db.session.commit()
+    send_otp_email(user, code)
+    flash('A new verification code has been sent to your email.', 'success')
+    return redirect(url_for('client.verify_otp'))
 
 
 @client_bp.route('/dashboard')
@@ -46,6 +108,33 @@ def dashboard():
     
     cases = LegalCase.query.filter_by(client_id=current_user.id).order_by(LegalCase.updated_at.desc()).all()
     return render_template('client/dashboard.html', title='Client Dashboard', cases=cases)
+
+
+@client_bp.route('/dashboard/stats')
+@login_required
+def dashboard_stats():
+    if current_user.is_admin:
+        return jsonify({'error': 'Not applicable'}), 400
+
+    cases = LegalCase.query.filter_by(client_id=current_user.id).order_by(LegalCase.updated_at.desc()).all()
+    pending_invoices_count = 0
+    case_data = []
+    for case in cases:
+        for invoice in case.invoices:
+            if invoice.status == 'Pending':
+                pending_invoices_count += 1
+        case_data.append({
+            'id': case.id,
+            'status': case.status,
+            'updated_at': case.updated_at.strftime('%Y-%m-%d'),
+        })
+
+    return jsonify({
+        'active_count': sum(1 for c in cases if c.status == 'Active'),
+        'total_count': len(cases),
+        'pending_invoices_count': pending_invoices_count,
+        'cases': case_data,
+    })
 
 
 @client_bp.route('/cases/<int:case_id>', methods=['GET'])

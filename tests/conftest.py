@@ -24,7 +24,17 @@ def client(app):
     return app.test_client()
 
 
+def _complete_otp_step(client, verify_url):
+    """Look up the last OTP generated during this test run and submit it."""
+    from utils.otp import get_last_generated_code_for_testing
+    code = get_last_generated_code_for_testing()
+    if code:
+        return client.post(verify_url, data={'code': code}, follow_redirects=True)
+    return None
+
+
 @pytest.fixture
 def admin_client(client):
     client.post('/auth/login', data={'username': 'admin', 'password': 'testpass123'})
+    _complete_otp_step(client, '/auth/verify-otp')
     return client

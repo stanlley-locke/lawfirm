@@ -8,9 +8,14 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm border-0 bg-white" style="border-radius: 0;">
-                <div class="card-body p-4 text-start">
-                    <h3 class="fw-bold mb-1" style="color: var(--doa-navy);">Welcome, {{ current_user.username }}</h3>
-                    <p class="text-muted mb-0">Manage and track your legal matters, view milestones, and exchange documents with our advocates.</p>
+                <div class="card-body p-4 text-start d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div>
+                        <h3 class="fw-bold mb-1" style="color: var(--doa-navy);">Welcome, {{ current_user.username }}</h3>
+                        <p class="text-muted mb-0">Manage and track your legal matters, view milestones, and exchange documents with our advocates.</p>
+                    </div>
+                    <span class="dashboard-refresh-indicator" id="dashboardLastUpdated">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Updated just now
+                    </span>
                 </div>
             </div>
         </div>
@@ -38,7 +43,7 @@
                     </div>
                     <div>
                         <h6 class="text-uppercase small fw-bold text-muted mb-1">Active Matters</h6>
-                        <h2 class="fw-bold mb-0 text-dark">{{ cases|selectattr('status', 'equalto', 'Active')|list|length }}</h2>
+                        <h2 class="fw-bold mb-0 text-dark" id="active-matters-count">{{ cases|selectattr('status', 'equalto', 'Active')|list|length }}</h2>
                     </div>
                 </div>
             </div>
@@ -52,7 +57,7 @@
                     </div>
                     <div>
                         <h6 class="text-uppercase small fw-bold text-muted mb-1">Total Matters</h6>
-                        <h2 class="fw-bold mb-0 text-dark">{{ cases|length }}</h2>
+                        <h2 class="fw-bold mb-0 text-dark" id="total-matters-count">{{ cases|length }}</h2>
                     </div>
                 </div>
             </div>
@@ -66,7 +71,7 @@
                     </div>
                     <div>
                         <h6 class="text-uppercase small fw-bold text-muted mb-1">Pending Invoices</h6>
-                        <h2 class="fw-bold mb-0 text-dark">{{ pending_invoices|length }}</h2>
+                        <h2 class="fw-bold mb-0 text-dark" id="pending-invoices-count">{{ pending_invoices|length }}</h2>
                     </div>
                 </div>
             </div>
@@ -120,9 +125,9 @@
                                         <th class="pe-4 text-end">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="clientMattersBody">
                                     {% for case in cases %}
-                                        <tr>
+                                        <tr data-case-id="{{ case.id }}">
                                             <td class="ps-4 py-3">
                                                 <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ case.title }}</div>
                                                 <div class="small text-muted font-monospace" style="font-size: 0.75rem;">{{ case.case_number }}</div>
@@ -133,7 +138,7 @@
                                             <td>
                                                 <span class="badge bg-light text-dark border">{{ case.case_type or 'General' }}</span>
                                             </td>
-                                            <td>
+                                            <td id="case-status-{{ case.id }}">
                                                 {% if case.status == 'Active' %}
                                                     <span class="badge bg-success" style="border-radius: 0;">Active</span>
                                                 {% elif case.status == 'Pending' %}
@@ -142,7 +147,7 @@
                                                     <span class="badge bg-secondary" style="border-radius: 0;">Closed</span>
                                                 {% endif %}
                                             </td>
-                                            <td>
+                                            <td id="case-updated-{{ case.id }}">
                                                 <span class="text-muted small">{{ case.updated_at.strftime('%Y-%m-%d') }}</span>
                                             </td>
                                             <td class="pe-4 text-end">
@@ -170,21 +175,63 @@
 {% endblock %}
 
 {% block client_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard-refresh.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('matterSearchInput');
+
+        function applyMatterFilter() {
+            if (!searchInput) return;
+            const term = searchInput.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#clientMattersBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
+
         if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                const term = e.target.value.toLowerCase().trim();
-                const rows = document.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    if (text.includes(term)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+            searchInput.addEventListener('input', applyMatterFilter);
+        }
+
+        // Auto-refresh matter counts + statuses without a full page reload.
+        if (window.DashboardAutoRefresh) {
+            const statusBadge = {
+                'Active': '<span class="badge bg-success" style="border-radius: 0;">Active</span>',
+                'Pending': '<span class="badge bg-warning text-dark" style="border-radius: 0;">Pending</span>',
+            };
+
+            window.DashboardAutoRefresh.start({
+                url: '{{ url_for("client.dashboard_stats") }}',
+                intervalMs: 20000,
+                lastUpdatedEl: '#dashboardLastUpdated',
+                onData: function (data) {
+                    const setText = function (id, value) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = value;
+                    };
+                    setText('active-matters-count', data.active_count);
+                    setText('total-matters-count', data.total_count);
+                    setText('pending-invoices-count', data.pending_invoices_count);
+
+                    // Skip touching matter rows while the user is actively typing
+                    // in the search box, to avoid disrupting their filtering.
+                    if (document.activeElement === searchInput) return;
+
+                    (data.cases || []).forEach(function (caseInfo) {
+                        const statusCell = document.getElementById('case-status-' + caseInfo.id);
+                        if (statusCell) {
+                            statusCell.innerHTML = statusBadge[caseInfo.status]
+                                || '<span class="badge bg-secondary" style="border-radius: 0;">' + caseInfo.status + '</span>';
+                        }
+                        const updatedCell = document.getElementById('case-updated-' + caseInfo.id);
+                        if (updatedCell) {
+                            updatedCell.innerHTML = '<span class="text-muted small">' + caseInfo.updated_at + '</span>';
+                        }
+                    });
+
+                    applyMatterFilter();
+                }
             });
         }
     });

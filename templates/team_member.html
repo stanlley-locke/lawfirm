@@ -2,8 +2,9 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
+{% set header_bg = url_for('static', filename='images/assets/patrick-fore-H5Lf0nGyetk-unsplash.webp') %}
 <!-- Page Header -->
-<div class="page-header">
+<div class="page-header team-member-hero" style="background-image: url('{{ header_bg }}');">
     <div class="container">
         <h1 class="page-hero-title">{{ team_member.name }}</h1>
         <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
@@ -13,6 +14,9 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ team_member.name }}</li>
             </ol>
         </nav>
+        {% if team_member.position and team_member.position|trim|lower != team_member.name|trim|lower %}
+        <p class="page-hero-lead">{{ team_member.position }}</p>
+        {% endif %}
     </div>
 </div>
 

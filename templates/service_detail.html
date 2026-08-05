@@ -2,7 +2,7 @@
 {% block body_class %}page-hero{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="page-header service-detail-hero service-detail-hero--{{ service.slug }}">
     <div class="container">
         <h1 class="page-hero-title">{{ service.title }}</h1>
         <nav aria-label="breadcrumb" class="page-hero-breadcrumb">
@@ -12,72 +12,158 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ service.title }}</li>
             </ol>
         </nav>
+        {% if service.description %}
+        <p class="page-hero-lead">{{ service.description|striptags|truncate(220) }}</p>
+        {% endif %}
     </div>
 </div>
 
-<section class="section-block section-white">
-    <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-8">
-                {% if service.icon %}
-                <div class="practice-icon mb-4"><i class="{{ service.icon }}"></i></div>
-                {% endif %}
-                <div class="content-body mb-5">{{ service.description|safe }}</div>
-
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">How We Can Help</h2>
-                        <p>Our experienced team specializes in {{ service.title }} and can assist you with:</p>
-                        <ul>
-                            <li>Legal consultation and advice tailored to your specific situation</li>
-                            <li>Document preparation and review</li>
-                            <li>Representation in negotiations and dispute resolution</li>
-                            <li>Court representation and litigation when necessary</li>
-                        </ul>
+<article class="service-detail">
+    <section class="section-block section-cream service-detail__intro" aria-labelledby="service-intro-heading">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    <div class="service-detail__intro-header animate-on-scroll">
+                        {% if service.icon %}
+                        <span class="service-detail__icon" aria-hidden="true"><i class="{{ service.icon }}"></i></span>
+                        {% endif %}
+                        <span class="section-eyebrow">Practice Area</span>
+                        <h2 id="service-intro-heading">{{ service.title }}</h2>
                     </div>
-                </div>
-
-                {% if related_cases %}
-                <h2 class="h4 mb-4">Related Case Studies</h2>
-                <div class="row g-4">
-                    {% for case in related_cases %}
-                    <div class="col-md-6">
-                        {% include 'partials/case_study_card.html' %}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            <div class="col-lg-4">
-                <div class="card mb-4" style="border-top: 3px solid var(--doa-cyan);">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Contact Us</h2>
-                        <p class="small">Need assistance with {{ service.title }}? Contact our team for a consultation.</p>
-                        <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-primary w-100 mb-3">Request a Consultation</a>
-                        <p class="small mb-1"><i class="fas fa-phone me-2"></i><a href="tel:+254729116086">0729 116 086</a> / <a href="tel:+254734090411">0734 090 411</a></p>
-                        <p class="small mb-0"><i class="fas fa-envelope me-2"></i><a href="mailto:danochiengadvocates@gmail.com">danochiengadvocates@gmail.com</a></p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="p-3 border-bottom"><h2 class="h6 mb-0">Other Services</h2></div>
-                        <ul class="list-group list-group-flush">
-                            {% for other_service in footer_services if other_service.id != service.id %}
-                            <li class="list-group-item"><a href="{{ url_for('main.service_detail', slug=other_service.slug) }}">{{ other_service.title }}</a></li>
-                            {% else %}
-                            <li class="list-group-item"><a href="{{ url_for('main.services') }}">View all services</a></li>
-                            {% endfor %}
-                        </ul>
+                    <div class="service-detail__description content-body animate-on-scroll">
+                        {{ service.description|safe }}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="cta-section">
+    <section class="section-block section-white service-detail__main">
+        <div class="container">
+            <div class="row g-5 service-detail__layout">
+                <div class="col-lg-8 service-detail__content">
+                    <div class="service-detail__help animate-on-scroll">
+                        <div class="section-header text-start mb-4">
+                            <span class="section-eyebrow">Our Expertise</span>
+                            <h2 class="h3 mb-2">How We Can Help</h2>
+                            <p class="section-subtitle mb-0">Our experienced team specializes in {{ service.title }} and can assist you with:</p>
+                        </div>
+                        <div class="row g-4 service-detail__help-grid">
+                            <div class="col-md-6">
+                                <article class="service-detail-help-card card-lift animate-on-scroll" style="--i: 0;">
+                                    <span class="service-detail-help-card__icon" aria-hidden="true"><i class="fas fa-comments"></i></span>
+                                    <h3>Legal Consultation</h3>
+                                    <p>Expert advice tailored to your specific situation, objectives, and the legal landscape in Kenya.</p>
+                                </article>
+                            </div>
+                            <div class="col-md-6">
+                                <article class="service-detail-help-card card-lift animate-on-scroll" style="--i: 1;">
+                                    <span class="service-detail-help-card__icon" aria-hidden="true"><i class="fas fa-file-alt"></i></span>
+                                    <h3>Document Preparation</h3>
+                                    <p>Thorough drafting, review, and preparation of agreements, filings, and supporting legal documents.</p>
+                                </article>
+                            </div>
+                            <div class="col-md-6">
+                                <article class="service-detail-help-card card-lift animate-on-scroll" style="--i: 2;">
+                                    <span class="service-detail-help-card__icon" aria-hidden="true"><i class="fas fa-handshake"></i></span>
+                                    <h3>Negotiations &amp; ADR</h3>
+                                    <p>Skilled representation in negotiations, mediation, and alternative dispute resolution processes.</p>
+                                </article>
+                            </div>
+                            <div class="col-md-6">
+                                <article class="service-detail-help-card card-lift animate-on-scroll" style="--i: 3;">
+                                    <span class="service-detail-help-card__icon" aria-hidden="true"><i class="fas fa-gavel"></i></span>
+                                    <h3>Litigation</h3>
+                                    <p>Strong courtroom advocacy and litigation support when court proceedings are necessary.</p>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if related_cases %}
+                    <section class="service-detail__cases animate-on-scroll" aria-labelledby="service-cases-heading">
+                        <div class="section-header text-start mb-4">
+                            <span class="section-eyebrow">Success Stories</span>
+                            <h2 id="service-cases-heading" class="h3 mb-0">Related Case Studies</h2>
+                        </div>
+                        <div class="row g-4">
+                            {% for case in related_cases %}
+                            <div class="col-md-6">
+                                {% set show_badges = true %}
+                                {% include 'partials/case_study_card.html' %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <aside class="service-detail-sidebar animate-on-scroll">
+                        <div class="service-detail-sidebar__card">
+                            <h2 class="service-detail-sidebar__title">Contact Us</h2>
+                            <p class="service-detail-sidebar__lead">Need assistance with {{ service.title }}? Reach out to schedule a consultation.</p>
+                            <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-primary w-100 service-detail-sidebar__cta">Request a Consultation</a>
+
+                            <ul class="service-detail-sidebar__list">
+                                <li class="service-detail-sidebar__item">
+                                    <span class="service-detail-sidebar__item-icon" aria-hidden="true"><i class="fas fa-phone"></i></span>
+                                    <div>
+                                        <span class="service-detail-sidebar__item-label">Phone</span>
+                                        <p class="mb-0">
+                                            <a href="tel:+254729116086">0729 116 086</a>
+                                            <span class="service-detail-sidebar__sep"> / </span>
+                                            <a href="tel:+254734090411">0734 090 411</a>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="service-detail-sidebar__item">
+                                    <span class="service-detail-sidebar__item-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+                                    <div>
+                                        <span class="service-detail-sidebar__item-label">Email</span>
+                                        <p class="mb-0"><a href="mailto:danochiengadvocates@gmail.com">danochiengadvocates@gmail.com</a></p>
+                                    </div>
+                                </li>
+                                <li class="service-detail-sidebar__item">
+                                    <span class="service-detail-sidebar__item-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+                                    <div>
+                                        <span class="service-detail-sidebar__item-label">Office</span>
+                                        <p class="mb-0">Tumaini Mall, 1st Floor, Suite 108<br>Ring Road – Milimani, Kisumu City</p>
+                                    </div>
+                                </li>
+                                <li class="service-detail-sidebar__item">
+                                    <span class="service-detail-sidebar__item-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
+                                    <div>
+                                        <span class="service-detail-sidebar__item-label">Hours</span>
+                                        <p class="mb-0">Mon–Fri: 8:00 am – 5:30 pm<br>Sat: 9:30 am – 1:00 pm</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {% if other_services %}
+                        <div class="service-detail-sidebar__card service-detail-sidebar__card--services">
+                            <h2 class="service-detail-sidebar__title">Other Services</h2>
+                            <nav class="service-detail-pills" aria-label="Other practice areas">
+                                {% for other_service in other_services %}
+                                <a href="{{ url_for('main.service_detail', slug=other_service.slug) }}" class="service-detail-pill">{{ other_service.title }}</a>
+                                {% endfor %}
+                            </nav>
+                            <a href="{{ url_for('main.services') }}" class="service-detail-sidebar__all link-arrow">View all services</a>
+                        </div>
+                        {% endif %}
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+</article>
+
+<section class="cta-section service-detail-cta">
     <div class="container text-center">
+        <span class="section-eyebrow">Get in Touch</span>
         <h2 class="mb-4">Ready to Get Started?</h2>
+        <p class="lead mb-4 section-subtitle">Speak with our advocates about your {{ service.title|lower }} needs and the best path forward.</p>
         <a href="{{ url_for('contact.contact', service=service.id) }}" class="btn btn-white btn-lg">Contact Us Now</a>
     </div>
 </section>

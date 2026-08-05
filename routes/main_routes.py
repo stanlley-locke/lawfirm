@@ -43,11 +43,16 @@ def services():
 def service_detail(slug):
     service = Service.query.filter_by(slug=slug, is_active=True).first_or_404()
     related_cases = CaseStudy.query.filter_by(service_id=service.id, is_active=True).all()
+    other_services = Service.query.filter(
+        Service.is_active == True,  # noqa: E712
+        Service.id != service.id,
+    ).order_by(Service.display_order).all()
     return render_template(
         'service_detail.html',
         title=service.title,
         service=service,
         related_cases=related_cases,
+        other_services=other_services,
     )
 
 

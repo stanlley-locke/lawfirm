@@ -10,6 +10,10 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
 
 
+class OTPForm(FlaskForm):
+    code = StringField('Verification Code', validators=[DataRequired(), Length(min=6, max=6)])
+
+
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
     email = StringField('Email', validators=[DataRequired(), Email()])

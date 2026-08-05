@@ -118,16 +118,66 @@ def test_public_case_tracker(client, app):
 def test_client_portal_login_and_dashboard(client, app):
     from models import User
     from extensions import db
-    
+    from utils.otp import get_last_generated_code_for_testing
+
     with app.app_context():
         c = User(username='testclient2', email='client2@test.com', is_admin=False)
         c.set_password('pass123')
         db.session.add(c)
         db.session.commit()
-        
+
     response = client.post('/client/login', data={'username': 'testclient2', 'password': 'pass123'}, follow_redirects=True)
     assert response.status_code == 200
+    assert b'Verify' in response.data or b'verification' in response.data.lower()
+
+    code = get_last_generated_code_for_testing()
+    assert code is not None
+
+    response = client.post('/client/verify-otp', data={'code': code}, follow_redirects=True)
+    assert response.status_code == 200
     assert b'matters' in response.data or b'Matters' in response.data or b'Client Dashboard' in response.data
+
+
+def test_otp_flow_incorrect_code_then_correct(client, app):
+    from models import User
+    from extensions import db
+    from utils.otp import get_last_generated_code_for_testing
+
+    with app.app_context():
+        c = User(username='otpuser', email='otpuser@test.com', is_admin=False)
+        c.set_password('pass123')
+        db.session.add(c)
+        db.session.commit()
+
+    response = client.post('/client/login', data={'username': 'otpuser', 'password': 'pass123'})
+    assert response.status_code == 302
+
+    # Wrong code should not log the user in and should show an error.
+    response = client.post('/client/verify-otp', data={'code': '000000'}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Incorrect' in response.data or b'incorrect' in response.data.lower()
+
+    # The correct code should complete login.
+    code = get_last_generated_code_for_testing()
+    response = client.post('/client/verify-otp', data={'code': code}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Client Dashboard' in response.data or b'Matters' in response.data
+
+
+def test_otp_resend_rate_limited(client, app):
+    from models import User
+    from extensions import db
+
+    with app.app_context():
+        c = User(username='otpresend', email='otpresend@test.com', is_admin=False)
+        c.set_password('pass123')
+        db.session.add(c)
+        db.session.commit()
+
+    client.post('/client/login', data={'username': 'otpresend', 'password': 'pass123'})
+    response = client.post('/client/resend-otp', follow_redirects=True)
+    assert response.status_code == 200
+    assert b'wait' in response.data.lower()
 
 
 def test_document_generator(admin_client):
