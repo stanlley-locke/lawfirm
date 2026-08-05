@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint, render_template, request, jsonify, session, current_app,
-    send_file, abort,
+    send_file, abort, url_for,
 )
 from flask_login import current_user, login_required
 from flask_socketio import emit, join_room, leave_room
@@ -14,7 +14,7 @@ from reportlab.pdfgen import canvas
 
 from extensions import db, socketio
 from models import User, ChatMessage, ChatRoom, CannedResponse, ChatSetting
-from utils.email_utils import send_email, escape_html
+from utils.email_utils import send_template_email
 from utils.security import (
     user_can_access_room, socketio_authenticated_admin, reject_socket,
     is_within_business_hours,
@@ -30,8 +30,8 @@ def _serialize_message(msg):
         'content': msg.content,
         'is_from_client': msg.is_from_client,
         'client_name': msg.client_name if msg.is_from_client else None,
-        'user': msg.user.username if msg.user else None,
-        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        'user': msg.user.username if getattr(msg, 'user', None) else None,
+        'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S') if msg.timestamp else '',
         'is_read': msg.is_read,
     }
     if msg.attachment_filename:
@@ -44,20 +44,25 @@ def _notify_admin_new_message(chat_room, message):
     admin_email = current_app.config.get('ADMIN_NOTIFICATION_EMAIL')
     if not admin_email:
         return
-    send_email(
+    send_template_email(
         subject=f"New chat message from {chat_room.client_name or 'Visitor'}",
         recipients=[admin_email],
+        template_name='emails/notification.html',
         text_body=(
             f"New chat message in room {chat_room.room_id}:\n\n"
             f"From: {chat_room.client_name} ({chat_room.client_email})\n"
             f"Message: {message.content}\n"
         ),
-        html_body=(
-            f"<p><strong>Room:</strong> {escape_html(chat_room.room_id)}</p>"
-            f"<p><strong>From:</strong> {escape_html(chat_room.client_name)} "
-            f"({escape_html(chat_room.client_email)})</p>"
-            f"<p><strong>Message:</strong> {escape_html(message.content)}</p>"
-        ),
+        context={
+            'heading': 'New Live Chat Message',
+            'body': (
+                f"Room: {chat_room.room_id}\n"
+                f"From: {chat_room.client_name} ({chat_room.client_email})\n\n"
+                f"Message:\n{message.content}"
+            ),
+            'action_url': url_for('chat.admin_chats', _external=True),
+            'action_label': 'Open Live Chats',
+        },
     )
 
 
@@ -469,10 +474,16 @@ def export_chat_email(room_id):
         sender = msg.client_name if msg.is_from_client else (msg.user.username if msg.user else 'Staff')
         lines.append(f"[{msg.timestamp.strftime('%Y-%m-%d %H:%M')}] {sender}: {msg.content}")
 
-    send_email(
+    transcript_text = '\n'.join(lines)
+    send_template_email(
         subject=f'Chat transcript: {chat_room.client_name or room_id}',
         recipients=[recipient],
-        text_body='\n'.join(lines),
+        template_name='emails/notification.html',
+        text_body=transcript_text,
+        context={
+            'heading': f'Chat Transcript — {chat_room.client_name or room_id}',
+            'body': transcript_text,
+        },
     )
     return jsonify({'success': True})
 
@@ -638,7 +649,6 @@ def handle_chat_start_notifications(chat_room):
     from utils.security import is_within_business_hours
     from models import User, ChatMessage
     from extensions import db
-    from utils.email_utils import send_email
 
     admin_email = current_app.config.get('ADMIN_NOTIFICATION_EMAIL')
     if not admin_email:
@@ -676,10 +686,17 @@ def handle_chat_start_notifications(chat_room):
             f"View chat logs here:\n{admin_chats_link}"
         )
         try:
-            send_email(
+            send_template_email(
                 subject=f"Off-Hours Chat Request from {chat_room.client_name or 'Visitor'}",
                 recipients=[admin_email],
-                text_body=email_body
+                template_name='emails/notification.html',
+                text_body=email_body,
+                context={
+                    'heading': 'Off-Hours Chat Request',
+                    'body': email_body,
+                    'action_url': admin_chats_link,
+                    'action_label': 'Open Live Chats',
+                },
             )
         except Exception as e:
             current_app.logger.error(f"Failed to send off-hours email to admin: {e}")
@@ -705,10 +722,17 @@ def handle_chat_start_notifications(chat_room):
             f"Please log in to respond:\n{admin_chats_link}"
         )
         try:
-            send_email(
+            send_template_email(
                 subject=f"UNANSWERED CHAT: Live Chat Request from {chat_room.client_name or 'Visitor'}",
                 recipients=[admin_email],
-                text_body=email_body
+                template_name='emails/notification.html',
+                text_body=email_body,
+                context={
+                    'heading': 'Unanswered Live Chat Request',
+                    'body': email_body,
+                    'action_url': admin_chats_link,
+                    'action_label': 'Open Live Chats',
+                },
             )
         except Exception as e:
             current_app.logger.error(f"Failed to send missed chat email to admin: {e}")

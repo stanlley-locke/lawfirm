@@ -139,7 +139,7 @@ def create_app(config_name=None):
             "https://fonts.googleapis.com; "
             "img-src 'self' data: https:; "
             "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
-            "connect-src 'self' ws: wss: https://cdn.tiny.cloud https://cdn.jsdelivr.net; "
+            "connect-src 'self' ws: wss: https://cdn.tiny.cloud https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
             "frame-src https://www.google.com https://maps.google.com https://calendly.com; "
             "object-src 'none'; "
             "base-uri 'self'; "
