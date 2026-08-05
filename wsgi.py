@@ -2,9 +2,6 @@
 
 Monkey-patch MUST run before any Flask/SQLAlchemy imports.
 """
-import eventlet
-
-eventlet.monkey_patch()
 
 from app import create_app  # noqa: E402
 

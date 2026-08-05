@@ -72,6 +72,7 @@ def handle_connect():
         current_user.is_online = True
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+        join_room('admin_updates')
         return True
     if session.get('chat_room'):
         return True
@@ -175,7 +176,18 @@ def handle_message(data):
     if is_from_client and chat_room:
         _notify_admin_new_message(chat_room, chat_message)
 
-    emit('message', _serialize_message(chat_message), room=room)
+    msg_data = _serialize_message(chat_message)
+    emit('message', msg_data, room=room)
+
+    # Broadcast to all admins for sidebar update
+    emit('admin_chat_update', {
+        'room': room,
+        'message': msg_data,
+        'client_name': chat_room.client_name if chat_room else None,
+        'client_email': chat_room.client_email if chat_room else None,
+        'assigned_to_id': chat_room.assigned_to_id if chat_room else None,
+        'is_active': chat_room.is_active if chat_room else True
+    }, room='admin_updates')
 
     if is_from_client and not is_within_business_hours(current_app):
         auto_reply = (
@@ -244,6 +256,14 @@ def start_chat():
     db.session.commit()
     
     handle_chat_start_notifications(chat_room)
+    
+    socketio.emit('new_chat_started', {
+        'room': room_id,
+        'client_name': name,
+        'client_email': email,
+        'timestamp': datetime.utcnow().strftime('%H:%M'),
+        'last_message_content': 'Started chat session.'
+    }, room='admin_updates')
     
     return jsonify({'success': True, 'room_id': room_id})
 

@@ -375,6 +375,14 @@
                     }
                 }
             });
+
+            socket.on('admin_chat_update', (data) => {
+                updateSidebarRoom(data);
+            });
+
+            socket.on('new_chat_started', (data) => {
+                addNewSidebarRoom(data);
+            });
         }
 
         // Load a chat room dynamic message content
@@ -459,9 +467,11 @@
             msgDiv.className = `d-flex flex-column mb-3 ${isClient ? 'align-items-start' : 'align-items-end'}`;
             
             const contentDiv = document.createElement('div');
-            contentDiv.className = `p-3 rounded shadow-sm text-start ${isClient ? 'bg-light text-dark' : 'bg-primary text-white'}`;
+            contentDiv.className = `p-3 shadow-sm text-start ${isClient ? 'bg-white border text-dark' : 'text-white'}`;
+            contentDiv.style.backgroundColor = isClient ? '#ffffff' : '#082068';
             contentDiv.style.maxWidth = '75%';
-            contentDiv.style.borderRadius = isClient ? '18px 18px 18px 0px' : '18px 18px 0px 18px';
+            contentDiv.style.borderRadius = isClient ? '20px 20px 20px 0px' : '20px 20px 0px 20px';
+            contentDiv.style.fontSize = '0.95rem';
             
             // Plain text or attachments content
             if (data.attachment_url) {
@@ -570,9 +580,14 @@
         // Canned replies select change
         document.getElementById('activeCannedSelect').addEventListener('change', function() {
             if (this.value) {
-                messageInput.value = this.value;
+                if (socket && activeRoomId) {
+                    socket.emit('message', {
+                        room: activeRoomId,
+                        message: this.value,
+                        is_from_client: false
+                    });
+                }
                 this.value = '';
-                messageInput.focus();
             }
         });
 
@@ -725,7 +740,7 @@
             document.getElementById('cannedId').value = '';
         });
 
-        // --- Active Hours / Settings handlers ---
+        // Active Hours / Settings handlers
         const settingsForm = document.getElementById('chatSettingsForm');
         settingsForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -734,7 +749,7 @@
             const daysVal = this.querySelector('input[name="business_hours_days"]').value;
             const tzVal = this.querySelector('input[name="business_hours_tz"]').value;
             const msgVal = this.querySelector('textarea[name="closed_message"]').value;
-
+            
             fetch('/admin/chat/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
@@ -754,6 +769,90 @@
             })
             .catch(err => console.error(err));
         });
+
+        // --- Real-time sidebar update helpers ---
+        function updateSidebarRoom(data) {
+            const listId = data.is_active ? 'activeRoomList' : 'archivedRoomList';
+            const list = document.getElementById(listId);
+            if (!list) return;
+
+            let item = list.querySelector(`.chat-room-item[data-room-id="${data.room}"]`);
+            if (!item) {
+                return;
+            }
+
+            const contentP = item.querySelector('p.text-muted');
+            if (contentP) contentP.textContent = data.message.content;
+
+            const timeSmall = item.querySelector('small.text-muted.font-monospace');
+            if (timeSmall) {
+                const parts = data.message.timestamp.split(' ');
+                timeSmall.textContent = parts.length > 1 ? parts[1].substring(0, 5) : data.message.timestamp;
+            }
+
+            if (data.room !== activeRoomId && data.message.is_from_client) {
+                let badge = item.querySelector('.badge.bg-primary');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge bg-primary rounded-circle ms-2 px-2 py-1';
+                    badge.style.fontSize = '0.7rem';
+                    badge.textContent = '1';
+                    item.appendChild(badge);
+                    
+                    const nameH6 = item.querySelector('h6');
+                    if (nameH6) nameH6.classList.add('text-primary');
+                } else {
+                    badge.textContent = parseInt(badge.textContent) + 1;
+                }
+            }
+
+            list.prepend(item);
+        }
+
+        function addNewSidebarRoom(data) {
+            const list = document.getElementById('activeRoomList');
+            if (!list) return;
+
+            const placeholder = list.querySelector('.text-center.py-5.text-muted');
+            if (placeholder) placeholder.remove();
+
+            const name = data.client_name || 'Anonymous';
+            const email = data.client_email || '';
+            const nameLen = name.length;
+            const colors = ['#082068', '#10b981', '#7c3aed', '#db2777', '#ea580c', '#0284c7', '#0d9488'];
+            const colorIdx = (nameLen + 3) % 7;
+            const initials = name.charAt(0).toUpperCase() + (name.length > 1 ? name.charAt(1).toUpperCase() : '');
+
+            const btn = document.createElement('button');
+            btn.className = 'list-group-item list-group-item-action d-flex align-items-center py-3 border-bottom chat-room-item';
+            btn.setAttribute('data-room-id', data.room);
+            btn.setAttribute('data-client-name', name);
+            btn.setAttribute('data-client-email', email);
+            btn.setAttribute('data-assigned-id', '');
+
+            btn.innerHTML = `
+                <div class="avatar-initials text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px; font-weight: 700; font-size: 0.9rem; background-color: ${colors[colorIdx]} !important;">
+                    ${initials}
+                </div>
+                <div class="w-100 overflow-hidden text-start">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-truncate fw-bold" style="max-width: 70%; font-size: 0.9rem;">${name}</h6>
+                        <small class="text-muted font-monospace" style="font-size: 0.7rem;">${data.timestamp}</small>
+                    </div>
+                    <p class="mb-0 small text-truncate text-muted" style="font-size: 0.75rem;">${data.last_message_content}</p>
+                </div>
+            `;
+
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.chat-room-item').forEach(i => i.classList.remove('active', 'bg-primary', 'text-white'));
+                this.classList.add('active');
+                const unreadBadge = this.querySelector('.badge');
+                if (unreadBadge) unreadBadge.remove();
+                loadRoom(this.getAttribute('data-room-id'), this.getAttribute('data-client-name'), this.getAttribute('data-client-email'), this.getAttribute('data-assigned-id'));
+            });
+
+            list.prepend(btn);
+        }
     });
 </script>
 {% endblock %}

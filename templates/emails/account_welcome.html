@@ -2,20 +2,20 @@
 {% block email_title %}Welcome to {{ app_name }}{% endblock %}
 {% block preheader %}Your {{ app_name }} portal account is ready.{% endblock %}
 {% block content %}
-<h1 style="margin:0 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size:20px; color:#082068;">Welcome, {{ user.username }}</h1>
-<p style="margin:0 0 20px;">An account has been created for you on the {{ app_name }} portal as a <strong>{{ role_name }}</strong>.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0F4FA; margin:0 0 24px;">
+<h1 style="margin:0 0 16px; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size:24px; color:#082068; font-weight:600;">Welcome, {{ user.username }}</h1>
+<p style="margin:0 0 24px;">An account has been created for you on the {{ app_name }} portal as a <strong>{{ role_name }}</strong>.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8FAFC; margin:0 0 28px; border-radius:6px; border:1px solid #E2E8F0;">
 <tr>
-<td style="padding:18px 20px; font-size:14px; color:#333333;">
-<p style="margin:0 0 10px;"><strong>Username:</strong> {{ user.username }}</p>
-<p style="margin:0;"><strong>Temporary Password:</strong> <span style="font-family:'Courier New', Courier, monospace; background:#E2E8F0; padding:2px 6px;">{{ temp_password }}</span></p>
+<td style="padding:24px 28px; font-size:15px; color:#334155;">
+<p style="margin:0 0 12px;"><strong>Username:</strong> {{ user.username }}</p>
+<p style="margin:0;"><strong>Temporary Password:</strong> <span style="font-family:'Courier New', Courier, monospace; background:#E2E8F0; padding:4px 8px; border-radius:4px; font-weight:600;">{{ temp_password }}</span></p>
 </td>
 </tr>
 </table>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 26px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 32px;">
 <tr>
-<td bgcolor="#082068" style="background-color:#082068; border-radius:2px;">
-<a href="{{ login_url }}" style="display:inline-block; padding:12px 28px; color:#FFFFFF; text-decoration:none; font-weight:bold; font-size:14px; font-family: Arial, Helvetica, sans-serif;">Go to Portal &rarr;</a>
+<td bgcolor="#082068" style="background-color:#082068; border-radius:6px; box-shadow: 0 2px 4px rgba(8, 32, 104, 0.2);">
+<a href="{{ login_url }}" style="display:inline-block; padding:14px 32px; color:#FFFFFF; text-decoration:none; font-weight:600; font-size:15px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;">Go to Portal &rarr;</a>
 </td>
 </tr>
 </table>
