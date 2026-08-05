@@ -2,7 +2,7 @@ services:
   - type: web
     name: lawfirm
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && flask db upgrade
     startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT wsgi:app
     envVars:
       - key: FLASK_ENV
