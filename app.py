@@ -60,7 +60,7 @@ def create_app(config_name=None):
     async_mode = 'eventlet' if config_name == 'production' else 'threading'
     socketio.init_app(
         app,
-        cors_allowed_origins=cors_origins,
+        cors_allowed_origins="*",
         async_mode=async_mode,
         ping_timeout=60,
         manage_session=False,
