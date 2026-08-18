@@ -56,7 +56,9 @@ class Config:
     # App metadata
     APP_NAME = os.getenv('APP_NAME', 'Dan Ochieng & Company Advocates')
     BASE_URL = os.getenv('BASE_URL', 'https://danochiengadvocatesllp.com')
-    ALLOWED_ORIGINS = _env_list('ALLOWED_ORIGINS', 'http://localhost:5000,http://127.0.0.1:5000')
+    if os.getenv('RENDER') and 'localhost' in BASE_URL:
+        BASE_URL = 'https://danochiengadvocatesllp.com'
+    ALLOWED_ORIGINS = _env_list('ALLOWED_ORIGINS', 'https://danochiengadvocatesllp.com,http://localhost:5000,http://127.0.0.1:5000')
 
     # Admin bootstrap
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
