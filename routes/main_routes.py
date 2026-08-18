@@ -229,6 +229,18 @@ def sitemap():
     return Response('\n'.join(xml), mimetype='application/xml')
 
 
+@main_bp.route('/robots.txt')
+def robots():
+    base = current_app.config.get('BASE_URL', 'https://www.danochiengadvocates.com').rstrip('/')
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "",
+        f"Sitemap: {base}/sitemap.xml"
+    ]
+    return Response("\n".join(lines), mimetype="text/plain")
+
+
 @main_bp.route('/track-case', methods=['GET', 'POST'])
 def track_case():
     from models import LegalCase

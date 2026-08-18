@@ -10,17 +10,29 @@
     <title>{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}</title>
     <meta name="description" content="{% block meta_description %}Dan Ochieng & Company Advocates — premier full-service law firm in Kisumu and Kwale County, Kenya. Commercial law, civil litigation, land matters, and legal consultancy.{% endblock %}">
     <link rel="canonical" href="{{ base_url }}{{ request.path }}">
-    <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name }}">
+    
+    <!-- OpenGraph / Facebook / LinkedIn -->
+    <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta property="og:description" content="{{ self.meta_description() }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ base_url }}{{ request.path }}">
+    <meta property="og:image" content="{{ base_url }}{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
+    <meta property="og:site_name" content="{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta property="og:locale" content="en_KE">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta name="twitter:description" content="{{ self.meta_description() }}">
+    <meta name="twitter:image" content="{{ base_url }}{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LegalService",
       "name": "Dan Ochieng & Company Advocates",
-      "url": "https://www.danochiengadvocates.com",
-      "telephone": ["+254729116086", "+254734090411"],
-      "email": "danochiengadvocates@gmail.com",
+      "url": "{{ base_url }}",
+      "telephone": ["{{ firm_phone_primary_tel }}", "{{ firm_phone_secondary_tel }}"],
+      "email": "{{ firm_email }}",
       "address": [
         {
           "@type": "PostalAddress",
@@ -75,6 +87,22 @@
       ]
     }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Dan Ochieng & Company Advocates",
+      "url": "{{ base_url }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ base_url }}/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,7 +113,12 @@
 
     {% block head_scripts %}{% endblock %}
 
-    <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <meta name="theme-color" content="#0d3b66">
 </head>
 <body class="{% block body_class %}{% endblock %}">
     {% block navbar %}
