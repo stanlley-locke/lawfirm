@@ -1,6 +1,6 @@
 # Design Reference
 
-Visual direction for the Dan Ochieng & Company Advocates website is based on **client-provided design screenshots** and the **official logo**. These assets are the primary source of truth — not third-party Figma templates.
+Visual direction for the Dan Ochieng Advocates LLP website is based on **client-provided design screenshots** and the **official logo**. These assets are the primary source of truth — not third-party Figma templates.
 
 ## Primary Sources
 

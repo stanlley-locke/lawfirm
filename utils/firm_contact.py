@@ -8,7 +8,7 @@ FIRM_PHONE_PRIMARY_TEL = '+254745819632'
 FIRM_PHONE_SECONDARY = '0734 090 411'
 FIRM_PHONE_SECONDARY_TEL = '+254734090411'
 FIRM_WHATSAPP_NUMBER = '254745819632'
-FIRM_INQUIRY_SUBJECT = 'Legal Inquiry - Dan Ochieng & Company Advocates'
+FIRM_INQUIRY_SUBJECT = 'Legal Inquiry - Dan Ochieng Advocates LLP'
 FIRM_INQUIRY_BODY = (
     'Hello, I would like to inquire about your legal services. '
     'Please contact me at your earliest convenience.'

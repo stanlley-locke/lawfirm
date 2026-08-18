@@ -7,29 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}</title>
-    <meta name="description" content="{% block meta_description %}Dan Ochieng & Company Advocates — premier full-service law firm in Kisumu and Kwale County, Kenya. Commercial law, civil litigation, land matters, and legal consultancy.{% endblock %}">
+    <title>{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng Advocates LLP' }}</title>
+    <meta name="description" content="{% block meta_description %}Dan Ochieng  Advocates LLP — premier full-service law firm in Kisumu and Kwale County, Kenya. Commercial law, civil litigation, land matters, and legal consultancy.{% endblock %}">
     <link rel="canonical" href="{{ base_url }}{{ request.path }}">
     
     <!-- OpenGraph / Facebook / LinkedIn -->
-    <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta property="og:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng Advocates LLP' }}">
     <meta property="og:description" content="{{ self.meta_description() }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ base_url }}{{ request.path }}">
     <meta property="og:image" content="{{ base_url }}{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
-    <meta property="og:site_name" content="{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta property="og:site_name" content="{{ app_name or 'Dan Ochieng Advocates LLP' }}">
     <meta property="og:locale" content="en_KE">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng & Company Advocates' }}">
+    <meta name="twitter:title" content="{% if title %}{{ title }} – {% endif %}{{ app_name or 'Dan Ochieng Advocates LLP' }}">
     <meta name="twitter:description" content="{{ self.meta_description() }}">
     <meta name="twitter:image" content="{{ base_url }}{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.png') }}">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LegalService",
-      "name": "Dan Ochieng & Company Advocates",
+      "name": "Dan Ochieng Advocates LLP",
       "url": "{{ base_url }}",
       "telephone": ["{{ firm_phone_primary_tel }}", "{{ firm_phone_secondary_tel }}"],
       "email": "{{ firm_email }}",
@@ -91,7 +91,7 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Dan Ochieng & Company Advocates",
+      "name": "Dan Ochieng Advocates LLP",
       "url": "{{ base_url }}",
       "potentialAction": {
         "@type": "SearchAction",
@@ -127,7 +127,7 @@
             <div class="doa-navbar-inner px-3 px-lg-4">
                 <a class="navbar-brand doa-brand" href="{{ url_for('main.index') }}">
                     <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}"
-                         alt="Dan Ochieng & Company Advocates"
+                         alt="Dan Ochieng Advocates LLP"
                          class="doa-brand-logo"
                          width="46" height="46">
                     <span class="doa-brand-name">Dan Ochieng &amp; Company Advocates</span>
@@ -506,7 +506,7 @@
                 <div class="col-12 col-lg-3 footer__brand-col">
                     <div class="footer-brand">
                         <img src="{{ url_for('static', filename='images/logo/dan_ochieng_advocates_logo.webp') }}"
-                             alt="Dan Ochieng & Company Advocates">
+                             alt="Dan Ochieng Advocates LLP">
                         <div class="footer-brand-name">Dan Ochieng &amp; Company Advocates</div>
                         <p class="footer-tagline">Commercial, Civil Litigation &amp; Legal Consultancy</p>
                     </div>

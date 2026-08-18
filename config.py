@@ -54,7 +54,7 @@ class Config:
     ADMIN_NOTIFICATION_EMAIL = os.getenv('ADMIN_NOTIFICATION_EMAIL', 'danochiengadvocates@gmail.com')
 
     # App metadata
-    APP_NAME = os.getenv('APP_NAME', 'Dan Ochieng & Company Advocates')
+    APP_NAME = os.getenv('APP_NAME', 'Dan Ochieng Advocates LLP')
     BASE_URL = os.getenv('BASE_URL', 'https://danochiengadvocatesllp.com')
     if os.getenv('RENDER') and 'localhost' in BASE_URL:
         BASE_URL = 'https://danochiengadvocatesllp.com'

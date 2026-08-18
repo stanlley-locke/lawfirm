@@ -526,7 +526,7 @@ def new_user():
 
         text_body = (
             f"Hello {user.username},\n\n"
-            f"An account has been created for you on the Dan Ochieng & Company Advocates portal.\n\n"
+            f"An account has been created for you on the Dan Ochieng Advocates LLP portal.\n\n"
             f"Here are your login credentials:\n"
             f"Role: {role_name}\n"
             f"Username: {user.username}\n"
@@ -890,7 +890,7 @@ def generate_document():
             story.append(Spacer(1, 30))
             story.append(Paragraph("Yours faithfully,", body_style))
             story.append(Spacer(1, 10))
-            story.append(Paragraph(f"___________________________<br/><b>{advocate}</b><br/>For: Dan Ochieng & Company Advocates", body_style))
+            story.append(Paragraph(f"___________________________<br/><b>{advocate}</b><br/>For: Dan Ochieng Advocates LLP", body_style))
             
         doc.build(story)
         buffer.seek(0)

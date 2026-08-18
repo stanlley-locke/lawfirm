@@ -403,7 +403,7 @@ def _seed_blog_posts():
             'title': 'Welcome to Our New Website',
             'slug': 'welcome-new-website',
             'summary': (
-                'Dan Ochieng & Company Advocates launches an updated online presence '
+                'Dan Ochieng Advocates LLP launches an updated online presence '
                 'to serve clients across Kisumu, Kwale County, and Western Kenya.'
             ),
             'content': (

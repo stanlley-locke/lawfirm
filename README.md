@@ -1,4 +1,4 @@
-# Dan Ochieng & Company Advocates — Law Firm Website
+# Dan Ochieng Advocates LLP — Law Firm Website
 
 Flask-based website and admin CMS for a Kisumu, Kenya law firm. Includes contact forms, live chat (SocketIO), blog, case studies, and admin content management.
 
@@ -297,4 +297,4 @@ The implementation uses a **hybrid dark theme** (navy surfaces, gold accents) to
 
 ## License
 
-Private — Dan Ochieng & Company Advocates.
+Private — Dan Ochieng Advocates LLP.

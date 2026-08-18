@@ -80,7 +80,7 @@ def _default_email_context():
         logo_url = f"{base_url}/static/images/logo/dan_ochieng_advocates_logo.webp"
 
     return {
-        'app_name': current_app.config.get('APP_NAME', "Dan Ochieng & Company Advocates"),
+        'app_name': current_app.config.get('APP_NAME', "Dan Ochieng Advocates LLP"),
         'current_year': datetime.utcnow().year,
         'logo_url': logo_url,
         'firm_email': firm_contact.FIRM_EMAIL,
