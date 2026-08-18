@@ -231,7 +231,7 @@ def sitemap():
 
 @main_bp.route('/robots.txt')
 def robots():
-    base = current_app.config.get('BASE_URL', 'https://www.danochiengadvocates.com').rstrip('/')
+    base = current_app.config.get('BASE_URL', 'https://danochiengadvocatesllp.com').rstrip('/')
     lines = [
         "User-agent: *",
         "Allow: /",
