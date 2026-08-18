@@ -17,6 +17,26 @@ from utils.sanitize import sanitize_html
 from utils.email_utils import send_template_email
 from utils.uploads import save_upload
 
+import base64
+import io
+from PIL import Image
+
+def _process_photo_to_base64(file_storage):
+    """Reads a FileStorage object, compresses it to WebP, and returns a base64 data URI string."""
+    try:
+        img = Image.open(file_storage.stream)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+        img.thumbnail((400, 400), Image.Resampling.LANCZOS)
+        output = io.BytesIO()
+        img.save(output, format='WebP', quality=80)
+        output.seek(0)
+        b64 = base64.b64encode(output.read()).decode('utf-8')
+        return f"data:image/webp;base64,{b64}"
+    except Exception as e:
+        current_app.logger.error(f"Error processing image to base64: {e}")
+        return None
+
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
@@ -170,9 +190,10 @@ def new_team_member():
             is_active=form.is_active.data,
         )
         if form.photo.data:
-            upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'team')
-            stored, _ = save_upload(form.photo.data, upload_dir, current_app.config.get('UPLOAD_EXTENSIONS'))
-            member.photo_filename = stored
+            b64_img = _process_photo_to_base64(form.photo.data)
+            if b64_img:
+                member.photo_url = b64_img
+                member.photo_filename = None
         db.session.add(member)
         db.session.commit()
         flash('Team member created successfully!', 'success')
@@ -200,12 +221,15 @@ def edit_team_member(id):
         team_member.display_order = form.display_order.data
         team_member.is_active = form.is_active.data
         if form.photo.data:
-            upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'team')
-            stored, _ = save_upload(form.photo.data, upload_dir, current_app.config.get('UPLOAD_EXTENSIONS'))
-            team_member.photo_filename = stored
+            b64_img = _process_photo_to_base64(form.photo.data)
+            if b64_img:
+                team_member.photo_url = b64_img
+                team_member.photo_filename = None
         db.session.commit()
         flash('Team member updated successfully!', 'success')
         return redirect(url_for('admin.team'))
+    if form.photo_url.data and form.photo_url.data.startswith('data:image'):
+        form.photo_url.data = ''
     return render_template('admin/team_edit.html', title='Edit Team Member', form=form, team_member=team_member)
 
 

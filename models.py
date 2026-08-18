@@ -97,7 +97,7 @@ class TeamMember(db.Model):
     email = db.Column(db.String(120))
     phone = db.Column(db.String(30))
     practice_number = db.Column(db.String(50))
-    photo_url = db.Column(db.String(255))
+    photo_url = db.Column(db.Text)
     photo_filename = db.Column(db.String(255))
     linkedin = db.Column(db.String(255))
     twitter = db.Column(db.String(255))
